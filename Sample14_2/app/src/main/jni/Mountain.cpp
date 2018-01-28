@@ -15,30 +15,30 @@ Mountain::Mountain()
 
 void Mountain::initVertexData()
 {
-	int vsize = sizeof(mHigh);
-	int rows = sqrt((double)vsize/sizeof(float))-1;
-	int cols = rows;
+	int vsize = sizeof(mHigh); // mHigh来自头文件 一个64*64的二维数组  代表每个点的高度?
+	int rows = sqrt((double)vsize/sizeof(float))-1; // rows = 63
+	int cols = rows; // cols = 63
 
-    vCount = cols*cols*6;
+    vCount = cols*cols*6; // 64*64的点  构成了 63*63个正方形格子  每个格子用6个顶点来表示
 
 	float* vertices = (float*)malloc(vCount*3*sizeof(float));
 
     int count=0;//顶点计数器
      for(int j=0;j<rows;j++)
      {
-     	for(int i=0;i<cols;i++)
+     	for(int i=0;i<cols;i++) // 遍历每个格子  设置每个格子的 两个三角形 共6个顶点的坐标
      	{
     		//计算当前格子左上侧点坐标
-     		float zsx=-UNIT_SIZE*cols/2+i*UNIT_SIZE;
-     		float zsz=-UNIT_SIZE*rows/2+j*UNIT_SIZE;
+     		float zsx=-UNIT_SIZE*cols/2+i*UNIT_SIZE;//zs_x  以整个山地平面中间的格子 对应原点 ; 如果以原点为整个山地平面的左上角 那么山地平面就会往z轴正方向延伸很多...
+     		float zsz=-UNIT_SIZE*rows/2+j*UNIT_SIZE;//zs_z
 
      		vertices[count++]=zsx;
-     		vertices[count++]=mHigh[j][i]*LAND_HIGHEST/255-LAND_HIGH_ADJUST;
+     		vertices[count++]=mHigh[j][i]*LAND_HIGHEST/255-LAND_HIGH_ADJUST;// 高度
      		vertices[count++]=zsz;
 
      		vertices[count++]=zsx;
      		vertices[count++]=mHigh[j+1][i]*LAND_HIGHEST/255-LAND_HIGH_ADJUST;
-     		vertices[count++]=zsz+UNIT_SIZE;
+     		vertices[count++]=zsz+UNIT_SIZE; // UNIT_SIZE = 3  一个格子  UNIT_SIZE*UNIT_SIZE  可以认为是3pix*3pix
 
      		vertices[count++]=zsx+UNIT_SIZE;
      		vertices[count++]=mHigh[j][i+1]*LAND_HIGHEST/255-LAND_HIGH_ADJUST;
