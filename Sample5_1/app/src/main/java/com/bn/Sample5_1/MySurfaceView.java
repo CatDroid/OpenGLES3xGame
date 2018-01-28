@@ -68,7 +68,8 @@ class MySurfaceView extends GLSurfaceView
         	//计算视口的宽高比
         	float ratio= (float) width / height;
             //设置正交投影
-        	MatrixState.setProjectOrtho(-ratio*2, ratio*2, -2, 2,    .2f, 10); // 1f-->0.5f 因为六角形在物体坐标系中 已经距离原点比较远 旋转的时候六角形的外部会调出视觉体
+        	MatrixState.setProjectOrtho(-ratio*2, ratio*2, -2, 2,    .2f, 10);  // 正交投影 near=0没有问题!!
+            // 1f-->0.5f 因为六角形在物体坐标系中 已经距离原点比较远 旋转的时候六角形的外部会调出视觉体
         	//  ratio , -ratio  -1 1 是 长方体视椎体的 近平面 的 Left right top bottom  经过投影后 到 x=[-1,1] y=[-1,1]范围的屏幕上
             //  也就是说这个框出来的区域 要满足 视口(viewport)的宽高比   只要满足视口宽高比 那么实际大小就是影响视角的大小
             //  视角越大 物体越小  因为屏幕就这么大 要显示更大视角的区域
