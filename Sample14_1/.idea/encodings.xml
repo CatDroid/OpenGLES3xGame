@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/bn/sample14_1/GL2JNILib.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/bn/sample14_1/GL2JNIView.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/com/bn/sample14_1/Sample14_1Activity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/jni/gl_code.cpp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/jni/util/FileUtil.cpp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/jni/util/FileUtil.h" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/jni/util/ShaderUtil.cpp" charset="UTF-8" />
+  </component>
+</project>
