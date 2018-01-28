@@ -81,9 +81,9 @@ void Mountain::initShader()
 	sTextureGrassHandle=glGetUniformLocation(mProgram, "sTextureGrass");
 	//石头
 	sTextureRockHandle=glGetUniformLocation(mProgram, "sTextureRock");
-	//x位置
+	// landStartY 低于这个高度 用grass.png纹理     目前 是 0 和 10
 	landStartYYHandle=glGetUniformLocation(mProgram, "landStartY");
-	//x最大
+	// landYSpan 过渡带高度 过渡带用线性插值混合grass和rock     超过landStartY+landYSpan的高度   用rock.png纹理
 	landYSpanHandle=glGetUniformLocation(mProgram, "landYSpan");
 }
 

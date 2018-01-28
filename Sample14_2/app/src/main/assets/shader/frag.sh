@@ -2,7 +2,7 @@
 precision mediump float;							// 给出默认的浮点精度
 
 in vec2 vTextureCoord; 						        // 接收从顶点着色器过来的纹理坐标
-in float currY;								        // 接收从顶点着色器过来的Y坐标
+in float currY;								        // 接收从顶点着色器过来的Y坐标  给到顶点着色器的顶点属性坐标 还是外面传递进来的 没有约束在 -1 1的
 uniform sampler2D sTextureGrass;					// 纹理内容数据（草皮）
 uniform sampler2D sTextureRock;					    // 纹理内容数据（岩石）
 uniform float landStartY;							// 过程纹理起始Y坐标
