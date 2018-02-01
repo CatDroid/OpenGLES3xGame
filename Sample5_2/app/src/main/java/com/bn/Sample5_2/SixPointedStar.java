@@ -130,6 +130,9 @@ public class SixPointedStar
         maPositionHandle = GLES30.glGetAttribLocation(mProgram, "aPosition");
         //获取程序中顶点颜色属性引用id  
         maColorHandle= GLES30.glGetAttribLocation(mProgram, "aColor");
+
+		android.util.Log.d("TOM", maPositionHandle + " " + maColorHandle );
+
         //获取程序中总变换矩阵引用id
         muMVPMatrixHandle = GLES30.glGetUniformLocation(mProgram, "uMVPMatrix");  
     }
