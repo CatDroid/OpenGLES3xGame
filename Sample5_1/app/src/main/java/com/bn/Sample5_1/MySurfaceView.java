@@ -97,7 +97,10 @@ class MySurfaceView extends GLSurfaceView
                                     */);
             }            
             //打开深度检测
-            GLES30.glEnable(GLES30.GL_DEPTH_TEST);
+//            GLES30.glEnable(GLES30.GL_DEPTH_TEST);
+            //  是否打开深度测试 效果会不一样
+            //  如果打开深度测试 那么初始时候 看到的是 ha[0] 在世界坐标系中 最靠近x-y平面 （因为x=0
+            //  关闭深度测试  那么初始化时候  看到的是 Ha[5] 在世界坐标系中 是最远离x-y平面的，而在前面是因为他是最后一个draw上去的
 
             float[] test = new float[16];
             Matrix.setIdentityM(test,0);
