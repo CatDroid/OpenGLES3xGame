@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/main_liner"
+    >
+   <ToggleButton 
+      android:textOff="合理视角"
+      android:textOn="不合理视角" 
+      android:checked="true"
+      android:id="@+id/ToggleButton01" 
+      android:layout_width="fill_parent" 
+      android:layout_height="wrap_content">
+   </ToggleButton>   
+</LinearLayout>
