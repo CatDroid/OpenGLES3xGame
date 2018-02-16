@@ -45,10 +45,14 @@ public class Sample5_13_Activity extends Activity {
  	 		            //调用此方法计算产生透视投影矩阵
  	 		            MatrixState.setProjectFrustum(-ratio*0.7f, ratio*0.7f, -0.7f, 0.7f, 1, 10);
  	 		            //调用此方法产生摄像机观察矩阵
- 	 		            MatrixState.setCamera(0,0.5f,4,0f,0f,0f,0f,1.0f,0.0f);
+//                        MatrixState.setCamera(0, 0.5f, 4,     0f,0f,0f,    0f,1.0f,0.0f);
+ 	 		            MatrixState.setCamera(0, 0.5f, 8,   0f,0f,0f,   0f, 1.0f,0.0f);
+                        // 大视角下 如果摄像头位置跟物体位置相距比较大  还是不会变形的 只会导致物体成像比较小
 
-                        android.util.Log.w("TOM","视角不合适导致变形的情况 垂直视角 fovy = " + 2*Math.atan(ratio*0.7f/1) );
-                        // 1.924942658315621
+                        android.util.Log.w("TOM","视角不合适--导致变形的情况 垂直视角 fovy = " +
+                                            2*Math.atan(ratio*0.7f/1) * 180.0f/Math.PI
+                        );
+                        // 弧度 1.924942658315621  --> 角度 110.29
  	 				}
  	 				else
  	 				{
@@ -56,10 +60,12 @@ public class Sample5_13_Activity extends Activity {
 	 	 	             //调用此方法计算产生透视投影矩阵
 	 	 	             MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 20, 100);
 	 	 	             //调用此方法产生摄像机观察矩阵
-	 	 	             MatrixState.setCamera(0,8f,45,0f,0f,0f,0f,1.0f,0.0f);
+	 	 	             MatrixState.setCamera(0, 8f, 45f,   0f,0f,0f,    0f,1.0f,0.0f  );
 
-                        android.util.Log.w("TOM","视角合适不变形的情况 垂直视角 fovy = " + 2*Math.atan(ratio / 20 ) );
-                        //  0.20441345360727425
+                        android.util.Log.w("TOM","视角合适---不变形的情况 垂直视角 fovy = " +
+                                             2*Math.atan(ratio / 20 ) * 180.0f/Math.PI
+                        );
+                        // 弧度 0.204417425  --> 角度  11.71
  	 				}
  	 			}
              }

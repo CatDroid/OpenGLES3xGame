@@ -1,4 +1,0 @@
-#Thu Feb 08 23:40:19 CST 2018
-base.0=D\:\\Project\\OpenGLES3xGame\\Sample5_13_大视角变形\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\1f\\main
-renamed.0=classes.dex
-file.0=D\:\\Project\\OpenGLES3xGame\\Sample5_13_大视角变形\\app\\build\\intermediates\\transforms\\dex\\debug\\folders\\1000\\1f\\main\\classes.dex
