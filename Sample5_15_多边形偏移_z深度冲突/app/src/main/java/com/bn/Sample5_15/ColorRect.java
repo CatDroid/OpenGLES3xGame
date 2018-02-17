@@ -24,9 +24,9 @@ public class ColorRect
     float[] mColorArray = null;// !!! hhl add !!! 使用顶点常量属性
 	
 	FloatBuffer   mVertexBuffer;//顶点坐标数据缓冲
-	FloatBuffer   mColorBuffer;//顶点着色数据缓冲
+//	FloatBuffer   mColorBuffer;//顶点着色数据缓冲
     int vCount=0;
-    float colors[];
+//    float colors[];
     float vertices[];
     float unitSize=600f;
     
@@ -65,24 +65,24 @@ public class ColorRect
         //顶点坐标数据的初始化================end============================
         
         //顶点着色数据的初始化================begin============================
-        colors=new float[]//顶点颜色值数组，每个顶点4个色彩值RGBA
-        {
-    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
-    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
-    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
-    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
-    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
-    		colorIn[0],colorIn[1],colorIn[2],colorIn[3]
-        };
+//        colors=new float[]//顶点颜色值数组，每个顶点4个色彩值RGBA
+//        {
+//    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
+//    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
+//    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
+//    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
+//    		colorIn[0],colorIn[1],colorIn[2],colorIn[3],
+//    		colorIn[0],colorIn[1],colorIn[2],colorIn[3]
+//        };
 
         mColorArray = colorIn ;
         
         //创建顶点着色数据缓冲
-        ByteBuffer cbb = ByteBuffer.allocateDirect(colors.length*4);
-        cbb.order(ByteOrder.nativeOrder());//设置字节顺序
-        mColorBuffer = cbb.asFloatBuffer();//转换为Float型缓冲
-        mColorBuffer.put(colors);//向缓冲区中放入顶点着色数据
-        mColorBuffer.position(0);//设置缓冲区起始位置
+//        ByteBuffer cbb = ByteBuffer.allocateDirect(colors.length*4);
+//        cbb.order(ByteOrder.nativeOrder());//设置字节顺序
+//        mColorBuffer = cbb.asFloatBuffer();//转换为Float型缓冲
+//        mColorBuffer.put(colors);//向缓冲区中放入顶点着色数据
+//        mColorBuffer.position(0);//设置缓冲区起始位置
         //特别提示：由于不同平台字节顺序不同数据单元不是字节的一定要经过ByteBuffer
         //转换，关键是要通过ByteOrder设置nativeOrder()，否则有可能会出问题
         //顶点着色数据的初始化================end============================
