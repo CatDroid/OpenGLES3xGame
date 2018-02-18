@@ -82,6 +82,7 @@ class MySurfaceView extends GLSurfaceView
 
             //!!!! 启用多边形偏移
             GLES30.glEnable (GLES30.GL_POLYGON_OFFSET_FILL );
+            // GLES30 没有 glPolygonMode([GL_LINE|GL_FILL...]) 设置当前的多边形光栅化方法 GL_FILL 是唯一的
             GLES30.glPolygonOffset ( polygonOffsetFactor, polygonOffsetUnits );
             // !!! factor 计算深度值得比例  units 计算深度值的单位 !!!!
             // 深度偏移值 = m * factor + r * units
