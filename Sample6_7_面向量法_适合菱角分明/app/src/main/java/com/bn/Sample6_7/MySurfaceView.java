@@ -50,12 +50,12 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.pushMatrix(); 
             //绘制立方体
             MatrixState.pushMatrix();
-            MatrixState.translate(-1.2f, 0, 0);
+            MatrixState.translate(-1.2f, 0, 2f);
             cube.drawSelf();    
             MatrixState.popMatrix();       
             //绘制立方体
             MatrixState.pushMatrix();
-            MatrixState.translate(1.2f, 0, 0);
+            MatrixState.translate(1.2f, 0, -2f);
             cube.drawSelf();    
             MatrixState.popMatrix();       
             //恢复现场
