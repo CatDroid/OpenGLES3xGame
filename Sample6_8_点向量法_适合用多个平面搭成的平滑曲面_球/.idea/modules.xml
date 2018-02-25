@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Sample6_8_点向量法_适合用多个平面搭成的平滑曲面_球.iml" filepath="$PROJECT_DIR$/Sample6_8_点向量法_适合用多个平面搭成的平滑曲面_球.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+    </modules>
+  </component>
+</project>
