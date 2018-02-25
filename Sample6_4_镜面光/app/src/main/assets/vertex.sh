@@ -24,7 +24,7 @@ void pointLight(				//定位光光照计算的方法
   vec3 vp= normalize(lightLocation-(uMMatrix*vec4(aPosition,1)).xyz);  
   vp=normalize(vp);//格式化vp
   vec3 halfVector=normalize(vp+eye);	//求视线与光线的”半向量“  光源向量与观察者向量的规范化 之后 求和   刚好就是光源和观察者的中间线
-  float shininess=50.0;				//粗糙度，越小越光滑    
+  float shininess=15.0;				//粗糙度，越小越光滑
   float nDotViewHalfVector=dot(newNormal,halfVector);			//法线与半向量的点积 
   float powerFactor=max(0.0,pow(nDotViewHalfVector,shininess)); 	//镜面反射光强度因子   shader函数: max(a,b)  pow(a,b) a^b
   specular=lightSpecular*powerFactor;    //最终的镜面光强度
