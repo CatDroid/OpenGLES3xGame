@@ -52,13 +52,14 @@ public class Celestial {	//表示星空天球的类
         mVertexBuffer.position(0);//设置缓冲区起始位置
     }
     public void intShader(MySurfaceView mv){    //初始化着色器
+        
     	//加载顶点着色器的脚本内容       
         mVertexShader=ShaderUtil.loadFromAssetsFile("vertex_xk.sh", mv.getResources());
-        ShaderUtil.checkGlError("==ss==");   
+        ShaderUtil.checkGlError("vertex_xk.sh");
         //加载片元着色器的脚本内容
         mFragmentShader=ShaderUtil.loadFromAssetsFile("frag_xk.sh", mv.getResources());  
         //基于顶点着色器与片元着色器创建程序
-        ShaderUtil.checkGlError("==ss==");      
+        ShaderUtil.checkGlError("frag_xk.sh");
         mProgram = createProgram(mVertexShader, mFragmentShader);
         //获取程序中顶点位置属性引用
         maPositionHandle = GLES30.glGetAttribLocation(mProgram, "aPosition");        

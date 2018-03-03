@@ -30,11 +30,11 @@ void pointLight(                // 定位光光照计算的方法
   // Step.1 计算变换后的法向量
   //vec3 normalTarget=aPosition+normal;
   //vec3 newNormal=(uMMatrix*vec4(normalTarget,1)).xyz-(uMMatrix*vec4(aPosition,1)).xyz;
-  vec3 newNormal=mat3(uMMatrix)* normal
+  vec3 newNormal=mat3(uMMatrix)* normal;
   newNormal=normalize(newNormal);
 
   // Step.1+ 计算 表面点在世界坐标系中的位置
-  vec3 model = uMMatrix*vec4(aPosition,1).xyz
+  vec3 model = (uMMatrix*vec4(aPosition,1)).xyz;
 
   // Step.2 计算从表面点到摄像机的向量
   vec3 eye= normalize(uCamera- model );

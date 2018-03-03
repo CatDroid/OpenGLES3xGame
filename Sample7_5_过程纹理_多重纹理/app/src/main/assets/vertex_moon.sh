@@ -32,13 +32,13 @@ void pointLight(					//定位光光照计算的方法
   newNormal=normalize(newNormal);
 
   // 计算表面点 在世界坐标系中的位置 (Mark.1 计算光照 需要使用表面点的世界坐标系,需要用到模型变换矩阵)
-  vec3 model = (uMMatrix*vec4(aPosition,1)).xyz
+  vec3 model = (uMMatrix*vec4(aPosition,1)).xyz;
 
   // 计算从表面点到摄像机的向量
   vec3 eye= normalize(uCamera-model);
 
   // 计算从表面点到光源位置的向量vp
-  vec3 vp= normalize(lightLocation-model).xyz);
+  vec3 vp= normalize((lightLocation-model).xyz);
   vp=normalize(vp);
 
   // 直接得出环境光的最终强度
