@@ -52,7 +52,7 @@ public class Celestial {	//表示星空天球的类
         mVertexBuffer.position(0);//设置缓冲区起始位置
     }
     public void intShader(MySurfaceView mv){    //初始化着色器
-        
+
     	//加载顶点着色器的脚本内容       
         mVertexShader=ShaderUtil.loadFromAssetsFile("vertex_xk.sh", mv.getResources());
         ShaderUtil.checkGlError("vertex_xk.sh");
