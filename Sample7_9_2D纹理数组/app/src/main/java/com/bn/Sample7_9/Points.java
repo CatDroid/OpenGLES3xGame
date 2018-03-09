@@ -90,7 +90,7 @@ public class Points {
 		GLES30.glEnableVertexAttribArray(maPositionHandle);
 		
 		///启用2D纹理数组
-		GLES30.glEnable(GLES30.GL_TEXTURE_2D_ARRAY);  
+		//GLES30.glEnable(GLES30.GL_TEXTURE_2D_ARRAY);
 		
 		//激活纹理
 		GLES30.glActiveTexture(GLES30.GL_TEXTURE0);

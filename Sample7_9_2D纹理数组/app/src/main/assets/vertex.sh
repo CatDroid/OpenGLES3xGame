@@ -8,7 +8,8 @@ void main()
    gl_Position = uMVPMatrix * vec4(aPosition,1); //根据总变换矩阵计算此次绘制此顶点位置
    gl_PointSize=64.0;//设置点精灵对应点的大小
    //vid=float(1);//将顶点编号传递给片元着色器
-   vid= -2.0f ;
+   //vid= -2.0f ;
+   vid = float(gl_VertexID);
 }
 
 /*
