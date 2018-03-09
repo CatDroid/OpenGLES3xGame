@@ -113,12 +113,12 @@ class MySurfaceView extends GLSurfaceView
 		(
 				GLES30.GL_TEXTURE_2D_ARRAY,  //纹理类型
 				0, //纹理的层次
-				GLES30.GL_RGBA8, //纹理颜色分量
+				GLES30.GL_RGBA8 , //纹理颜色分量  也可以是GL_RGBA 内部格式GL_RGBA是为了兼容之前的
 				width, //宽度
 				height, //高度
 				picId.length,//  hhl  数组长度  r方向 代表图片数量
 				0, //纹理边框尺寸
-				GLES30.GL_RGBA, //纹理数据的格式
+				GLES30.GL_RGBA, //纹理数据的格式   这个不可以是GL_RGBA8
 				GLES30.GL_UNSIGNED_BYTE, //纹理数据的数据类型
 	            texels//纹理缓冲
 	    );
