@@ -128,23 +128,7 @@ public class MyMathUtil{
 	static void resolve(final int times,int rowNum,int xnum,double AugMatrix[][])
 	{//分解
 
-		for(int i=times+1;i<=rowNum+xnum;i++) 	// update U
-		{
-			for(int j=times-1;j>=1;j--)
-			{
-				//AugMatrix[times][i]=AugMatrix[times][i]-AugMatrix[times][j]*AugMatrix[j][i];
-				AugMatrix[times][i]-=AugMatrix[times][j]*AugMatrix[j][i];
-			}
 
-			/*
-			   	a[i,j] = Σ(k=1 k<=min{i,j}) l[i,k] * u[k,j]
-
-			   	对于上三角矩阵 j >= i
-
-			   	a[i,j] = ( Σ(k=1 k<=i-1 ) l[i,k] * u[k,j] )  +  l[i,i] u[i,j]   其中 l[i,i] == 1
-
-			 */
-		}
 
 		for(int i=times+1;i<=rowNum;i++) 		// update L
 		{
@@ -168,17 +152,41 @@ public class MyMathUtil{
 
 		}
 
+		for(int i=times+1;i<=rowNum+xnum;i++) 	// update U 和 b  b会成为y的!!!  最后求x的时候 就只要 Ux=y了 !!!
+		{													//因为y的求法 跟u的求法一样 都是依赖该行的l[i][0~i]和 y列的 y[0~i]  和 b[i]
+			for(int j=times-1;j>=1;j--)						// Σ{k 1~i-1 }L[k,1]*y[k] + y[i]  = b[i]
+															// y[i] = b[i] -  Σ{k 1~i-1 }L[k,1]*y[k]  形式上跟
+															// u[i,j] = a[i,j] - Σ{k 1~i-1 }L[i,k] * u[k,j] 一样的 所以可以同时算
+			{
+				//AugMatrix[times][i]=AugMatrix[times][i]-AugMatrix[times][j]*AugMatrix[j][i];
+				AugMatrix[times][i]-=AugMatrix[times][j]*AugMatrix[j][i];
+			}
+
+			/*
+			   	a[i,j] = Σ(k=1 k<=min{i,j}) l[i,k] * u[k,j]
+
+			   	对于上三角矩阵 j >= i
+
+			   	a[i,j] = ( Σ(k=1 k<=i-1 ) l[i,k] * u[k,j] )  +  l[i,i] u[i,j]   其中 l[i,i] == 1
+
+			 */
+		}
+
 	}
 	static void findX(int rowNum,int xnum,double AugMatrix[][])
 	{//求解
+		// 如果 Ax=b  b是两列 x也是两列的话  那么可以看成 x=[x1,x2] Ax=b --> Ax1 = b1 Ax2 = b2
+		// 注意 这里的 AugMatrix[rowNum][rowNum+k] 其实是 y 了  也就是 Ax=b LUx=b  Ly=b  Ux=y  中的y 在前面分解的时候 已经把y的值同时得到了
 		for(int k=1;k<=xnum;k++)
 		{
-			AugMatrix[rowNum][rowNum+k]=AugMatrix[rowNum][rowNum+k]/AugMatrix[rowNum][rowNum];
+
+			AugMatrix[rowNum][rowNum+k]=AugMatrix[rowNum][rowNum+k]/AugMatrix[rowNum][rowNum]; // 最后一个的解
+
 			for(int i=rowNum-1;i>=1;i--)
 			{
 				for(int j=rowNum;j>i;j--)
 				{
-					AugMatrix[i][rowNum+k]=AugMatrix[i][rowNum+k]-AugMatrix[i][j]*AugMatrix[j][rowNum+k];
+					AugMatrix[i][rowNum+k] -= AugMatrix[i][j]*AugMatrix[j][rowNum+k];
 				}
 				AugMatrix[i][rowNum+k]=AugMatrix[i][rowNum+k]/AugMatrix[i][i];
 			}
