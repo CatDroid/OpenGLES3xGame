@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Sample8_7_旋转面技术_曲线生成技术_贝塞尔曲线.iml" filepath="$PROJECT_DIR$/Sample8_7_旋转面技术_曲线生成技术_贝塞尔曲线.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+    </modules>
+  </component>
+</project>
