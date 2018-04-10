@@ -133,12 +133,12 @@ public class LoadUtil
 		      			{	//若集合不存在则创建
 		      				hsn=new HashSet<Normal>();
 		      			}
-		      			//将此点的法向量添加到集合中
+
 		      			//由于Normal类重写了equals方法，因此同样的法向量不会重复出现在此点
-		      			//对应的法向量集合中
+						// ??? 为什么不能重复??? 因为不在一个方向上的法向量相加 得到的平均法向量 是 距离这几个法向量一样
 		      			hsn.add(new Normal(vNormal[0],vNormal[1],vNormal[2]));//将此点的法向量添加到集合中
-		      			//将法向量集合放进HashMap中
-		      			hmn.put(tempInxex, hsn);
+
+		      			hmn.put(tempInxex, hsn);//将法向量集合放进HashMap中
 		      		}
 		      	}		      		
 		    } 
