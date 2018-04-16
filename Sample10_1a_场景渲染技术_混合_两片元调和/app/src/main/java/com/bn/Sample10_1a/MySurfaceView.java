@@ -87,6 +87,8 @@ class MySurfaceView extends GLSurfaceView
 		LoadedObjectVertexNormalAverage qt;
 		LoadedObjectVertexNormalAverage yh;
 		LoadedObjectVertexNormalAverage ch;
+        LoadedObjectVertexNormalAverage myteapot;// hl.he Add:自己用3dsMax生成的茶壶
+
 		TextureRect rect;
         @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		@SuppressLint("InlinedApi")
@@ -147,10 +149,17 @@ class MySurfaceView extends GLSurfaceView
             yh.drawSelf();
             MatrixState.popMatrix();  
 
+//            MatrixState.pushMatrix();//绘制茶壶
+//            MatrixState.translate(0, 0, 10f);
+//            ch.drawSelf();
+//            MatrixState.popMatrix();
+
             MatrixState.pushMatrix();//绘制茶壶
-            MatrixState.translate(0, 0, 10f);
-            ch.drawSelf();
+            MatrixState.translate(0f, 0, 10f);
+            MatrixState.scale(0.5f,0.5f,0.5f);// hl.he Add 太大了
+            myteapot.drawSelf();
             MatrixState.popMatrix();
+
 
             MatrixState.popMatrix();  // scale
 
@@ -216,10 +225,11 @@ class MySurfaceView extends GLSurfaceView
 
             //加载要绘制的物体
             ch=LoadUtil.loadFromFileVertexOnlyAverage("ch.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
-            pm=LoadUtil.loadFromFileVertexOnlyFace("pm.obj", MySurfaceView.this.getResources(),MySurfaceView.this);;
-    		cft=LoadUtil.loadFromFileVertexOnlyFace("cft.obj", MySurfaceView.this.getResources(),MySurfaceView.this);;
-    		qt=LoadUtil.loadFromFileVertexOnlyAverage("qt.obj", MySurfaceView.this.getResources(),MySurfaceView.this);;
-    		yh=LoadUtil.loadFromFileVertexOnlyAverage("yh.obj", MySurfaceView.this.getResources(),MySurfaceView.this);;
+            pm=LoadUtil.loadFromFileVertexOnlyFace("pm.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
+    		cft=LoadUtil.loadFromFileVertexOnlyFace("cft.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
+    		qt=LoadUtil.loadFromFileVertexOnlyAverage("qt.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
+    		yh=LoadUtil.loadFromFileVertexOnlyAverage("yh.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
+            myteapot=LoadUtil.loadFromFileVertexOnlyAverage("teapot.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
     		rect = new TextureRect(MySurfaceView.this, 10, 10);    
         }  
     }
