@@ -157,25 +157,25 @@ class MySurfaceView extends GLSurfaceView
             //打开背面剪裁   
             GLES30.glEnable(GLES30.GL_CULL_FACE);
             //初始化变换矩阵
-            MatrixState.setInitStack();         
+            MatrixState.setInitStack();
+
             //纹理id
             try {
-                rectTexId=BnETC2Util.initTextureETC2("pkm/lgq.pkm",MySurfaceView.this.getResources());
+                //rectTexId=BnETC2Util.initTextureETC2("pkm/lgq.pkm",MySurfaceView.this.getResources());
+                rectTexId=BnETC2Util.initTextureETC2("mypkm/myetc2.pkm",MySurfaceView.this.getResources());
             } catch (Exception e) {
                 e.printStackTrace();
                 return ;
             }
+
             //加载要绘制的物体
             ch=LoadUtil.loadFromFileVertexOnlyAverage("obj/ch.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
-            Log.d("TOM","ch");
             pm=LoadUtil.loadFromFileVertexOnlyFace("obj/pm.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
-            Log.d("TOM","pm");
     		cft=LoadUtil.loadFromFileVertexOnlyFace("obj/cft.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
-            Log.d("TOM","cft");
     		qt=LoadUtil.loadFromFileVertexOnlyAverage("obj/qt.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
-            Log.d("TOM","qt");
     		yh=LoadUtil.loadFromFileVertexOnlyAverage("obj/yh.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
-            Log.d("TOM","yh");
+
+
     		rect = new TextureRect(MySurfaceView.this, 10, 10);
         }  
     }

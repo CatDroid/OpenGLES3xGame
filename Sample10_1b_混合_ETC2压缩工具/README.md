@@ -95,9 +95,9 @@ static const char* kNoCompressExt[] = {
 　　};
 ```
 
-* 只有没有被aapt压缩的assets才能使用openFd 然后可以使用ByteBuffer读取
+* 只有没有被aapt压缩的assets才能使用openFd,然后才可以使用ByteBuffer读取
 ```
-context.getResoxe.getAssets().openFd
+context.getResources().getAssets().openFd
 ```
 
 #### assets使用ByteBuffer读取 注意事项
