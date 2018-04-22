@@ -44,13 +44,15 @@
 ```
 ![smooth对比](http://sol.gfxile.net/interpolation/smoothstep.gif)
 
-* exp^-(density*dist)和exp^-(density*dist)^2
+* exp 
 ![指数雾exp公式](exp_formula.png)
 ![指数雾exp2公式](exp2_formula.png)
 ![指数雾图形](exp.png)
 
 #### OpengGL shader API 内建函数
 
+| 函数名 | 签名 | 作用 | 备注 |
+| --- | --- | --- | --- |
 |length| float length (genType x) | 向量的模/长度 | genType可以是vec2,vec3|
 |distance| float distance(genType p0,genType p1)|向量p0到向量p1的距离| genType可以是vec2,vec3，也可以用lenght(p0-p1)代替|
 |mod| genType mod (genType x, float y) | 求余  | 区别与length，这个是求余数，计算%，不是向量的模 |
