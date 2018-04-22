@@ -26,10 +26,12 @@
 * 最终颜色计算 finalColor = flogFactor * lightColor + (1-flogFactor)*flogColor 
 
 
-#### 各种插值 和球运动轨迹
+#### 各种插值 球运动轨迹
 * http://sol.gfxile.net/interpolation/ 
 
-#### OpenGL 重要函数 平滑过渡函数 平滑埃尔米特差值 指数雾
+#### 埃尔米特插值
+
+#### OpenGL 重要函数 平滑过渡函数 指数雾
 * smoothstep
 ![smoothstep公式](smoothStep_formula.png)
 ![smoothstep图形](smoothstep.png)
@@ -81,6 +83,8 @@
     * 线性雾原理：开始位置到结束位置之间，雾的浓度越来越高，浓度的变化和距离成正比
 
 * https://blog.csdn.net/hb707934728/article/details/78016238
+    * 雾浓度越大，斜线越抖，越快看不清景物
+    * 雾浓度不能是负数
 
 
 #### Unity中的雾效果
