@@ -57,7 +57,7 @@
 #### 图示
 ![树木与旋转角](树木与旋转角.png)
 ![两个位置求旋转角](摄像机位置和树木位置求得旋转角.png)
-
+![摄像头位置更新](摄像头位置更新.png)
 
 #### Demo
 * TreeForDraw只是一个普通的画矩形的Render，外部通过传递textureID和修改MatrixState改变Render行为，矩形大小是 UNIT_SIZE*3,UNIT_SIZE*5 在xoy平面原点处
