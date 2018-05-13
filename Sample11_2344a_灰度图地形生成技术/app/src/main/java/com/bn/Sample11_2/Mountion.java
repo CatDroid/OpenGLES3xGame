@@ -5,10 +5,12 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import android.opengl.GLES30;
 
+import static com.bn.Sample11_2.Constant.CONFIG_TEXTRUE;
+
 public class Mountion
 {
 	//地形网格中每个小格子的尺寸
-	float UNIT_SIZE=1.0f;
+	float UNIT_SIZE=2.0f;
 	
 	//自定义渲染管线的id
 	int mProgram;
@@ -21,7 +23,13 @@ public class Mountion
 	
 	//草地的id
 	int sTextureGrassHandle;
-	
+	//岩石纹理的引用
+	int sTextureRockHandle;
+	//过程纹理起始y坐标的引用
+	int landStartYYHandle;
+	//过程纹理跨度的引用
+	int landYSpanHandle;
+
 	//顶点数据缓冲和纹理坐标数据缓冲
 	FloatBuffer mVertexBuffer;
 	FloatBuffer mTexCoorBuffer; 
@@ -97,8 +105,16 @@ public class Mountion
 	//初始化着色器的方法
 	public void initShader(MySurfaceView mv) 
 	{
-		String mVertexShader=ShaderUtil.loadFromAssetsFile("vertex.sh", mv.getResources());
-		String mFragmentShader=ShaderUtil.loadFromAssetsFile("frag.sh", mv.getResources());
+		String mVertexShader;
+		String mFragmentShader;
+		if(CONFIG_TEXTRUE != Constant.RENDER_TYPE.One_Texture){
+			mVertexShader = ShaderUtil.loadFromAssetsFile("vertex_procedural.sh", mv.getResources());
+			mFragmentShader = ShaderUtil.loadFromAssetsFile("frag_procedural.sh", mv.getResources());
+		}else{ // else  RENDER_TYPE.One_Texture
+			mVertexShader = ShaderUtil.loadFromAssetsFile("vertex.sh", mv.getResources());
+			mFragmentShader = ShaderUtil.loadFromAssetsFile("frag.sh", mv.getResources());
+		}
+
 		//基于顶点着色器与片元着色器创建程序
         mProgram = ShaderUtil.createProgram(mVertexShader, mFragmentShader);
         //获取程序中顶点位置属性引用id  
@@ -109,9 +125,21 @@ public class Mountion
         muMVPMatrixHandle = GLES30.glGetUniformLocation(mProgram, "uMVPMatrix");
         //草地纹理
 		sTextureGrassHandle=GLES30.glGetUniformLocation(mProgram, "vTextureCoord");
+
+		if( CONFIG_TEXTRUE != Constant.RENDER_TYPE.One_Texture ){
+			//草地
+			sTextureGrassHandle=GLES30.glGetUniformLocation(mProgram, "sTextureGrass");
+			//石头
+			sTextureRockHandle=GLES30.glGetUniformLocation(mProgram, "sTextureRock");
+			//x位置
+			landStartYYHandle=GLES30.glGetUniformLocation(mProgram, "landStartY");
+			//x最大
+			landYSpanHandle=GLES30.glGetUniformLocation(mProgram, "landYSpan");
+
+		}
 	}
-	
-	public void drawSelf(int texId)
+
+	public void drawSelf(int texId,int rock_textId)
 	{
 		//指定使用某套着色器程序
    	 	GLES30.glUseProgram(mProgram); 
@@ -146,8 +174,19 @@ public class Mountion
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texId);
 		GLES30.glUniform1i(sTextureGrassHandle, 0);//使用0号纹理
-        
-        //绘制纹理矩形
+
+		if( CONFIG_TEXTRUE != Constant.RENDER_TYPE.One_Texture ) {
+			GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
+			GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, rock_textId);//绑定岩石纹理
+			GLES30.glUniform1i(sTextureRockHandle, 1); //岩石纹理编号为1
+
+			GLES30.glUniform1f(landStartYYHandle, 0);//传送过程纹理起始y坐标
+			GLES30.glUniform1f(landYSpanHandle, 30);//传送过程纹理跨度
+		}
+
+
+
+		//绘制纹理矩形
         GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vCount); 
 	}
 	//自动切分纹理产生纹理数组的方法

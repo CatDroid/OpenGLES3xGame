@@ -20,6 +20,8 @@ public class MySurfaceView extends GLSurfaceView
 	float cx=0;//摄像机x坐标
 	float cz=0;//12 //摄像机z坐标
 	float radium = 12 ; // 摄像机旋转的半径
+	float Offset = radium; // 摄像机位置距离观察点距离
+	final float CameraYPosition = 8.0f; // 摄像机位置高度
 
 	float tx=0;//观察目标点x坐标
 	float tz=0;//观察目标点z坐标
@@ -28,7 +30,7 @@ public class MySurfaceView extends GLSurfaceView
     boolean flag=true;
     float x;
     float y;
-    float Offset=12;
+
 	SceneRenderer mRender;
 	float preX;  
 	float preY;
@@ -102,7 +104,7 @@ public class MySurfaceView extends GLSurfaceView
 		tx=(float)(cx-Math.sin(direction)*Offset);//观察目标点x坐标 
         tz=(float)(cz-Math.cos(direction)*Offset);//观察目标点z坐标     	
         //设置新的摄像机位置
-        MatrixState.setCamera(cx,3,cz,tx,1,tz,0,1,0);
+        MatrixState.setCamera(cx,CameraYPosition,cz,tx,CameraYPosition,tz,0,1,0);
 		return true;
 	}
 	
@@ -111,6 +113,9 @@ public class MySurfaceView extends GLSurfaceView
 		Mountion mountion;//山地地形对象引用
 		//山的纹理id
 		int mountionId;
+		// 石头的纹理id
+		int rockId;
+
 		@Override
 		public void onDrawFrame(GL10 gl)
 		{
@@ -118,8 +123,8 @@ public class MySurfaceView extends GLSurfaceView
             GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
             
             MatrixState.pushMatrix();
-            mountion.drawSelf(mountionId);
-            MatrixState.popMatrix(); 
+			mountion.drawSelf(mountionId,rockId);
+			MatrixState.popMatrix();
 		}
 		@Override
 		public void onSurfaceChanged(GL10 gl, int width, int height)
@@ -129,11 +134,11 @@ public class MySurfaceView extends GLSurfaceView
         	//计算GLSurfaceView的宽高比
             float ratio = (float) width / height;
             //调用此方法计算产生透视投影矩阵
-            MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 1, 100);
+            MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 1, 300); //100  hhl 如果UnitSize改成了2 那么land.png是64*64 就会64*2=128 如果这里还是100的话，远处的山头就很容易消失
             //调用此方法产生摄像机9参数位置矩阵
 			cx = (float)Math.sin(direction)*radium; // hhl 通过修改半径的方法更新摄像头的位置
 			cz = (float)Math.cos(direction)*radium;
-            MatrixState.setCamera(cx,3,cz,tx,1,tz,0,1,0);
+            MatrixState.setCamera(cx,CameraYPosition,cz,tx,CameraYPosition,tz,0,1,0);
 		}
 		@Override
 		public void onSurfaceCreated(GL10 gl, EGLConfig config)
@@ -148,6 +153,11 @@ public class MySurfaceView extends GLSurfaceView
             mountion=new Mountion(MySurfaceView.this,yArray,yArray.length-1,yArray[0].length-1);
             //加载山地地形草皮纹理
             mountionId=initTexture(R.drawable.grass);
+			if(CONFIG_TEXTRUE!=RENDER_TYPE.One_Texture){
+				rockId=initTexture(R.drawable.rock);
+			}
+
+
 		}
     }
 	//生成纹理Id的方法
@@ -155,52 +165,41 @@ public class MySurfaceView extends GLSurfaceView
 	{
 		//生成纹理ID
 		int[] textures = new int[1];
-		GLES30.glGenTextures
-		(
-				1,          //产生的纹理id的数量
-				textures,   //纹理id的数组
-				0           //偏移量
-		);    
+		GLES30.glGenTextures(1, textures, 0);
 		int textureId=textures[0];    
 		GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textureId);
 		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_NEAREST);
 		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
-		//ST方向纹理拉伸方式
 		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_REPEAT);
 		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_REPEAT);		
-        
-        //通过输入流加载图片
+
         InputStream is = this.getResources().openRawResource(drawableId);
         Bitmap bitmapTmp;
-        try 
-        {
+        try {
         	bitmapTmp = BitmapFactory.decodeStream(is);        	
-        } 
-        finally 
-        {
-            try 
-            {
+        } finally {
+            try {
                 is.close();
             } 
-            catch(IOException e) 
-            {
+            catch(IOException e) {
                 e.printStackTrace();
             }
         }   
-        
-        //实际加载纹理
-        GLUtils.texImage2D
-        (
-        		GLES30.GL_TEXTURE_2D,   //纹理类型
+
+        GLUtils.texImage2D( //实际加载纹理
+        		GLES30.GL_TEXTURE_2D, //纹理类型
         		0, 					  //纹理的层次，0表示基本图像层，可以理解为直接贴图
         		bitmapTmp, 			  //纹理图像
         		0					  //纹理边框尺寸
         );   
-        //自动生成Mipmap纹理
-        GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D);
-        //释放纹理图
+
+		if(CONFIG_TEXTRUE == RENDER_TYPE.MipMap_Texture){
+			GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D);//自动生成Mipmap纹理
+		}
+
+
+
         bitmapTmp.recycle();
-        //返回纹理ID
         return textureId;
 	}
 }

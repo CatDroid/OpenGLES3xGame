@@ -7,9 +7,17 @@ import android.graphics.Color;
 
 public class Constant
 {
+	public enum RENDER_TYPE {
+		One_Texture ,
+		Procedural_Texture ,
+		MipMap_Texture,
+	}
+	public static final RENDER_TYPE CONFIG_TEXTRUE = RENDER_TYPE.Procedural_Texture;
+
+
 	public static float[][] yArray;//存储地形顶点高度的数组
 	public static final float LAND_HIGH_ADJUST=-2f;//陆地的高度调整值
-	public static final float LAND_HIGHEST=20f;//陆地最大高差  
+	public static final float LAND_HIGHEST=40f;//陆地最大高差
 	//从灰度图片中加载陆地上每个顶点的高度
 	public static float[][] loadLandforms(Resources resources,int index)
 	{
