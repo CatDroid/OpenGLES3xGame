@@ -29,14 +29,14 @@
     * 对于类 C 的每一个 e1 和 e2 来说，当且仅当 e1.compareTo(e2) == 0 与 e1.equals(e2) 具有相同的 boolean 值时，类 C 的自然排序才叫做与 equals 一致。
     
     
-  Comparator接口
+* Comparator接口
     * Comparator接口其实就是一种策略模式的实践
     * 策略模式定义了一系列的算法，并将每一个算法封装起来，而且使它们还可以相互替换。策略模式让算法独立于使用它的客户而独立变化
     * 它一定要实现compareTo(T o1, T o2) 
     * 将算法和数据分离
         * 类的设计师没有考虑到 Compare 的问题而没有实现 Comparable 接口
         * 为了使用不同的排序标准做准备，比如：升序、降序或其他什么序
-        * 
+
     
 * Arrays.sort 
     * 排序算法：
@@ -66,3 +66,4 @@
 * Desert，一个简单的矩形Render，SurfaceView创建时给定纹理坐标和宽高尺寸*UNIT_SIZE(顶点坐标)，纹理采用GL_REPEAT，纹理坐标超过1.0会重复，通过传递textureID和修改MatrixState改变Render行为，P(全局)*V(全局)*M(只做位移到(0, -2, 0))
 * SurfaceView 创建并上传Desert和SingleTree需要的纹理图，根据触摸位置，调整摄像头位置(半径和旋转角)，所有Tree的旋转方向，对需要混合的Tree计算与摄像头当前的距离并进行Collections.sort排序
 * 半径和水平角度-->改变摄像机位置-->重新计算Tree的朝向(只跟摄像头位置和自己的位置有关)-->计算Tree跟摄像头的距离从而排序-->重新渲染
+* 由于摄像头始终看向原点(0,0,0)，所以在offset(半径)从正到负的时候，会由远到近变成近到远

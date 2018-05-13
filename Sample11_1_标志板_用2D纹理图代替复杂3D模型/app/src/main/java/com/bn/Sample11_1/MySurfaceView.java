@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class MySurfaceView extends GLSurfaceView
@@ -87,16 +88,29 @@ public class MySurfaceView extends GLSurfaceView
 				flag=false;
 			break;
 		}
-		cx=(float)(Math.sin(direction)*Offset);//计算新的摄像机x坐标
-        cz=(float)(Math.cos(direction)*Offset);//计算新的摄像机z坐标 
-        
+
+//		double more = 0;
+//		if( Offset < 0 ) more = Math.PI;
+//		double radium = Math.abs(Offset);
+//		cx=(float)(Math.sin(direction+more)*radium);//计算新的摄像机x坐标
+//		if(Math.abs(cx)< 0.000001 ) cx = 0 ;
+//        cz=(float)(Math.cos(direction+more)*radium);//计算新的摄像机z坐标
+//		Log.d("TOM"," " + Offset +" " + radium + " " + direction + " " + cx + " " + cz );
+
+		cx=(float)(Math.sin(direction)*Offset);
+		cz=(float)(Math.cos(direction)*Offset); // hhl 由于摄像头始终看向原点(0,0,0)，所以在offset从正到负的时候，会由远到近变成近到远
+
         //重新计算所有植物纹理矩形的朝向
         mRender.tg.calculateBillboardDirection();
         
         //将植物列表按照离摄像机的距离由远及近排序
         Collections.sort(mRender.tg.alist);		// hhl SingleTree需要实现Comparable接口compareTo 这是多个物体混合必须做的从远到近排序
+
+		double lockAt_x = cx - 10*Math.sin(direction); // hhl 这样就避免的offset从正到负的时候，远近突然变化
+		double lockAt_z = cz - 10*Math.cos(direction);
+
         //重新设定摄像机位置
-        MatrixState.setCamera(cx,0,cz,  0,0,0,   0,1,0); // hhl 默认摄像头在世界坐标系的(0,0,15)
+        MatrixState.setCamera(cx,0,cz,  (float)lockAt_x,0,(float)lockAt_z,  0,1,0); // hhl 默认摄像头在世界坐标系的(0,0,15)  始终看向原点(0,0,0
 		return true;
 	}
 	
