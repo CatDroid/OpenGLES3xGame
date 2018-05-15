@@ -34,10 +34,26 @@
 * 部分机型要求MipMap的纹理图必须长宽相等，否者不能正确显示
 * Mipmap纹理采样本身也分线性采样和最近点采样
 * OpenGL ES3.1 获取 特定mipmap层的尺寸
-*   glGetTexLevelParameteriv(GL_TEXTURE_2D,MIPMAP_LEVEL, GL_TEXTURE_WIDTH,texDims,0);
+```
+    glGetTexLevelParameteriv(GL_TEXTURE_2D,MIPMAP_LEVEL, GL_TEXTURE_WIDTH,texDims,0);
+```
 * OpenGL ES 读取 特定mipmap层的图像 
-*   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D, textures, MIPMAP_LEVEL);
-*   glReadPixels(x,y,w,h,GL_RGBA,GL_UNSIGNED_BYTE,buffer) 这里可以指定开始位置宽高 不受glViewPoint影响
+```
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D, textures, MIPMAP_LEVEL);
+    glReadPixels(x,y,w,h,GL_RGBA,GL_UNSIGNED_BYTE,buffer) 这里可以指定开始位置宽高 不受glViewPoint影响
+```
+* 产生mipmap纹理
+```
+    glBindTexture(GLES30.GL_TEXTURE_2D, textureId);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameterf(GLES30.GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    GLUtils.texImage2D( GL_TEXTURE_2D,0,orgin256x256,0 );           // 加载原始图片作为纹理 基本图像层 
+    glGenerateMipmap(GL_TEXTURE_2D)                                 // 产生mipmap
+    GLUtils.texImage2D( GL_TEXTURE_2D,1,custom_img128x128,0 );      // 覆盖mipmap的第一层
+    GLUtils.texImage2D( GL_TEXTURE_2D,2,custom_img64x64,0 );        // 覆盖mipmap的第二层
+```
+* 原纹理基本图层256*256(草地),第一层和第二层分别被自定义的128*128,64*64的纹理图替换,效果:
+![自定义mipmap层](custom_mipmap.png)
 
 #### 各种采样方式/过滤方式
 
