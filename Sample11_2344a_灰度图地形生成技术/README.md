@@ -1,11 +1,15 @@
 #### 灰度图地形生成技术
 * 一个灰度图land.png(64*64)的r g b的平均值作为高度，灰度图的宽高决定了地形网格的数目
+
 ![灰度图](app/src/main/res/drawable-hdpi/land.png)
+
 * 灰度图land.png的白色像素 代表海拔最高处
 * 由于灰度图的值是在0~255，转换成高度需要换算：最大高度差*平均值/255 + 最低海拔，高度差20.0f 最低-2.0f
 * Mountion生成顶点坐标，决定了在XOZ平面上的宽高尺寸， 分割成多少个格子由灰度图决定，每个格子大小UNIT_SIZE=2.0f
 * XOZ平面顶点计算:
+
 ![XOZ平面顶点](XOZ平面顶点坐标计算.png)
+
 * 纹理坐标生成
     * 确定S/T轴的最大坐标值(纹理重复的次数) 16.0f
     * 按照灰度图的尺寸生成同样多个格子对应的纹理坐标
@@ -51,7 +55,7 @@
 * GL_后面的参数 为如何在选定的纹理上进行纹理采样
 
 
-#### mip层之间的最邻近与线性插补(三线性过滤)
+#### MIP层之间的选择 最邻近与线性插补(三线性过滤)
 * 假设一张32768x32768的mipmap贴图，当前屏幕分辨率为1024*1024。
 * 眼睛距离物体比较近时，mipmap最大也只可能从1024*1024的Mipmap图层选取texel。
 * 再次，当使用三线性过滤（trilinear）时，最大也只能访问2048*2048的图层选取texel，
@@ -73,3 +77,45 @@
         * 最后的结果作为单个像素值。
         * 这种为了图元中的一个像素，而结合了“两幅纹理”，共8个像素的技术，称为“三线性过滤”
         * 因为它在纹理的三个方向----u、 v和纹理级别上都进行了线性过滤。
+
+#### MIP 深度
+* num_levels = log_2(maxsize) + 1
+* where (for 2D tex, array, cube and cube array) 
+* maxsize = max(width, height)
+
+#### MIP is Much In Little
+* mip实际上是三个拉丁词的首字母：multum in parvo
+* 翻译成英文就是：much in little
+* 其意思也就是说可以在一个纹理对象中生成很多不同尺寸的纹理。
+
+#### 代码调用
+
+
+```
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+gl.generateMipmap(gl.TEXTURE_2D);
+```
+* 还有一种方式，需要你事先生成好不同尺寸的纹理，然后通过 texImage2D 来设置mipmap：
+```
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image_0);
+gl.texImage2D(gl.TEXTURE_2D, 1, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image_1);
+gl.texImage2D(gl.TEXTURE_2D, 2, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image_2);
+```
+* 在上面代码中，我们调用了三次texImage2D，每次传递不同的纹理图片。
+* 注意第二个参数，它是来指定mipmap的level，0表示原始级别，1表示缩小一半的级别、2表示再缩小一半的级别。
+
+* 需要指定纹理缩小时需要采取的采样方式为mipmapping，比如：
+```
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+```
+
+
+#### 对比
+
+![vs](mipmapping-vs.jpg)
+* 使用了mipmap更加平滑了~
+
+
+#### 使用MIPMAP注意
+* 目前测试宽高不一样，在晓龙820上没有问题
+* 目前测试500*256,250*250,500不是2的N次方,在晓龙820上没有问题,250*250第一层mip是125*125
