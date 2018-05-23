@@ -5,12 +5,14 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import android.opengl.GLES30;
 
+import static com.bn.Sample11_2.Constant.BETWEEN_GRASS_AND_ROCK;
 import static com.bn.Sample11_2.Constant.CONFIG_TEXTRUE;
+import static com.bn.Sample11_2.Constant.END_OF_GRASS;
 
 public class Mountion
 {
 	//地形网格中每个小格子的尺寸
-	float UNIT_SIZE=2.0f;
+	float UNIT_SIZE=5.0f;
 	
 	//自定义渲染管线的id
 	int mProgram;
@@ -180,8 +182,8 @@ public class Mountion
 			GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, rock_textId);//绑定岩石纹理
 			GLES30.glUniform1i(sTextureRockHandle, 1); //岩石纹理编号为1
 
-			GLES30.glUniform1f(landStartYYHandle, 0);//传送过程纹理起始y坐标
-			GLES30.glUniform1f(landYSpanHandle, 30);//传送过程纹理跨度
+			GLES30.glUniform1f(landStartYYHandle, END_OF_GRASS);//传送过程纹理起始y坐标
+			GLES30.glUniform1f(landYSpanHandle, BETWEEN_GRASS_AND_ROCK );//传送过程纹理跨度
 		}
 
 

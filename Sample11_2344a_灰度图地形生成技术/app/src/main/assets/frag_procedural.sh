@@ -1,24 +1,24 @@
 #version 300 es
-precision mediump float;							//¸ø³öÄ¬ÈÏµÄ¸¡µã¾«¶È
-in vec2 vTextureCoord; 						//½ÓÊÕ´Ó¶¥µã×ÅÉ«Æ÷¹ıÀ´µÄÎÆÀí×ø±ê
-in float currY;								//½ÓÊÕ´Ó¶¥µã×ÅÉ«Æ÷¹ıÀ´µÄY×ø±ê
-uniform sampler2D sTextureGrass;					//ÎÆÀíÄÚÈİÊı¾İ£¨²İÆ¤£©
-uniform sampler2D sTextureRock;					//ÎÆÀíÄÚÈİÊı¾İ£¨ÑÒÊ¯£©
-uniform float landStartY;							//¹ı³ÌÎÆÀíÆğÊ¼Y×ø±ê
-uniform float landYSpan;							//¹ı³ÌÎÆÀí¿ç¶È
+precision mediump float;							//ç»™å‡ºé»˜è®¤çš„æµ®ç‚¹ç²¾åº¦
+in vec2 vTextureCoord; 						//æ¥æ”¶ä»é¡¶ç‚¹ç€è‰²å™¨è¿‡æ¥çš„çº¹ç†åæ ‡
+in float currY;								//æ¥æ”¶ä»é¡¶ç‚¹ç€è‰²å™¨è¿‡æ¥çš„Yåæ ‡
+uniform sampler2D sTextureGrass;					//çº¹ç†å†…å®¹æ•°æ®ï¼ˆè‰çš®ï¼‰
+uniform sampler2D sTextureRock;					//çº¹ç†å†…å®¹æ•°æ®ï¼ˆå²©çŸ³ï¼‰
+uniform float landStartY;							//è¿‡ç¨‹çº¹ç†èµ·å§‹Yåæ ‡
+uniform float landYSpan;							//è¿‡ç¨‹çº¹ç†è·¨åº¦
 
-out vec4 fragColor;//Êä³öµ½µÄÆ¬ÔªÑÕÉ«
+out vec4 fragColor;//è¾“å‡ºåˆ°çš„ç‰‡å…ƒé¢œè‰²
 void main(){          
-   vec4 gColor=texture(sTextureGrass, vTextureCoord); 	//´Ó²İÆ¤ÎÆÀíÖĞ²ÉÑù³öÑÕÉ«
-   vec4 rColor=texture(sTextureRock, vTextureCoord); 	//´ÓÑÒÊ¯ÎÆÀíÖĞ²ÉÑù³öÑÕÉ«
-   vec4 finalColor;									//×îÖÕÑÕÉ«
+   vec4 gColor=texture(sTextureGrass, vTextureCoord); 	//ä»è‰çš®çº¹ç†ä¸­é‡‡æ ·å‡ºé¢œè‰²
+   vec4 rColor=texture(sTextureRock, vTextureCoord); 	//ä»å²©çŸ³çº¹ç†ä¸­é‡‡æ ·å‡ºé¢œè‰²
+   vec4 finalColor;									//æœ€ç»ˆé¢œè‰²
    if(currY<landStartY){			
-	  finalColor=gColor;	//µ±Æ¬ÔªY×ø±êĞ¡ÓÚ¹ı³ÌÎÆÀíÆğÊ¼Y×ø±êÊ±²ÉÓÃ²İÆ¤ÎÆÀí
+	  finalColor=gColor;	//å½“ç‰‡å…ƒYåæ ‡å°äºè¿‡ç¨‹çº¹ç†èµ·å§‹Yåæ ‡æ—¶é‡‡ç”¨è‰çš®çº¹ç†
    }else if(currY>landStartY+landYSpan){
-	  finalColor=rColor;	//µ±Æ¬ÔªY×ø±ê´óÓÚ¹ı³ÌÎÆÀíÆğÊ¼Y×ø±ê¼Ó¿ç¶ÈÊ±²ÉÓÃÑÒÊ¯ÎÆÀí
+	  finalColor=rColor;	//å½“ç‰‡å…ƒYåæ ‡å¤§äºè¿‡ç¨‹çº¹ç†èµ·å§‹Yåæ ‡åŠ è·¨åº¦æ—¶é‡‡ç”¨å²©çŸ³çº¹ç†
    }else{
-       float currYRatio=(currY-landStartY)/landYSpan;	//¼ÆËãÑÒÊ¯ÎÆÀíËùÕ¼µÄ°Ù·Ö±È
-       finalColor= currYRatio*rColor+(1.0- currYRatio)*gColor;//½«ÑÒÊ¯¡¢²İÆ¤ÎÆÀíÑÕÉ«°´±ÈÀı»ìºÏ
+       float currYRatio=(currY-landStartY)/landYSpan;	//è®¡ç®—å²©çŸ³çº¹ç†æ‰€å çš„ç™¾åˆ†æ¯”
+       finalColor= currYRatio*rColor+(1.0- currYRatio)*gColor;//å°†å²©çŸ³ã€è‰çš®çº¹ç†é¢œè‰²æŒ‰æ¯”ä¾‹æ··åˆ
    } 
-	   fragColor = finalColor; //¸ø´ËÆ¬Ôª×îÖÕÑÕÉ«Öµ    
+	   fragColor = finalColor; //ç»™æ­¤ç‰‡å…ƒæœ€ç»ˆé¢œè‰²å€¼    
 }  
