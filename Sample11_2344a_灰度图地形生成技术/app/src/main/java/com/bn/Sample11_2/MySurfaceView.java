@@ -50,6 +50,9 @@ public class MySurfaceView extends GLSurfaceView
 	SceneRenderer mRender;
 	float preX;  
 	float preY;
+
+	int colsPlusOne ; // 灰度图行列数 用在顶点着色器生成地形
+	int rowsPlusOne ;
 	
 	public MySurfaceView(Context context)
 	{
@@ -131,6 +134,8 @@ public class MySurfaceView extends GLSurfaceView
 		int mountionId;
 		// 石头的纹理id
 		int rockId;
+		// 地形图的纹理id用于顶点着色器生成地形图
+		int landId;
 
 		@Override
 		public void onDrawFrame(GL10 gl)
@@ -139,7 +144,7 @@ public class MySurfaceView extends GLSurfaceView
             GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
             
             MatrixState.pushMatrix();
-			mountion.drawSelf(mountionId,rockId);
+			mountion.drawSelf(mountionId,rockId,landId);
 			MatrixState.popMatrix();
 		}
 		@Override
@@ -164,9 +169,15 @@ public class MySurfaceView extends GLSurfaceView
             //打开深度检测
             GLES30.glEnable(GLES30.GL_DEPTH_TEST);
             MatrixState.setInitStack();
-    		yArray=loadLandforms(MySurfaceView.this.getResources(), R.raw.land);
-            
-            mountion=new Mountion(MySurfaceView.this,yArray,yArray.length-1,yArray[0].length-1);
+
+			if(CONFIG_TEXTRUE==RENDER_TYPE.Using_Texture_In_VertexShader){
+				landId=initTexture(LAND_ID);
+				mountion=new Mountion(MySurfaceView.this,colsPlusOne-1,rowsPlusOne-1);// 减去1是因为横向最后一个 和竖向最低一个 跟前面的一个顶点生成一个矩形/三角形
+			}else{
+				yArray=loadLandforms(MySurfaceView.this.getResources(), R.raw.land);
+				mountion=new Mountion(MySurfaceView.this,yArray,yArray.length-1,yArray[0].length-1);
+			}
+
             //加载山地地形草皮纹理
             mountionId=initTexture(GRASS_R_ID);
 			if(CONFIG_TEXTRUE!=RENDER_TYPE.One_Texture){
@@ -188,8 +199,8 @@ public class MySurfaceView extends GLSurfaceView
 			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST);
 			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
 		}else{
-			//GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR_MIPMAP_LINEAR);
-			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST);
+			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR_MIPMAP_LINEAR);
+			// GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST); // 这样就不会有MIPMAP贴图了
 			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR_MIPMAP_LINEAR);
 		}
 		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_REPEAT);
@@ -327,6 +338,11 @@ public class MySurfaceView extends GLSurfaceView
 			}
 			GLES30.glDeleteFramebuffers(1,offscreen_fbo,0);
 
+		}
+
+		if(CONFIG_TEXTRUE == RENDER_TYPE.Using_Texture_In_VertexShader){
+			colsPlusOne = bitmapTmp.getWidth();
+			rowsPlusOne = bitmapTmp.getHeight();
 		}
 
 

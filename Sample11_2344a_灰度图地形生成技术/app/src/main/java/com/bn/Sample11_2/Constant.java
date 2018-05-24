@@ -10,10 +10,11 @@ public class Constant
 	public final static String TAG = "TOM";
 	public enum RENDER_TYPE {
 		One_Texture ,
-		Procedural_Texture ,
-		MipMap_Texture,
+		Procedural_Texture , // 过渡纹理
+		MipMap_Texture,		 // 使用MIPMAP纹理
+		Using_Texture_In_VertexShader , // 在顶点着色器中使用纹理
 	}
-	public static final RENDER_TYPE CONFIG_TEXTRUE = RENDER_TYPE.MipMap_Texture;
+	public static final RENDER_TYPE CONFIG_TEXTRUE = RENDER_TYPE.Using_Texture_In_VertexShader;
 	public static final boolean USING_MY_MIPMAP = true;
 
 
@@ -24,6 +25,7 @@ public class Constant
 	public static final float BETWEEN_GRASS_AND_ROCK = 20; // 草地和石头过渡带
 	public static final int ROCK_R_ID = R.raw.rock ;// R.raw.rock_500_256; //;
 	public static final int GRASS_R_ID =R.raw.grass; // R.raw.grass_250_250; //
+	public static final int LAND_ID = R.raw.land;
 
 	//从灰度图片中加载陆地上每个顶点的高度
 	public static float[][] loadLandforms(Resources resources,int index)

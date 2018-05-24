@@ -22,6 +22,9 @@ public class Mountion
 	int maPositionHandle;
 	//顶点纹理坐标属性引用id
 	int maTexCoorHandle;
+
+	// 顶点属性 纹理灰度图的坐标
+	int maTexCoorHandle1;
 	
 	//草地的id
 	int sTextureGrassHandle;
@@ -31,18 +34,36 @@ public class Mountion
 	int landStartYYHandle;
 	//过程纹理跨度的引用
 	int landYSpanHandle;
+	//灰度图的id
+	int sTextureLandHandle;
+
+	//陆地的高度调整值
+	int landHighAdjustHandle;
+	//陆地最大高差
+	int landHighestHandle;
 
 	//顶点数据缓冲和纹理坐标数据缓冲
 	FloatBuffer mVertexBuffer;
-	FloatBuffer mTexCoorBuffer; 
+	FloatBuffer mTexCoorBuffer;
+	//灰度图纹理坐标
+	FloatBuffer mTexCoorBuffer1;
 	//地形中顶点的数量
 	int vCount=0;
-	
+
+
 	public Mountion(MySurfaceView mv,float[][] yArray,int rows,int cols)
 	{
 		initVertexData(yArray,rows,cols);
 		initShader(mv);
 	}
+
+	// 顶点着色器 通过每个顶点的灰度图坐标属性  在灰度图贴图texture中获取顶点的高度
+	public Mountion(MySurfaceView mv,int rows,int cols)
+	{
+		initVertexData(rows,cols);
+		initShader(mv);
+	}
+
 	//初始化顶点数据
     public void initVertexData(float[][] yArray,int rows,int cols)
     {
@@ -103,19 +124,91 @@ public class Mountion
         mTexCoorBuffer.put(texCoor);
         mTexCoorBuffer.position(0);
     }
+
+	public void initVertexData(int rows,int cols) {
+		//顶点坐标数据的初始化
+		vCount = cols * rows * 2 * 3;
+		float vertices[] = new float[vCount * 3];
+		int count = 0;//顶点计数器
+		for (int j = 0; j < rows; j++) {
+			for (int i = 0; i < cols; i++) {
+				//计算当前格子左上侧点坐标
+				float zsx = -UNIT_SIZE * cols / 2 + i * UNIT_SIZE;
+				float zsz = -UNIT_SIZE * rows / 2 + j * UNIT_SIZE;
+
+				vertices[count++] = zsx;// 顶点坐标是没有归一化的
+				vertices[count++] = 0;	// 高度会在顶点着色器中通过texture纹理采样得到
+				vertices[count++] = zsz;
+
+				vertices[count++] = zsx;
+				vertices[count++] = 0;
+				vertices[count++] = zsz + UNIT_SIZE;
+
+				vertices[count++] = zsx + UNIT_SIZE;
+				vertices[count++] = 0;
+				vertices[count++] = zsz;
+
+				vertices[count++] = zsx + UNIT_SIZE;
+				vertices[count++] = 0;
+				vertices[count++] = zsz;
+
+				vertices[count++] = zsx;
+				vertices[count++] = 0;
+				vertices[count++] = zsz + UNIT_SIZE;
+
+				vertices[count++] = zsx + UNIT_SIZE;
+				vertices[count++] = 0;
+				vertices[count++] = zsz + UNIT_SIZE;
+			}
+		}
+
+		//创建顶点坐标数据缓冲
+		ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length*4);
+		vbb.order(ByteOrder.nativeOrder());//设置字节顺序
+		mVertexBuffer = vbb.asFloatBuffer();//转换为Float型缓冲
+		mVertexBuffer.put(vertices);//向缓冲区中放入顶点坐标数据
+		mVertexBuffer.position(0);//设置缓冲区起始位置
+
+		//顶点纹理坐标数据的初始化
+		float[] texCoor=generateTexCoor(cols,rows,16.0f);
+		ByteBuffer cbb = ByteBuffer.allocateDirect(texCoor.length*4);
+		cbb.order(ByteOrder.nativeOrder());
+		mTexCoorBuffer = cbb.asFloatBuffer();
+		mTexCoorBuffer.put(texCoor);
+		mTexCoorBuffer.position(0);
+
+
+		//灰度图顶点纹理坐标数据的初始化
+		float[] texCoor_land=generateTexCoor(cols,rows,1.0f); // 这是归一化的 给到顶点着色器 作为每个顶点的属性
+		ByteBuffer cbb1 = ByteBuffer.allocateDirect(texCoor_land.length*4);
+		cbb1.order(ByteOrder.nativeOrder());
+		mTexCoorBuffer1 = cbb1.asFloatBuffer();
+		mTexCoorBuffer1.put(texCoor_land);
+		mTexCoorBuffer1.position(0);
+
+	}
 	
 	//初始化着色器的方法
 	public void initShader(MySurfaceView mv) 
 	{
 		String mVertexShader;
 		String mFragmentShader;
-		if(CONFIG_TEXTRUE != Constant.RENDER_TYPE.One_Texture){
-			mVertexShader = ShaderUtil.loadFromAssetsFile("vertex_procedural.sh", mv.getResources());
-			mFragmentShader = ShaderUtil.loadFromAssetsFile("frag_procedural.sh", mv.getResources());
-		}else{ // else  RENDER_TYPE.One_Texture
-			mVertexShader = ShaderUtil.loadFromAssetsFile("vertex.sh", mv.getResources());
-			mFragmentShader = ShaderUtil.loadFromAssetsFile("frag.sh", mv.getResources());
+		switch (CONFIG_TEXTRUE){
+			case One_Texture:
+				mVertexShader = ShaderUtil.loadFromAssetsFile("vertex.sh", mv.getResources());
+				mFragmentShader = ShaderUtil.loadFromAssetsFile("frag.sh", mv.getResources());
+				break;
+			case Using_Texture_In_VertexShader:
+				mVertexShader = ShaderUtil.loadFromAssetsFile("vertex_texture.sh", mv.getResources());
+				mFragmentShader = ShaderUtil.loadFromAssetsFile("frag_procedural.sh", mv.getResources());
+				break;
+			default:
+				mVertexShader = ShaderUtil.loadFromAssetsFile("vertex_procedural.sh", mv.getResources());
+				mFragmentShader = ShaderUtil.loadFromAssetsFile("frag_procedural.sh", mv.getResources());
+				break;
+
 		}
+
 
 		//基于顶点着色器与片元着色器创建程序
         mProgram = ShaderUtil.createProgram(mVertexShader, mFragmentShader);
@@ -125,8 +218,7 @@ public class Mountion
         maTexCoorHandle= GLES30.glGetAttribLocation(mProgram, "aTexCoor");
         //获取程序中总变换矩阵引用id
         muMVPMatrixHandle = GLES30.glGetUniformLocation(mProgram, "uMVPMatrix");
-        //草地纹理
-		sTextureGrassHandle=GLES30.glGetUniformLocation(mProgram, "vTextureCoord");
+
 
 		if( CONFIG_TEXTRUE != Constant.RENDER_TYPE.One_Texture ){
 			//草地
@@ -138,10 +230,24 @@ public class Mountion
 			//x最大
 			landYSpanHandle=GLES30.glGetUniformLocation(mProgram, "landYSpan");
 
+		}else{
+			//草地纹理
+			sTextureGrassHandle=GLES30.glGetUniformLocation(mProgram, "sTexture");
+		}
+
+		if(CONFIG_TEXTRUE == Constant.RENDER_TYPE.Using_Texture_In_VertexShader){
+			//获取程序中灰度图顶点纹理坐标属性引用id
+			maTexCoorHandle1= GLES30.glGetAttribLocation(mProgram, "aTexLandCoor");
+			//灰度图
+			sTextureLandHandle=GLES30.glGetUniformLocation(mProgram, "sTextureLand");
+			//陆地的高度调整值
+			landHighAdjustHandle=GLES30.glGetUniformLocation(mProgram, "landHighAdjust");
+			//陆地最大高差
+			landHighestHandle=GLES30.glGetUniformLocation(mProgram, "landHighest");
 		}
 	}
 
-	public void drawSelf(int texId,int rock_textId)
+	public void drawSelf(int texId,int rock_textId, int land_texId)
 	{
 		//指定使用某套着色器程序
    	 	GLES30.glUseProgram(mProgram); 
@@ -186,6 +292,18 @@ public class Mountion
 			GLES30.glUniform1f(landYSpanHandle, BETWEEN_GRASS_AND_ROCK );//传送过程纹理跨度
 		}
 
+		if(CONFIG_TEXTRUE == Constant.RENDER_TYPE.Using_Texture_In_VertexShader){
+			GLES30.glVertexAttribPointer ( maTexCoorHandle1,
+							2, GLES30.GL_FLOAT, false, 2*4, mTexCoorBuffer1 );
+			GLES30.glEnableVertexAttribArray(maTexCoorHandle1);
+
+			GLES30.glActiveTexture(GLES30.GL_TEXTURE2);
+			GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, land_texId);
+			GLES30.glUniform1i(sTextureLandHandle, 2);
+
+			GLES30.glUniform1f(landHighAdjustHandle, Constant.LAND_HIGH_ADJUST);
+			GLES30.glUniform1f(landHighestHandle, Constant.LAND_HIGHEST );
+		}
 
 
 		//绘制纹理矩形
@@ -227,4 +345,41 @@ public class Mountion
     	}
     	return result;
     }
+
+
+	public float[] generateTexCoor(int bw,int bh,float size)
+	{
+		float[] result=new float[bw*bh*6*2];
+		float sizew=size/bw;//列数
+		float sizeh=size/bh;//行数
+		int c=0;
+		for(int i=0;i<bh;i++)
+		{
+			for(int j=0;j<bw;j++)
+			{
+				//每行列一个矩形，由两个三角形构成，共六个点，12个纹理坐标
+				float s=j*sizew;
+				float t=i*sizeh;
+
+				result[c++]=s;
+				result[c++]=t;
+
+				result[c++]=s;
+				result[c++]=t+sizeh;
+
+				result[c++]=s+sizew;
+				result[c++]=t;
+
+				result[c++]=s+sizew;
+				result[c++]=t;
+
+				result[c++]=s;
+				result[c++]=t+sizeh;
+
+				result[c++]=s+sizew;
+				result[c++]=t+sizeh;
+			}
+		}
+		return result;
+	}
 }
