@@ -32,6 +32,7 @@
 * Android的View系统一定要是预乘的Bitmap
 ![预乘](Bitmap预乘alpha.png)
 
+
 #### dpi与BitmapFactory.decodeResource
 * drawable-hdpi里面存放高分辨率的图片,如WVGA (480x800),FWVGA (480x854)
 * drawable-mdpi里面存放中等分辨率的图片,如HVGA (320x480)
@@ -49,6 +50,15 @@
     * opts.inTargetDenstiy默认是屏幕的dpi, 荣耀V10/小米5都是480
     * 如果使用raw或者drawable目录，TypedValue.density都是0，结果inDensity会设置为160
     * 结论 scale = 480/160 = 3 放大了3倍,lang.png是64*64，解码后就是192.192
+
+#### 不同资源目录下的获取方式和压缩
+
+|目录 | assets | res/raw | res/drawable |
+| --- | --- | --- | --- |
+| 获取资源方式 | 文件路径+文件名 |R.raw.xxx | R.drawable.xxx
+| 是否被压缩 | NO | NO | YES（失真压缩） |
+| 能否获取子目录下的资源 | YES | NO | NO |
+
 
 #### MIPMAP
 * Mipmap在3D图形学中主要是用来做anti-aliasing，这跟图像学中的概念是一致的：
