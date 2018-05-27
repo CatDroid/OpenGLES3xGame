@@ -12,7 +12,7 @@ import static com.bn.Sample11_2.Constant.END_OF_GRASS;
 public class Mountion
 {
 	//地形网格中每个小格子的尺寸
-	float UNIT_SIZE=5.0f;
+	float UNIT_SIZE=3.0f;
 	
 	//自定义渲染管线的id
 	int mProgram;
@@ -68,14 +68,14 @@ public class Mountion
     public void initVertexData(float[][] yArray,int rows,int cols)
     {
     	//顶点坐标数据的初始化
-    	vCount=cols*rows*2*3;//每个格子两个三角形，每个三角形3个顶点   
+    	vCount=cols*rows*2*3;//每个格子两个三角形，每个三角形3个顶点
         float vertices[]=new float[vCount*3];//存储顶点x、y、z坐标的数组
         int count=0;//顶点计数器
         for(int j=0;j<rows;j++)//遍历地形网格的行
         {
         	for(int i=0;i<cols;i++) //遍历地形网格的列
-        	{        		
-        		//计算当前格子左上侧点坐标 
+        	{
+        		//计算当前格子左上侧点坐标
 //        		float zsx=-UNIT_SIZE*cols/2+i*UNIT_SIZE;
 //        		float zsz=-UNIT_SIZE*rows/2+j*UNIT_SIZE;
 
@@ -86,36 +86,36 @@ public class Mountion
         		vertices[count++]=zsx;
         		vertices[count++]=yArray[j][i];
         		vertices[count++]=zsz;
-        		
+
         		vertices[count++]=zsx;
         		vertices[count++]=yArray[j+1][i];
         		vertices[count++]=zsz+UNIT_SIZE;
-        		
+
         		vertices[count++]=zsx+UNIT_SIZE;
         		vertices[count++]=yArray[j][i+1];
         		vertices[count++]=zsz;
-        		
+
         		vertices[count++]=zsx+UNIT_SIZE;
         		vertices[count++]=yArray[j][i+1];
         		vertices[count++]=zsz;
-        		
+
         		vertices[count++]=zsx;
         		vertices[count++]=yArray[j+1][i];
         		vertices[count++]=zsz+UNIT_SIZE;
-        		
+
         		vertices[count++]=zsx+UNIT_SIZE;
         		vertices[count++]=yArray[j+1][i+1];
         		vertices[count++]=zsz+UNIT_SIZE;
         	}
         }
-		
+
         //创建顶点坐标数据缓冲
         ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length*4);
         vbb.order(ByteOrder.nativeOrder());
         mVertexBuffer = vbb.asFloatBuffer();
         mVertexBuffer.put(vertices);
         mVertexBuffer.position(0);
-        
+
         //顶点纹理坐标数据的初始化
         float[] texCoor=generateTexCoor(cols,rows);
         ByteBuffer cbb = ByteBuffer.allocateDirect(texCoor.length*4);
@@ -256,27 +256,27 @@ public class Mountion
         //将顶点位置数据送入渲染管线
 		GLES30.glVertexAttribPointer
 		(
-			maPositionHandle, 
-			3, 
-			GLES30.GL_FLOAT, 
-			false, 
-			3*4, 
+			maPositionHandle,
+			3,
+			GLES30.GL_FLOAT,
+			false,
+			3*4,
 			mVertexBuffer
 		);
 		//将纹理坐标数据送入渲染管线
 		GLES30.glVertexAttribPointer
 		(
-			maTexCoorHandle, 
-			2, 
-			GLES30.GL_FLOAT, 
-			false, 
-			2*4, 
+			maTexCoorHandle,
+			2,
+			GLES30.GL_FLOAT,
+			false,
+			2*4,
 			mTexCoorBuffer
 		);
 		//启用顶点位置数据数组
         GLES30.glEnableVertexAttribArray(maPositionHandle);  
         //启用纹理坐标数据数组
-        GLES30.glEnableVertexAttribArray(maTexCoorHandle);  
+        GLES30.glEnableVertexAttribArray(maTexCoorHandle);
         
         //绑定纹理
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
@@ -307,12 +307,13 @@ public class Mountion
 
 
 		//绘制纹理矩形
-        GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vCount); 
+        GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vCount);
+
 	}
 	//自动切分纹理产生纹理数组的方法
     public float[] generateTexCoor(int bw,int bh)
     {
-    	float[] result=new float[bw*bh*6*2]; 
+    	float[] result=new float[bw*bh*6*2];
     	float sizew=16.0f/bw;//列数 16.0 分别代表S/T轴的最大坐标值 这样意味着纹理在整个地形中重复了16次
     	float sizeh=16.0f/bh;//行数
     	int c=0;
@@ -323,24 +324,24 @@ public class Mountion
     			//每行列一个矩形，由两个三角形构成，共六个点，12个纹理坐标
     			float s=j*sizew;
     			float t=i*sizeh;
-    			
+
     			result[c++]=s;
     			result[c++]=t;
-    			
-    			result[c++]=s;
-    			result[c++]=t+sizeh;
-    			
-    			result[c++]=s+sizew;
-    			result[c++]=t;
-    			
-    			result[c++]=s+sizew;
-    			result[c++]=t;
-    			
+
     			result[c++]=s;
     			result[c++]=t+sizeh;
-    			
+
     			result[c++]=s+sizew;
-    			result[c++]=t+sizeh;    			
+    			result[c++]=t;
+
+    			result[c++]=s+sizew;
+    			result[c++]=t;
+
+    			result[c++]=s;
+    			result[c++]=t+sizeh;
+
+    			result[c++]=s+sizew;
+    			result[c++]=t+sizeh;
     		}
     	}
     	return result;

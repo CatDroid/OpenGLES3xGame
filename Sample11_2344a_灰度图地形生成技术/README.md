@@ -24,6 +24,31 @@
 #### 顶点着色器中也可以使用texture
 * 顶点的属性，还可以包含纹理图的坐标，每个顶点对应一个纹理坐标
 * 在顶点着色器中使用texture，获取对应纹理图的rgb
+* 顶点着色器在渲染管线开头；片元着色器在光栅化后，纹理采样会根据屏幕像素和纹理大小做MAG MIN
+
+#### Bitmap预乘
+* opt.inPremultiplied = true 默认情况下BitmapFactory解码是预乘的
+* 除非在使用RenderScript或者OpenGL，这样才使用没有预乘的原来的rgba
+* Android的View系统一定要是预乘的Bitmap
+![预乘](Bitmap预乘alpha.png)
+
+#### dpi与BitmapFactory.decodeResource
+* drawable-hdpi里面存放高分辨率的图片,如WVGA (480x800),FWVGA (480x854)
+* drawable-mdpi里面存放中等分辨率的图片,如HVGA (320x480)
+* drawable-ldpi里面存放低分辨率的图片,如QVGA (240x320)
+* openRawResource
+    * TypedValue value = new TypedValue();
+    * resources.openRawResource(id, value);
+    * raw  TypedValue.density = 0
+    * hdpi-drawable TypedValue.density = 240
+    * mdpi-drawable TypedValue.density = 160
+    * ldpi-drawable TypedValue.density = 120
+    * drawable TypedValue.density = 0
+* BitmapFactory.decodeResource
+    * 会根据 opts.inDensity opts.inTargetDensity 计算出缩放比
+    * opts.inTargetDenstiy默认是屏幕的dpi, 荣耀V10/小米5都是480
+    * 如果使用raw或者drawable目录，TypedValue.density都是0，结果inDensity会设置为160
+    * 结论 scale = 480/160 = 3 放大了3倍,lang.png是64*64，解码后就是192.192
 
 #### MIPMAP
 * Mipmap在3D图形学中主要是用来做anti-aliasing，这跟图像学中的概念是一致的：
@@ -170,3 +195,7 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR)
 #### 使用MIPMAP注意
 * 目前测试宽高不一样，在晓龙820上没有问题
 * 目前测试500*256,250*250,500不是2的N次方,在晓龙820上没有问题,250*250第一层mip是125*125
+* 在晓龙820和海思970设置 GL_TEXTURE_MAG_FILTER 任何的MIPMAP 会遇到错误glerror 1280
+* 如果使用mipmap纹理而不调用glGenerateMipmap，将会是黑色的
+
+

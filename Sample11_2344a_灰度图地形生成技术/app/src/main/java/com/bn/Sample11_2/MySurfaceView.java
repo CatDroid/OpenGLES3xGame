@@ -33,11 +33,13 @@ import android.view.MotionEvent;
 public class MySurfaceView extends GLSurfaceView
 {
 	float direction=0;//视线方向
-	float cx=0;//摄像机x坐标
-	float cz=0;//12 //摄像机z坐标
-	float radium = 12 ; // 摄像机旋转的半径
+
+	float radium = 20  ; // 摄像机旋转的半径
 	float Offset = radium; // 摄像机位置距离观察点距离
-	final float CameraYPosition = 10.0f; // 摄像机位置高度
+	float cx=0;//摄像机x坐标
+	float cz= radium;//12 //摄像机z坐标
+	final float CameraYPosition = 5.0f; // 摄像机位置高度
+	final float CameraYLockAt = 1.0f ;  // 摄像机望向的目标高度
 
 	float tx=0;//观察目标点x坐标
 	float tz=0;//观察目标点z坐标
@@ -62,7 +64,7 @@ public class MySurfaceView extends GLSurfaceView
         setRenderer(mRender);					// 设置渲染器
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);// 设置渲染模式为主动渲染
 	}
-	
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
@@ -120,22 +122,20 @@ public class MySurfaceView extends GLSurfaceView
 		cz = (float)Math.cos(direction)*radium;
 
 		//设置新的观察目标点XZ坐标
-		tx=(float)(cx-Math.sin(direction)*Offset);//观察目标点x坐标 
-        tz=(float)(cz-Math.cos(direction)*Offset);//观察目标点z坐标     	
+		tx=(float)(cx-Math.sin(direction)*Offset);//观察目标点x坐标
+        tz=(float)(cz-Math.cos(direction)*Offset);//观察目标点z坐标
         //设置新的摄像机位置
-        MatrixState.setCamera(cx,CameraYPosition,cz,tx,CameraYPosition,tz,0,1,0);
+        MatrixState.setCamera(cx,CameraYPosition,cz,tx,CameraYLockAt,tz,0,1,0);
 		return true;
 	}
 	
 	private class SceneRenderer implements GLSurfaceView.Renderer 
     {
-		Mountion mountion;//山地地形对象引用
-		//山的纹理id
-		int mountionId;
-		// 石头的纹理id
-		int rockId;
-		// 地形图的纹理id用于顶点着色器生成地形图
-		int landId;
+		Mountion mountion;	// 山地地形对象引用
+
+		int mountionId;		// 山的纹理id
+		int rockId;			// 石头的纹理id
+		int landId;			// 地形图的纹理id用于顶点着色器生成地形图
 
 		@Override
 		public void onDrawFrame(GL10 gl)
@@ -150,16 +150,16 @@ public class MySurfaceView extends GLSurfaceView
 		@Override
 		public void onSurfaceChanged(GL10 gl, int width, int height)
 		{
-			//设置视窗大小及位置 
-        	GLES30.glViewport(0, 0, width, height); 
+			//设置视窗大小及位置
+        	GLES30.glViewport(0, 0, width, height);
         	//计算GLSurfaceView的宽高比
             float ratio = (float) width / height;
             //调用此方法计算产生透视投影矩阵
-            MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 1, 600); //100  hhl 如果UnitSize改成了2 那么land.png是64*64 就会64*2=128 如果这里还是100的话，远处的山头就很容易消失
+            MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 1, 300); //100  hhl 如果UnitSize改成了2 那么land.png是64*64 就会64*2=128 如果这里还是100的话，远处的山头就很容易消失
             //调用此方法产生摄像机9参数位置矩阵
 			cx = (float)Math.sin(direction)*radium; // hhl 通过修改半径的方法更新摄像头的位置
 			cz = (float)Math.cos(direction)*radium;
-            MatrixState.setCamera(cx,CameraYPosition,cz,tx,CameraYPosition,tz,0,1,0);
+			MatrixState.setCamera(cx,CameraYPosition,cz,tx,CameraYLockAt,tz,0,1,0);
 		}
 		@Override
 		public void onSurfaceCreated(GL10 gl, EGLConfig config)
@@ -172,9 +172,25 @@ public class MySurfaceView extends GLSurfaceView
 
 			if(CONFIG_TEXTRUE==RENDER_TYPE.Using_Texture_In_VertexShader){
 				landId=initTexture(LAND_ID);
-				mountion=new Mountion(MySurfaceView.this,colsPlusOne-1,rowsPlusOne-1);// 减去1是因为横向最后一个 和竖向最低一个 跟前面的一个顶点生成一个矩形/三角形
+				/*
+				* BitmapFactory.decodeStream 解码出来的是原图大小 64*64
+				* BitmapFactory.decodeResource 解码出来的是缩放的
+				* 								在480dpi的屏幕上，
+				* 								放在 drawable/raw(默认成160dpi) 放大成 192*192
+				* 								ldpi 放大成 256*256
+				* 								hdpi 放大成 128*128
+				* 								mdpi 放大成 192*192
+				*
+				* */
+				Bitmap temp = BitmapFactory.decodeResource(MySurfaceView.this.getResources(), LAND_ID);
+				colsPlusOne = temp.getWidth();
+				rowsPlusOne = temp.getHeight();
+				temp.recycle();
+				temp = null;
+				mountion=new Mountion(MySurfaceView.this,rowsPlusOne-1,colsPlusOne-1);// 减去1是因为横向最后一个 和竖向最低一个 跟前面的一个顶点生成一个矩形/三角形
+
 			}else{
-				yArray=loadLandforms(MySurfaceView.this.getResources(), R.raw.land);
+				yArray=loadLandforms(MySurfaceView.this.getResources(), LAND_ID);
 				mountion=new Mountion(MySurfaceView.this,yArray,yArray.length-1,yArray[0].length-1);
 			}
 
@@ -190,45 +206,62 @@ public class MySurfaceView extends GLSurfaceView
 	//生成纹理Id的方法
 	public int initTexture(int drawableId)
 	{
+
 		//生成纹理ID
 		int[] textures = new int[1];
 		GLES30.glGenTextures(1, textures, 0);
-		int textureId=textures[0];    
+		int textureId=textures[0];
+
 		GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textureId);
-		if(CONFIG_TEXTRUE != RENDER_TYPE.MipMap_Texture) {
-			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST);
-			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
-		}else{
-			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR_MIPMAP_LINEAR);
-			// GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST); // 这样就不会有MIPMAP贴图了
-			GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR_MIPMAP_LINEAR);
+
+		switch(CONFIG_TEXTRUE){
+			case One_Texture:
+			case Procedural_Texture:
+				GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST);
+				GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+				break;
+			case MipMap_Texture:
+			case Using_Texture_In_VertexShader:
+				//GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+				//ShaderUtil.checkGlError("before");
+				GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,
+						GLES30.GL_LINEAR_MIPMAP_LINEAR);   		//使用MipMap线性纹理采样
+				Log.e(TAG,"MAG MIPMAP ERROR = " +GLES30.glGetError());
+				//ShaderUtil.checkGlError("glTexParameteri GL_LINEAR_MIPMAP_LINEAR error ");
+				GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MIN_FILTER,
+						GLES30.GL_LINEAR_MIPMAP_NEAREST);		//使用MipMap最近点纹理采样
+//				 ShaderUtil.checkGlError("glTexParameteri");
+				break;
+			default:
+				Log.e(TAG,"initTexture fail");
+				throw new RuntimeException("Fail");
 		}
-		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_REPEAT);
-		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_REPEAT);		
+
+
+		GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_REPEAT);
+		GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_REPEAT);
 
         InputStream is = this.getResources().openRawResource(drawableId);
         Bitmap bitmapTmp;
         try {
-        	bitmapTmp = BitmapFactory.decodeStream(is);        	
-        } finally {
-            try {
-                is.close();
-            } 
-            catch(IOException e) {
-                e.printStackTrace();
-            }
-        }   
+			BitmapFactory.Options opt = new BitmapFactory.Options();
+			opt.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			opt.inPremultiplied = false ; // 不要预乘alpha 在要使用原图片 比如RenderScript或者自定义OpenGL上
+			opt.inDither = false ; // 不去抖动 解决显示在平面上实际上RGB565 而不是RGB888 导致过渡带的颜色会有断层
+			bitmapTmp = BitmapFactory.decodeStream(is,null,opt);
+			Log.w(TAG," hasAlpha = " + bitmapTmp.hasAlpha()
+					+ " isPremultiplied = " + bitmapTmp.isPremultiplied()
+					+ " land? " + (drawableId==LAND_ID) );
+        } finally {try {is.close();} catch(IOException e) {e.printStackTrace();}}
 
-        GLUtils.texImage2D( //实际加载纹理
-        		GLES30.GL_TEXTURE_2D, //纹理类型
-        		0, 					  //纹理的层次，0表示基本图像层，可以理解为直接贴图
-        		bitmapTmp, 			  //纹理图像
-        		0					  //纹理边框尺寸
-        );   
+        GLUtils.texImage2D( 			// 实际加载纹理
+        		GLES30.GL_TEXTURE_2D, 	// 纹理类型
+        		0, 					  	// 纹理的层次，0表示基本图像层，可以理解为直接贴图
+        		bitmapTmp, 			  	// 纹理图像
+        		0);					  	// 纹理边框尺寸
+
 
 		if(CONFIG_TEXTRUE == RENDER_TYPE.MipMap_Texture){
-
-
 
 			GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D);// 生成一组Mipmap纹理图像
 
@@ -237,36 +270,21 @@ public class MySurfaceView extends GLSurfaceView
 				if(USING_MY_MIPMAP) {
 					InputStream is128 = this.getResources().openRawResource(R.raw.grass_fake128128);
 					Bitmap temp;
-					try {
-						temp = BitmapFactory.decodeStream(is128);
-					} finally {
-						try {
-							is128.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
+					try {	temp = BitmapFactory.decodeStream(is128);
+					} finally {try {is128.close();} catch (IOException e) {e.printStackTrace();}}
 
 					GLUtils.texImage2D(
 							GLES30.GL_TEXTURE_2D,
-							1, 					  // 加载到mipmap纹理的第一层  grass原来是256*256 第一层是128*128
+							1, 		// 加载到mipmap纹理的第一层  grass原来是256*256 第一层是128*128
 							temp,
 							0
 					);
 					temp.recycle();
 					temp = null;
 
-
 					is128 = this.getResources().openRawResource(R.raw.grass_fake6464);
-					try {
-						temp = BitmapFactory.decodeStream(is128);
-					} finally {
-						try {
-							is128.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
+					try {	temp = BitmapFactory.decodeStream(is128);
+					} finally {try {is128.close();} catch (IOException e) {e.printStackTrace();}}
 
 					GLUtils.texImage2D(
 							GLES30.GL_TEXTURE_2D,
@@ -276,13 +294,8 @@ public class MySurfaceView extends GLSurfaceView
 					);
 					temp.recycle();
 					temp = null;
-
 				}
-
-
 			}
-
-
 
 			int[] texDims = new int[2];
 			GLES31.glGetTexLevelParameteriv(GLES31.GL_TEXTURE_2D,1,GL_TEXTURE_WIDTH,texDims,0);
@@ -317,32 +330,43 @@ public class MySurfaceView extends GLSurfaceView
 				FileChannel os = null;
 				try {
 					os = new FileOutputStream(new File(Environment.getExternalStorageDirectory()+"/mipmap_" + drawableId + "_level1.rgba")).getChannel();
-					try {
-						os.write(pack2cpu);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					try {
-						os.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					try {os.write(pack2cpu);} catch (IOException e) {e.printStackTrace();}
+					try {os.close();} catch (IOException e) {e.printStackTrace();}
 					Log.i(TAG,"save mipmap done!");
 				} catch (FileNotFoundException e) {
 					Log.e(TAG, "FileNotFoundException !!" + e.getMessage() );// 可能有权限要求
 					e.printStackTrace();
 				}
-
-
-
 			}
 			GLES30.glDeleteFramebuffers(1,offscreen_fbo,0);
 
 		}
 
 		if(CONFIG_TEXTRUE == RENDER_TYPE.Using_Texture_In_VertexShader){
-			colsPlusOne = bitmapTmp.getWidth();
-			rowsPlusOne = bitmapTmp.getHeight();
+			// 如果使用MIPMAP 但是不调用这个 会导致贴图黑色的
+			GLES30.glGenerateMipmap(GLES30.GL_TEXTURE_2D);
+			if( drawableId == LAND_ID){
+//				colsPlusOne = bitmapTmp.getWidth();
+//				rowsPlusOne = bitmapTmp.getHeight();
+
+				//bitmapTmp.copyPixelsToBuffer();
+//				int bytes = bitmapTmp.getByteCount();
+//				ByteBuffer buf = ByteBuffer.allocate(bytes);
+//				bitmapTmp.copyPixelsToBuffer(buf);
+//				buf.flip();
+//
+//				try {
+//					FileChannel os = new FileOutputStream(new File(Environment.getExternalStorageDirectory()+"/temp4.rgba")).getChannel();
+//					os.write(buf);
+//					os.close();
+//					Log.d(TAG,"save file " + bytes );
+//				} catch (FileNotFoundException e) {
+//					e.printStackTrace();
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//				}
+
+			}
 		}
 
 
