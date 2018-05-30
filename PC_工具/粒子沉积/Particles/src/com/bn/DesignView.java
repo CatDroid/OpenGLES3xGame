@@ -344,7 +344,11 @@ public class DesignView extends javax.swing.JPanel {
 						}
 
 						if (max != 0.0F) {
-							StringBuilder sb = new StringBuilder("const float mHigh[" + width + "][" + height + "]=\n");
+							StringBuilder sb = new StringBuilder(
+									"// !!! DO NOT EDIT !!!  AutoGen by Particles PC Tool\n" + 
+									"#ifndef GRAPMAP_H\n" +
+									"#define GRAPMAP_H\n\n"+
+									"const float mHigh[" + width + "][" + height + "]=\n");
 							sb.append("{\n");
 
 							float ratio = 255.0F / max;
@@ -356,8 +360,10 @@ public class DesignView extends javax.swing.JPanel {
 								sb.append("\n");
 							}
 							sb.append("};");
+							sb.append("\n\n");
+							sb.append("#endif");
 							String code = sb.toString();
-							java.io.File f = new java.io.File("code/terri.c");
+							java.io.File f = new java.io.File("GrapMap.h");
 							try {
 								java.io.FileWriter fw = new java.io.FileWriter(f);
 								fw.write(code);
