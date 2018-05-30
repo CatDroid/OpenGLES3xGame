@@ -111,6 +111,15 @@ public class DXView extends JPanel {
 			float[] PA = { Constant.vertexPeer[k], Constant.vertexPeer[(k + 1)], Constant.vertexPeer[(k + 2)] };
 			float[] PB = { Constant.vertexPeer[(k + 3)], Constant.vertexPeer[(k + 4)], Constant.vertexPeer[(k + 5)] };
 
+			// TOM ADD ++
+			if( Constant.vertexPeer[(k + 1)] <= 0.0f  && Constant.vertexPeer[(k + 4)] <= 0.0f ) {
+				g.setColor(Color.green);
+			}else {
+				g.setColor(Color.red);
+			}
+			
+			// TOM ADD -- 
+			
 			int[] fPA = MatrixState.finalPosition(PA, finalMatrix, 1000.0F, 600.0F);
 			int[] fPB = MatrixState.finalPosition(PB, finalMatrix, 1000.0F, 600.0F);
 
