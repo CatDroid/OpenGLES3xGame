@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, Sample11_9Activity!</string>
+    <string name="app_name">Sample11_9</string>
+    <string name="bitmapTexture">多国语言</string>
+    <string name="bitmapTextureLong">1990年5月31日出生于四川泸州，中国内地影视女演员。2001年，进入四川省舞蹈学校学习古典舞和民间舞</string>
+</resources>
