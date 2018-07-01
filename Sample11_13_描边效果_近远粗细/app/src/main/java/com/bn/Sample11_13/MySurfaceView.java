@@ -8,6 +8,7 @@ import android.content.Context;
 
 class MySurfaceView extends GLSurfaceView 
 {
+    private final boolean DRAW_ONLY_OUTLINE = false ;
 	private final float TOUCH_SCALE_FACTOR = 180.0f/320;//角度缩放比例
     private SceneRenderer mRenderer;//场景渲染器    
     
@@ -65,9 +66,9 @@ class MySurfaceView extends GLSurfaceView
   	}
 	private class SceneRenderer implements GLSurfaceView.Renderer 
     {
-    	//从指定的obj文件中加载对象
-		LoadedObjectVertexNormal lovo[]=new LoadedObjectVertexNormal[2];//0---原本物体   1---描边                茶壶
-		LoadedObjectVertexNormal lovo0[]=new LoadedObjectVertexNormal[2];//0---原本物体   1---描边                长方体
+    	//从指定的obj文件中加载对象  hhl 这里只是创建数组 只是引用，还没有创建实例
+		LoadedObjectVertexNormal lovo[]=new LoadedObjectVertexNormal[2];//0---原本物体   1---描边   茶壶
+		LoadedObjectVertexNormal lovo0[]=new LoadedObjectVertexNormal[2];//0---原本物体   1---描边  球体
     	
         public void onDrawFrame(GL10 gl) 
         { 
@@ -87,8 +88,10 @@ class MySurfaceView extends GLSurfaceView
             GLES30.glFrontFace(GLES30.GL_CW);
             lovo[1].drawSelfEdge();//绘制描边
             //绘制正面
-            GLES30.glFrontFace(GLES30.GL_CCW);
-            lovo[0].drawSelf();//绘制原本物体
+            if(!DRAW_ONLY_OUTLINE){
+                GLES30.glFrontFace(GLES30.GL_CCW);
+                lovo[0].drawSelf();//绘制原本物体
+            }
             MatrixState.popMatrix();
             
             //茶壶2
@@ -98,20 +101,27 @@ class MySurfaceView extends GLSurfaceView
             GLES30.glFrontFace(GLES30.GL_CW);
             lovo[1].drawSelfEdge();//绘制描边
             //绘制正面
-            GLES30.glFrontFace(GLES30.GL_CCW);
-            lovo[0].drawSelf();//绘制原本物体
+            if(!DRAW_ONLY_OUTLINE) {
+                GLES30.glFrontFace(GLES30.GL_CCW);
+                lovo[0].drawSelf();//绘制原本物体
+            }
             MatrixState.popMatrix();
             
             
             //圆1
             MatrixState.pushMatrix();
-            MatrixState.translate(-15f, 0f, 8f);
+            MatrixState.translate(-15f, 0f, 8f); // hhl 从obj 顶点坐标算出 球体半径是6.17f 两个物体在z轴相差8-(-2)=10 也就是会发生一个球内嵌入了另外一个
+            //MatrixState.translate(-15f, 0f, 12f);
+//            MatrixState.scale(2.0f,2.0f,2.0f); // hhl 这个例子没有做缩放和旋转 !!!!!
+//            MatrixState.rotate(30,1,0,0);
             //仅绘制背面
             GLES30.glFrontFace(GLES30.GL_CW);
             lovo0[1].drawSelfEdge();//绘制描边
             //绘制正面
-            GLES30.glFrontFace(GLES30.GL_CCW);
-            lovo0[0].drawSelf();//绘制原本物体
+            if(!DRAW_ONLY_OUTLINE) {
+                GLES30.glFrontFace(GLES30.GL_CCW);
+                lovo0[0].drawSelf();//绘制原本物体
+            }
             MatrixState.popMatrix();
             
             //圆2
@@ -121,8 +131,10 @@ class MySurfaceView extends GLSurfaceView
             GLES30.glFrontFace(GLES30.GL_CW);
             lovo0[1].drawSelfEdge();//绘制描边
             //绘制正面
-            GLES30.glFrontFace(GLES30.GL_CCW);
-            lovo0[0].drawSelf();//绘制原本物体
+            if(!DRAW_ONLY_OUTLINE) {
+                GLES30.glFrontFace(GLES30.GL_CCW);
+                lovo0[0].drawSelf();//绘制原本物体
+            }
             MatrixState.popMatrix();
             
             MatrixState.popMatrix();  
