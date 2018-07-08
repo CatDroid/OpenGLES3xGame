@@ -10,6 +10,8 @@ out vec4 ambient;
 out vec4 diffuse;
 out vec4 specular;
 
+
+
 //定位光光照计算的方法
 void pointLight(					//定位光光照计算的方法
   in vec3 normal,				//法向量
@@ -43,7 +45,11 @@ void pointLight(					//定位光光照计算的方法
 void main()     
 { 
    gl_Position = uMVPMatrix * vec4(aPosition,1); //根据总变换矩阵计算此次绘制此顶点位置  
-   
+
+   gl_Position = gl_Position / gl_Position.w ;
+
+   gl_Position = vec4(gl_Position.xyz, 0.5);
+
    vec4 ambientTemp, diffuseTemp, specularTemp;   //存放环境光、散射光、镜面反射光的临时变量   
    pointLight(normalize(aNormal),ambientTemp,diffuseTemp,specularTemp,uLightLocation,vec4(0.1,0.1,0.1,1.0),vec4(0.7,0.7,0.7,1.0),vec4(0.3,0.3,0.3,1.0));
    

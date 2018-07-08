@@ -16,7 +16,7 @@
 
 ## glViewPort与glScissor 
 * glScissor 可以控制 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);的区域,glViewPort不能,整个FB会清除
-* glViewport 的宽高对应顶点的-1~1，而glScissor则不会，依旧按照viewport宽高作为顶点的-1~1
+* glViewport 的宽高对应顶点的-1到1，而glScissor则不会，依旧按照viewport宽高作为顶点的-1到1
 
 
 ## 经验
@@ -30,3 +30,7 @@
 ### 在摄像头前方不同位置的投影
 *
 ![camera_position_project](camera_position_project.png)
+
+### Android Studio GLSL插件 并关联.sh文件
+*
+![install_GLSL_plugin_associate_sh_file](install_GLSL_plugin_associate_sh_file.png)
