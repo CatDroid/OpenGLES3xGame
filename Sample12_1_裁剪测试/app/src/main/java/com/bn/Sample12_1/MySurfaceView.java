@@ -215,6 +215,8 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.setLightLocation(40, 10, 20);
             //加载要绘制的物体
             lovo=LoadUtil.loadFromFileVertexOnly("ch.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
+
+            TestCameraMatrix.test();
         }
     }
 }
