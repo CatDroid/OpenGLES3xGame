@@ -23,37 +23,40 @@ void pointLight(					//定位光光照计算的方法
   in vec4 lightDiffuse,			//散射光强度
   in vec4 lightSpecular			//镜面光强度
 ){
-  ambient=lightAmbient;			//直接得出环境光的最终强度  
-  vec3 normalTarget=aPosition+normal;	//计算变换后的法向量
-  vec3 newNormal=(uMMatrix*vec4(normalTarget,1)).xyz-(uMMatrix*vec4(aPosition,1)).xyz;
-  newNormal=normalize(newNormal); 	//对法向量规格化
-  //计算从表面点到摄像机的向量
-  vec3 eye= normalize(uCamera-(uMMatrix*vec4(aPosition,1)).xyz);  
-  //计算从表面点到光源位置的向量vp
-  vec3 vp= normalize(lightLocation-(uMMatrix*vec4(aPosition,1)).xyz);  
-  vp=normalize(vp);//格式化vp
-  vec3 halfVector=normalize(vp+eye);	//求视线与光线的半向量    
-  float shininess=50.0;				//粗糙度，越小越光滑
-  float nDotViewPosition=max(0.0,dot(newNormal,vp)); 	//求法向量与vp的点积与0的最大值
-  diffuse=lightDiffuse*nDotViewPosition;				//计算散射光的最终强度
-  float nDotViewHalfVector=dot(newNormal,halfVector);	//法线与半向量的点积 
-  float powerFactor=max(0.0,pow(nDotViewHalfVector,shininess)); 	//镜面反射光强度因子
-  specular=lightSpecular*powerFactor;    			//计算镜面光的最终强度
+    ambient=lightAmbient;			//直接得出环境光的最终强度
+    vec3 normalTarget=aPosition+normal;	//计算变换后的法向量
+    vec3 newNormal=(uMMatrix*vec4(normalTarget,1)).xyz-(uMMatrix*vec4(aPosition,1)).xyz;
+    newNormal=normalize(newNormal); 	//对法向量规格化
+    //计算从表面点到摄像机的向量
+    vec3 eye= normalize(uCamera-(uMMatrix*vec4(aPosition,1)).xyz);
+    //计算从表面点到光源位置的向量vp
+    vec3 vp= normalize(lightLocation-(uMMatrix*vec4(aPosition,1)).xyz);
+    vp=normalize(vp);//格式化vp
+    vec3 halfVector=normalize(vp+eye);	//求视线与光线的半向量
+    float shininess=50.0;				//粗糙度，越小越光滑
+    float nDotViewPosition=max(0.0,dot(newNormal,vp)); 	//求法向量与vp的点积与0的最大值
+    diffuse=lightDiffuse*nDotViewPosition;				//计算散射光的最终强度
+    float nDotViewHalfVector=dot(newNormal,halfVector);	//法线与半向量的点积
+    float powerFactor=max(0.0,pow(nDotViewHalfVector,shininess)); 	//镜面反射光强度因子
+    specular=lightSpecular*powerFactor;    			//计算镜面光的最终强度
 }
 
 
 void main()     
 { 
-   gl_Position = uMVPMatrix * vec4(aPosition,1); //根据总变换矩阵计算此次绘制此顶点位置  
+    gl_Position = uMVPMatrix * vec4(aPosition,1); //根据总变换矩阵计算此次绘制此顶点位置
 
-   gl_Position = gl_Position / gl_Position.w ;
+    gl_Position = gl_Position / gl_Position.w ;   // 这样等效，管线做透视除法
 
-   gl_Position = vec4(gl_Position.xyz, 0.5);
+    float new_w = 1.0 ; // 2.0 0.9
+    gl_Position = vec4(gl_Position.xyz, new_w);
+    // new_w > 1.0 , x,y,z(绝对值)都会变小, 并且由于原来的gl_Position.xyz已经在标准设备空间(-1,1) 所以结果就是在标准设备空间(立方体空间)中往原点靠近
+    // new_w < 1.0 , x,y,z(绝对值)都会变大, 所以就是在标准设备空间(立方体空间)中往原点远离，可能超出-1,1，导致没有显示
 
-   vec4 ambientTemp, diffuseTemp, specularTemp;   //存放环境光、散射光、镜面反射光的临时变量   
-   pointLight(normalize(aNormal),ambientTemp,diffuseTemp,specularTemp,uLightLocation,vec4(0.1,0.1,0.1,1.0),vec4(0.7,0.7,0.7,1.0),vec4(0.3,0.3,0.3,1.0));
-   
-   ambient=ambientTemp;
-   diffuse=diffuseTemp;
-   specular=specularTemp;
+    vec4 ambientTemp, diffuseTemp, specularTemp;   //存放环境光、散射光、镜面反射光的临时变量
+    pointLight(normalize(aNormal),ambientTemp,diffuseTemp,specularTemp,uLightLocation,vec4(0.1,0.1,0.1,1.0),vec4(0.7,0.7,0.7,1.0),vec4(0.3,0.3,0.3,1.0));
+
+    ambient=ambientTemp;
+    diffuse=diffuseTemp;
+    specular=specularTemp;
 }                      

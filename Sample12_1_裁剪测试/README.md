@@ -26,6 +26,20 @@
 ### Matrix.scaleM(float[] m, int mOffset,  float x, float y, float z)
 * x = 0 , z = 0 ,  y = -1 可以y轴 关于XoZ平面 上下镜像
 
+### 透视除法
+* 标准设备空间(立方体空间)中往原点远离或者靠近原点    
+```
+//根据总变换矩阵计算此次绘制此顶点位置
+gl_Position = uMVPMatrix * vec4(aPosition,1); 
+
+// 这样等效，管线做透视除法
+gl_Position = gl_Position / gl_Position.w ; 
+
+float new_w = 2.0 ; // 0.9
+gl_Position = vec4(gl_Position.xyz, new_w);
+// new_w > 1.0 , x,y,z(绝对值)都会变小, 并且由于原来的gl_Position.xyz已经在标准设备空间(-1,1) 所以结果就是在标准设备空间(立方体空间)中往原点靠近
+// new_w < 1.0 , x,y,z(绝对值)都会变大, 所以就是在标准设备空间(立方体空间)中往原点远离，可能超出-1,1，导致没有显示
+```
 
 ### 在摄像头前方不同位置的投影
 *
