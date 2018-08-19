@@ -95,5 +95,11 @@ public class SoundManager
 		sp.stop(sound);
 		sp.setVolume(sound, 0, 0);
 	}
+
+	public void destroy(){
+		sp.release();
+		activity = null;
+		sp = null;
+	}
 }
 

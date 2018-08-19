@@ -16,6 +16,10 @@ public class Constant
 	public static float fromPixSizeToNearSize(float size)
 	{
 		return size*2/SCREEN_HEIGHT_STANDARD;
+		/*
+		*   hhl 归一化 都以高为长边  除以  SCREEN_HEIGHT_STANDARD/2 ( 把SCREEN_HEIGHT_STANDARD/2 归成 1 )
+		*   ? = size  / (SCREEN_HEIGHT_STANDARD/2)
+		* */
 	}
 	//屏幕x坐标到视口x坐标
 	public static float fromScreenXToNearX(float x)

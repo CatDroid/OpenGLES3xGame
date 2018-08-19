@@ -8,28 +8,32 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import static com.bn.constant.SourceConstant.*;
 public class MainActivity extends Activity {
+
+    static private final String TAG = "MainActivity" ;
+
 	private MySurfaceView mGLSurfaceView;
 	public static SoundManager sound;
 	public static SharedPreferences.Editor editor;
 	public static SharedPreferences sp;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
+        Log.w(TAG,"[onCreate]");
 		super.onCreate(savedInstanceState);
-		
+
 		sp=this.getSharedPreferences("bn", Context.MODE_PRIVATE);    
         editor=sp.edit();	//取得编辑对象，来修改Preferences文件    
         String firstStr=sp.getString("count",null);//获取键为“time”的值  
 //	         
         System.out.println("firstStr::"+firstStr);
-        if(firstStr==null)
-        {
-        	
+        if(firstStr==null) {
         	editor.putString("count", Integer.toString(20));
-             editor.commit();	//提交修改                	
+            editor.commit();	//提交修改
         }
         moneycount = Integer.parseInt(sp.getString("count",null));
         System.out.println("moneycount    moneycount:"+moneycount);
@@ -54,7 +58,7 @@ public class MainActivity extends Activity {
 //        editor=sp.edit();	//取得编辑对象，来修改Preferences文件     
 //        if(initmoneycount==null)
 //        {
-//        	 editor.putString("count", Integer.toString(moneycount));
+//        	 editor.putString("count", Integer.toS tring(moneycount));
 //
 //             editor.commit();	//提交修改        
 //        	
@@ -65,7 +69,10 @@ public class MainActivity extends Activity {
 
 	 @Override
     protected void onResume() {
+        Log.w(TAG,"[onResume]");
         super.onResume();
+         // GLSurfaceView.onPause会导致EGLContext销毁
+         // 开启不保留活动会把Activity销毁导致GLSurfaceView也会销毁,会重新加载资源
 //        mGLSurfaceView.onResume();
         if(MainActivity.sound.mp!=null)
    		{
@@ -75,11 +82,42 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
+        Log.w(TAG,"[onPause]");
         super.onPause();
 //        mGLSurfaceView.onPause();
         if(MainActivity.sound.mp!=null)
    		{
         	MainActivity.sound.mp.pause();
    		}
-    }   
+    }
+
+    @Override
+    protected void onStart() {
+        Log.w(TAG,"[onStart]");
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.w(TAG,"[onRestart]");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.w(TAG,"[onStop]");
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.w(TAG,"[onDestroy]");
+        super.onDestroy();
+        mGLSurfaceView.destroy();
+        mGLSurfaceView = null;
+
+        sound.destroy();
+        sound = null;
+
+    }
 }

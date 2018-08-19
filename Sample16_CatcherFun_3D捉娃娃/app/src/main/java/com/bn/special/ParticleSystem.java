@@ -76,7 +76,7 @@ public class ParticleSystem implements Comparable<ParticleSystem>
     	this.vy=VY[CURR_INDEX];
     	this.fpfd=fpfd;
     	
-    	new Thread()
+    	new Thread("ParticleSystem")
     	{
     		public void run()
     		{
@@ -94,7 +94,10 @@ public class ParticleSystem implements Comparable<ParticleSystem>
     		}
     	}.start();
     }
-    
+
+    public void exit(){
+		flag = false ;
+	}
     public void drawSelf()
     {
     	//关闭深度检测

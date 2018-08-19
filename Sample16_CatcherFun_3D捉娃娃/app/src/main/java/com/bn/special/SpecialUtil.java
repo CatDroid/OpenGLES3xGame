@@ -68,4 +68,11 @@ public class SpecialUtil
 			MatrixState3D.popMatrix();
 		}
 	}
+
+	public void lostContextOnGLThread(){
+		for(ParticleSystem ps :fps){
+			ps.exit();
+		}
+		fps.clear();
+	}
 }

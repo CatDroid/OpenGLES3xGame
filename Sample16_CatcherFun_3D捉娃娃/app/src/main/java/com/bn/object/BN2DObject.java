@@ -33,8 +33,11 @@ public class BN2DObject
 	int spng=0;
 	public BN2DObject(float x,float y,float picWidth,float picHeight,int texId,int programId)
 	{
-		this.x=Constant.fromScreenXToNearX(x);//将屏幕x转换成视口x坐标
-		this.y=Constant.fromScreenYToNearY(y);//将屏幕y转换成视口y坐标
+		// hhl 这里假定整个场景是1920x1080 所有的物体都是渲染到这个1920x1080的'画布'上
+		// hhl  x和y是物体中心点位置  以1920x1080的左上角为原点
+
+		this.x=Constant.fromScreenXToNearX(x);//将屏幕x转换成视口x坐标  hhl 转换成 中间为原点的 并且做了归一化(按高为最长边)
+		this.y=Constant.fromScreenYToNearY(y);//将屏幕y转换成视口y坐标  hhl 后面draw时候用来做平移的
 		this.texId=texId;
 		this.programId=programId;
 		initVertexData(picWidth,picHeight);//初始化顶点数据
@@ -48,7 +51,10 @@ public class BN2DObject
 		this.programId=programId;
 		initVertexData(picWidth,picHeight);//初始化顶点数据
 	}
-	public BN2DObject(float x,float y,float width,float height,int han,int lie,int HZ,int LZ,
+	public BN2DObject(
+			float x,float y,float width,float height,
+			int han,int lie,
+			int HZ,int LZ,
 			int texId,int programId)
 	{//这是一个loadView中的图片的new
 		this.x=Constant.fromScreenXToNearX(x);//将屏幕x转换成视口x坐标
@@ -69,7 +75,7 @@ public class BN2DObject
 		width=Constant.fromPixSizeToNearSize(width);//屏幕宽度转换成视口宽度
 		height=Constant.fromPixSizeToNearSize(height);//屏幕高度转换成视口高度
 		//初始化顶点坐标数据
-		float vertices[]=new float[]
+		float vertices[]=new float[] // hhl 也是做了归一化 按高为最长边
 		{
 				-width/2,height/2,0,
 				-width/2,-height/2,0,
@@ -89,15 +95,15 @@ public class BN2DObject
 					0,0,0,1,1,0,
 					1,1,1,0,0,1};
 		}else
-		{
+		{	// hhl 像load.png这样 一张纹理图中包含5x5的小图 连续图片 ，只需要显示纹理图中的其中一个
 			//给出一副纹理图的行跟列，这里就在对应的纹理图的地方，计算出来相应的纹理坐标
 			float sstep=(float)1/LZ;
 			float tstep=(float)1/HZ;
 			texCoor=new float[]
 					{
-					   sstep*han-sstep,tstep*lie-tstep,
-					   sstep*han-sstep,tstep*lie,
-					   sstep*han,tstep*lie-tstep,
+					   sstep*han-sstep,	tstep*lie-tstep,
+					   sstep*han-sstep,	tstep*lie,
+					   sstep*han,		tstep*lie-tstep,
 					   
 					   sstep*han,tstep*lie,
 					   sstep*han,tstep*lie-tstep,
@@ -149,6 +155,8 @@ public class BN2DObject
     	GLES30.glUniform1f(xHandle, loadPosition);
     	MatrixState2D.pushMatrix();//保护场景
 		MatrixState2D.translate(x,y, 0);//平移
+
+		// 根据实例化时候的配置，不同的2D-Object会先做以下缩放或者旋转(z轴),然后都会平移到各自指定位置(XOY平面)
 		if(spng==1){
 			MatrixState2D.scale(step/100,step/100,step/100);
 		}

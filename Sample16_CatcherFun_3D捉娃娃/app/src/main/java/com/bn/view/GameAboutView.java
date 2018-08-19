@@ -66,4 +66,9 @@ public class GameAboutView extends BNAbstractView{
 		GLES30.glEnable(GLES30.GL_DEPTH_TEST); 
 	}
 
+	@Override
+	public void lostContextOnGLThread() {
+
+	}
+
 }

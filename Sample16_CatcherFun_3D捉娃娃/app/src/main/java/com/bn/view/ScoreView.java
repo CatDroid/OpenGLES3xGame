@@ -149,5 +149,10 @@ public class ScoreView extends BNAbstractView{
 		
 	}
 
+	@Override
+	public void lostContextOnGLThread() {
+
+	}
+
 
 }

@@ -14,12 +14,8 @@ public class SourceConstant {
 	public static List<CLpng> cpng=new ArrayList<CLpng>();//存放BNObject对象
 	public static float Angle2D=0;
 	public static float ColorCS=0;
-	//背景图片的上的文字
-	public static BN2DObject BackText;
-	public static float BackTextx=540f;
-	public static float BackTexty=610f;
-	public static float BackText_Sizex=700f;
-	public static float BackText_Sizey=700f;
+
+
 	//图片替换
 	public static float step=0;
 	public static float AngleSpng=0;
@@ -80,22 +76,31 @@ public class SourceConstant {
     public static float clawAngle1=32.07f;//注意这是度数
     public static float clawAngle2=44.0f;//注意这是度数
     public static float clawAngle3=30.0f;//注意这是度数
-    //==========这是MainView界面的一些数据===========
+
+
     public static boolean isSet=false;//是否是设置界面的触控标志位
     public static boolean isYXJXTouch=false;//是否是游戏教学界面的触控标志位
-    //========这是游戏退出按钮数据
-    public static float Gamequitx=200f;
-    public static float Gamequity=1680f;
-    public static float Gamequit_SIZEx=410f;
-    public static float Gamequit_SIZEy=210f;
-    public static float Gamequit_TOUCH_LEFT_x=Gamequitx-Gamequit_SIZEx/2;
-    public static float Gamequit_TOUCH_RIGHT_x=Gamequitx+Gamequit_SIZEx/2;
-    public static float Gamequit_TOUCH_BOTTOM_y=Gamequity+Gamequit_SIZEy/2;
-    public static float Gamequit_TOUCH_TOP_y=Gamequity-Gamequit_SIZEy/2;
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    //背景图片的上的文字
+    public static BN2DObject BackText; // 3D可爱抓娃娃 在LoadView和MainView都要显示 spng = 2 Angle2D@Angle2DThread.java  backText.png
+    public static float BackTextx=540f;
+    public static float BackTexty=610f;
+    public static float BackText_Sizex=700f;
+    public static float BackText_Sizey=700f;
+
+    // 这是背景图的一些数据
+    public static int MainView_BGId;//背景图
+    public static float MainView_BG_x=540;//位置
+    public static float MainView_BG_y=960;
+    public static float MainView_BG_SIZE_x=1080;//大小
+    public static float MainView_BG_SIZE_y=1920;
+
+
     //========这是游戏成绩按钮数据
-    
-//    public static int GameAboutId;//这个奖品收藏按钮
-//    public static int GameAboutDownId;//这个奖品收藏按钮
     public static float GameScorex=200f;
     public static float GameScorey=1280f;
     public static float GameScore_SIZEx=410f;
@@ -104,8 +109,8 @@ public class SourceConstant {
     public static float GameScore_TOUCH_RIGHT_x=GameScorex+GameScore_SIZEx/2;
     public static float GameScore_TOUCH_BOTTOM_y=GameScorey+GameScore_SIZEy/2;
     public static float GameScore_TOUCH_TOP_y=GameScorey-GameScore_SIZEy/2;
+
     //========这是游戏关于按钮数据
-  
     public static int GameAboutId;//这个奖品收藏按钮
     public static int GameAboutDownId;//这个奖品收藏按钮
     public static float GameAboutx=200f;
@@ -116,15 +121,41 @@ public class SourceConstant {
     public static float GameAbout_TOUCH_RIGHT_x=GameAboutx+GameAbout_SIZEx/2;
     public static float GameAbout_TOUCH_BOTTOM_y=GameAbouty+GameAbout_SIZEy/2;
     public static float GameAbout_TOUCH_TOP_y=GameAbouty-GameAbout_SIZEy/2;
-    
-    //======游戏关于界面中的字体图片的一些数据
-    public static List<BN2DObject> GameAboutView_Button=new ArrayList<BN2DObject>();//存放BNObject对象
-    public static int GameAboutTextId;
-    public static float GameAboutTextx=540f;
-    public static float GameAboutTexty=960f;
-    public static float GameAboutText_SIZEx=1000f;
-    public static float GameAboutText_SIZEy=450f;
-    
+
+    //========这是游戏退出按钮数据
+    public static float Gamequitx=200f;
+    public static float Gamequity=1680f;
+    public static float Gamequit_SIZEx=410f;
+    public static float Gamequit_SIZEy=210f;
+    public static float Gamequit_TOUCH_LEFT_x=Gamequitx-Gamequit_SIZEx/2;
+    public static float Gamequit_TOUCH_RIGHT_x=Gamequitx+Gamequit_SIZEx/2;
+    public static float Gamequit_TOUCH_BOTTOM_y=Gamequity+Gamequit_SIZEy/2;
+    public static float Gamequit_TOUCH_TOP_y=Gamequity-Gamequit_SIZEy/2;
+
+    //这是开始游戏按钮的一些数据
+    public static int MainView_SGMId;//开始游戏按钮 纹理资源
+    public static int MainView_SGMDId;//开始游戏按下按钮 纹理资源
+    public static float StartGame_x=880;//位置
+    public static float StartGame_y=1080;
+    public static float StartGame_SIZE_x=400;//大小
+    public static float StartGame_SIZE_y=200;
+    public static float StartGame_TOUCH_LEFT_x=StartGame_x-StartGame_SIZE_x/2;//左//触控数据
+    public static float StartGame_TOUCH_RIGHT_x=StartGame_x+StartGame_SIZE_x/2;
+    public static float StartGame_TOUCH_BOTTOM_y=StartGame_y+StartGame_SIZE_y/2;
+    public static float StartGame_TOUCH_TOP_y=StartGame_y-StartGame_SIZE_y/2;
+
+    //这是游戏教学按钮的一些数据
+    public static int MainView_YXJXId;//游戏教学按钮
+    public static int MainView_YXJXDId;//游戏教学按下按钮
+    public static float YXJX_x=880;//位置
+    public static float YXJX_y=1280;
+    public static float YXJX_SIZE_x=400;//大小
+    public static float YXJX_SIZE_y=200;
+    public static float YXJX_TOUCH_LEFT_x=YXJX_x-YXJX_SIZE_x/2;//触控数据
+    public static float YXJX_TOUCH_RIGHT_x=YXJX_x+YXJX_SIZE_x/2;
+    public static float YXJX_TOUCH_BOTTOM_y=YXJX_y+YXJX_SIZE_y/2;
+    public static float YXJX_TOUCH_TOP_y=YXJX_y-YXJX_SIZE_y/2;
+
     //===========奖品收藏按钮数据
     public static int MainViewSCId;//这个奖品收藏按钮
     public static int MainViewSCDownId;//这个奖品收藏按钮
@@ -136,43 +167,7 @@ public class SourceConstant {
     public static float MainViewSC_TOUCH_RIGHT_x=MainViewSCx+MainViewSCSIZEx/2;
     public static float MainViewSC_TOUCH_BOTTOM_y=MainViewSCy+MainViewSCSIZEy/2;
     public static float MainViewSC_TOUCH_TOP_y=MainViewSCy-MainViewSCSIZEy/2;
-    
-    public static List<BN2DObject> MainView_Button=new ArrayList<BN2DObject>();//存放BNObject对象
-    
-    
-    public static int MainView_BGId;//背景图
-    public static int MainView_SGMId;//开始游戏按钮
-    public static int MainView_SGMDId;//开始游戏按下按钮
-    public static int MainView_JPSCDId;//奖品收藏按下
-    public static int MainView_JPSCId;//奖品收藏按钮
-    
-    public static int MainView_YXJXId;//游戏教学按钮
-    public static int MainView_YXJXDId;//游戏教学按下按钮
-    
-    //这是游戏教学按钮的一些数据
-    public static float YXJX_x=880;//位置
-    public static float YXJX_y=1280;
-    public static float YXJX_SIZE_x=400;//大小
-    public static float YXJX_SIZE_y=200;
-    public static float YXJX_TOUCH_LEFT_x=YXJX_x-YXJX_SIZE_x/2;//触控数据
-    public static float YXJX_TOUCH_RIGHT_x=YXJX_x+YXJX_SIZE_x/2;
-    public static float YXJX_TOUCH_BOTTOM_y=YXJX_y+YXJX_SIZE_y/2;
-    public static float YXJX_TOUCH_TOP_y=YXJX_y-YXJX_SIZE_y/2;
-    //这是背景图的一些数据
-    public static float MainView_BG_x=540;//位置
-    public static float MainView_BG_y=960;
-    public static float MainView_BG_SIZE_x=1080;//大小
-    public static float MainView_BG_SIZE_y=1920;
-    //这是开始游戏按钮的一些数据
-    public static float StartGame_x=880;//位置
-    public static float StartGame_y=1080;
-    public static float StartGame_SIZE_x=400;//大小
-    public static float StartGame_SIZE_y=200;
-    public static float StartGame_TOUCH_LEFT_x=StartGame_x-StartGame_SIZE_x/2;//左//触控数据
-    public static float StartGame_TOUCH_RIGHT_x=StartGame_x+StartGame_SIZE_x/2;
-    public static float StartGame_TOUCH_BOTTOM_y=StartGame_y+StartGame_SIZE_y/2;
-    public static float StartGame_TOUCH_TOP_y=StartGame_y-StartGame_SIZE_y/2;   
-    
+
     //=================这是游戏设定按钮的一些数据
     public static int GameSDId;//这个奖品收藏按钮
     public static int GameSDDownId;//这个奖品收藏按钮
@@ -184,8 +179,20 @@ public class SourceConstant {
     public static float GameSD_TOUCH_RIGHT_x=GameSDx+GameSD_SIZEx/2;
     public static float GameSD_TOUCH_BOTTOM_y=GameSDy+GameSD_SIZEy/2;
     public static float GameSD_TOUCH_TOP_y=GameSDy-GameSD_SIZEy/2;
-    
-    public static int AllbackId;//这个是游戏中所有的界面中的返回的按钮id
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // 游戏关于界面中的字体图片的一些数据
+    public static List<BN2DObject> GameAboutView_Button=new ArrayList<BN2DObject>();//存放BNObject对象
+    public static int GameAboutTextId;
+    public static float GameAboutTextx=540f;
+    public static float GameAboutTexty=960f;
+    public static float GameAboutText_SIZEx=1000f;
+    public static float GameAboutText_SIZEy=450f;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // 所有界面: 这个是游戏中所有的界面中的返回的按钮id
+    public static int AllbackId;
     public static float YXJXBackx=130f;
     public static float YXJXBacky=1800f;
     public static float YXJXBackSizex=250f;
@@ -194,7 +201,10 @@ public class SourceConstant {
     public static float YXJXBack_TOUCH_RIGHT_x=YXJXBackx+YXJXBackSizex/2;
     public static float YXJXBack_TOUCH_BOTTOM_y=YXJXBacky+YXJXBackSizey/2;
     public static float YXJXBack_TOUCH_TOP_y=YXJXBacky-YXJXBackSizey/2;
-    
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     public static float StepYXJS=2f;//阈值
     public static List<BN2DObject> YXJXView_Button=new ArrayList<BN2DObject>();//存放BNObject对象
     public static int Page0Id;
@@ -202,13 +212,20 @@ public class SourceConstant {
     public static int Page2Id;
     public static int Page3Id;
     public static int Page4Id;
-    
+
+
+    public static List<BN2DObject> MainView_Button=new ArrayList<BN2DObject>();//存放BNObject对象
+
+
+
+
+
     public static float[] Pagex=new float[]{540f,1620f,2700f,3780f,4860f};
     
     public static float Pagey=960f;
     public static float PageSizex=1080f;
     public static float PageSizey=1920f;
-    //========这是MainView界面的一些数据的结束=========
+
     
     //==================================
     public static LoadedObjectVertexNormalTexture[] bodyForDraws=new LoadedObjectVertexNormalTexture[6];

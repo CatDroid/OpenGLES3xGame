@@ -39,7 +39,7 @@ public class DrawNumber
 		}
 	}
 	
-	public void drawnumber(int count)
+	public void drawnumber(int count,boolean isMainView)
 	{					
 			
 		String str=count+"";
@@ -48,7 +48,7 @@ public class DrawNumber
 			char c=str.charAt(i);
 			  MatrixState2D.pushMatrix();
 			 
-			  if(MainView.isMainView)
+			  if(isMainView)
 			  {
 				  MatrixState2D.scale(0.6f, 0.6f, 0.6f);
 			  }

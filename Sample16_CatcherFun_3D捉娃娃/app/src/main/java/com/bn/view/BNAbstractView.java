@@ -6,7 +6,9 @@ import android.view.MotionEvent;
 
 public abstract class BNAbstractView 
 {
-	public abstract void initView();
-	public abstract boolean onTouchEvent(MotionEvent e);
-	public abstract void drawView(GL10 gl);
+	public abstract void initView(); // GL-Thread
+	public abstract void drawView(GL10 gl); // GL-Thread
+	public abstract void lostContextOnGLThread();// GL-Thread
+
+	public abstract boolean onTouchEvent(MotionEvent e); // Main-Thread
 }

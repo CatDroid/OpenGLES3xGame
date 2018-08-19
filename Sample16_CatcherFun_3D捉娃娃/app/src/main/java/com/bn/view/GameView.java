@@ -112,6 +112,8 @@ public class GameView extends BNAbstractView
     int danceSX=0;
     int SpecialJS=0;
     BN2DObject bn;
+
+	HoleThread mHoleTh = null;
 	public GameView(MySurfaceView viewManager)
 	{
 		this.viewManager=viewManager;
@@ -307,8 +309,8 @@ public class GameView extends BNAbstractView
 		 initButton();
 		 initWorld();
 		 if(hb!=null){
-			 HoleThread ht=new HoleThread();
-			 ht.start();
+			 mHoleTh=new HoleThread();
+			 mHoleTh.start();
 		 }
 		 update();
          score=new DrawNumber(this.viewManager);
@@ -487,7 +489,7 @@ public class GameView extends BNAbstractView
          drawdoll();
          GLES30.glDisable(GLES30.GL_DEPTH_TEST);
          
-         draw2DObject();
+         draw2DObject(gl);
        
          
          GLES30.glDisable(GLES30.GL_DEPTH_TEST);  
@@ -512,6 +514,27 @@ public class GameView extends BNAbstractView
          GLES30.glEnable(GLES30.GL_DEPTH_TEST); 
        
 	}
+
+	@Override
+	public void lostContextOnGLThread() {
+		if(pThread!=null){
+			pThread.quitSync();
+			pThread =null;
+		}
+		if(KThread!=null){
+			KThread.quitSync();
+			KThread = null;
+		}
+		if(mThread!=null){
+			mThread.quitSync();
+			mThread = null;
+		}
+		if(mHoleTh!=null){
+			mHoleTh.quitSync();
+			mHoleTh = null;
+		}
+	}
+
 	public void drawdoll()
 	{        
    
@@ -542,10 +565,10 @@ public class GameView extends BNAbstractView
 	{
 		initdatax=180;
 		initdatay=100;
-		score.drawnumber(moneycount);
+		score.drawnumber(moneycount,false);
 	}
    
-    public void draw2DObject()
+    public void draw2DObject(GL10 gl)
     {
     	if(ismoneyout)
 		{
@@ -553,7 +576,7 @@ public class GameView extends BNAbstractView
 		}
     	if(isMenu)
         {
-           viewManager.menuview.drawView();
+           viewManager.menuview.drawView(gl);
         }
     	if(!isMenu)
 	    {

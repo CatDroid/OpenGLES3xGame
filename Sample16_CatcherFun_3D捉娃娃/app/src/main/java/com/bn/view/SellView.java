@@ -227,7 +227,7 @@ public class SellView{
 			{
 				initdatax=620;
 				initdatay=1280;
-				score.drawnumber(jiazhilist.get(i));
+				score.drawnumber(jiazhilist.get(i),false);
 				for(int j=0;j<jiazhilist.get(i);j++)
 				{
 					xinglist.get(j+4).drawSelf();
@@ -242,11 +242,11 @@ public class SellView{
 		
 		initdatax=900;
 		initdatay=1700;
-		score.drawnumber(dollcount);
+		score.drawnumber(dollcount,false);
 		
 		initdatax=200;
 		initdatay=200;
-		score.drawnumber(moneycount);
+		score.drawnumber(moneycount,false);
 	}
 	public void drawView() 
 	{

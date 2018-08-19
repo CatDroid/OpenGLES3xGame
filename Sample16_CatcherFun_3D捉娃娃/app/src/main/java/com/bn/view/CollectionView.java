@@ -69,6 +69,12 @@ public class CollectionView extends BNAbstractView{
         }
 		
 	}
+
+	@Override
+	public void lostContextOnGLThread() {
+
+	}
+
 	public void initbackgroundlist()//加载界面背景图的方法
 	{
 		backgroundlist.add(0,new BN2DObject(540, 960, 1080, 
@@ -156,11 +162,11 @@ public class CollectionView extends BNAbstractView{
 		{
 			initdatax=numberlocationdata[i][0];
 			initdatay=numberlocationdata[i][1];
-		    score.drawnumber(dollcount[i]);
+		    score.drawnumber(dollcount[i],false);
 		}
 		initdatax=200;
 		initdatay=200;
-		score.drawnumber(moneycount);
+		score.drawnumber(moneycount,false);
 	}
 	public void initDoll()//初始化娃娃的相关参数
 	{
