@@ -1,0 +1,25 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "26.0.2"
+
+    defaultConfig {
+        applicationId "com.bn.hand"
+        minSdkVersion 21
+        targetSdkVersion 21
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:18.0.0'
+    compile files('libs/jbullet.jar')
+    compile files('libs/vecmath.jar')
+}
