@@ -114,7 +114,7 @@ public class ScoreView extends BNAbstractView{
 		     	{
 	    	    	 mv.mainView.reSetData();
     			  	 mv.currView=mv.mainView;
-					 if(!effictOff){
+					 if(!effectOff){
 				    		MainActivity.sound.playMusic(SOUND_Back,0);
 				     }
 		     	}

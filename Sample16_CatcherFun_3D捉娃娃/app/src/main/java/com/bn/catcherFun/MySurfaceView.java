@@ -7,9 +7,11 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.opengles.GL10;
+import javax.xml.transform.Source;
 
 import com.bn.MatrixState.MatrixState2D;
 import com.bn.MatrixState.MatrixState3D;
+import com.bn.constant.SourceConstant;
 import com.bn.hand.R;
 import com.bn.thread.SwitchThread;
 import com.bn.util.manager.ShaderManager;
@@ -81,52 +83,40 @@ public class MySurfaceView extends GLSurfaceView {
             if (currView == gameView) {
                 if (gameView.isMenu) {
                     currView = gameView;
-                    gameView.isMenu = false;
+                    gameView.isMenu = false; // GameView--MenuView 取消Overlay的MenuView
                 } else {
+                    if(!SourceConstant.musicOff){ // GameView-->MainView切换背景音乐
+                        MainActivity.sound.playBackGroundMusic(activity, R.raw.nogame);
+                    }
                     currView = mainView;
-//					if(!isBGMusic){
-//						//创建音乐
-//						if(!musicOff){
-//							MainActivity.sound.playBackGroundMusic(activity, R.raw.nogame);
-//						}
-//					}
                 }
-
-            } else if (currView == ScoreView) {
+            }else if (currView == mainView)
+            {
+                if (isSet) {
+                    isSet = false;
+                    currView = mainView;    //  MainView--MenuView 取消Overlay的MenuView
+                } else {
+                    exit();                 //  只有处于主界面时才可以按返回键返回桌面
+                }
+            }else if (currView == ScoreView) {
                 currView = mainView;
             } else if (currView == YXJXView) {
                 currView = mainView;
             } else if (currView == GameAboutView) {
                 currView = mainView;
-            } else if (currView == collectionview) {
-                if (isCollection) {
-                    currView = gameView;
+            } else if (currView == collectionview) { // 奖品收藏
+                if (isSet) {                // 主界面--设置--奖品收藏  返回主界面，而且没有MenuView的Overlay
+                    Log.i(TAG,"reset to MainView");
+                    isCollection = false;
+                    isSet = false;
+                    currView = mainView;
+                }else if (isCollection) {   // 游戏界面--菜单--奖品收藏 返回游戏界面，而且没有MenuView的Overlay
                     isCollection = false;
                     gameView.isMenu = false;
                     gameView.reData();
-                } else {
-                    currView = mainView;
-//					if(!isBGMusic){
-//						//创建音乐
-//						if(!musicOff){
-//							MainActivity.sound.playBackGroundMusic(activity, R.raw.nogame);
-//						}
-//					}
+                    currView = gameView;
+                    Log.i(TAG,"GameView's MenuView");
                 }
-                if (isSet) {
-                    isSet = false;
-                    currView = mainView;
-                }
-
-            } else if (currView == mainView)//只有处于主界面时才可以按返回键返回桌面
-            {
-                if (isSet) {
-                    isSet = false;
-                    currView = mainView;
-                } else {
-                    exit();
-                }
-
             }
             return true;
         }
@@ -140,9 +130,10 @@ public class MySurfaceView extends GLSurfaceView {
             new Handler().postDelayed(new Runnable() {
                 public void run() {
                     isExit = false;
-                    isBGMusic = true;
-                    effictOff = true;
-                }
+                    SourceConstant.musicOff = true;
+                    SourceConstant.effectOff = true;
+                    MainActivity.sound.mp.pause(); // 如果还不按第二次 那么退出按钮作为关闭按钮和背景音乐功能
+                }// 如果2500ms没有再按退出，那么只是把按钮声音mute了，之后按按钮没有声音
             }, 2500);
         } else {
             android.os.Process.killProcess(android.os.Process.myPid());
@@ -254,12 +245,11 @@ public class MySurfaceView extends GLSurfaceView {
 
             if (currView == null) { // 最开始的BNAbstractView: LoadView 负载加载 加载完毕后 这个BNAbstractView就会永远释放掉
                 LoadView lv = new LoadView(MySurfaceView.this);
-                if (!isBGMusic) {
-                    //创建音乐
-                    if (!musicOff) {
-                        MainActivity.sound.playBackGroundMusic(activity, R.raw.nogame);
-                    }
+
+                if (!musicOff) {//创建音乐
+                    MainActivity.sound.playBackGroundMusic(activity, R.raw.nogame);
                 }
+
                 currView = lv;
                 lv = null;
             }

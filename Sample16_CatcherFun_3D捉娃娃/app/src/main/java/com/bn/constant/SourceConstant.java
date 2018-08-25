@@ -31,14 +31,14 @@ public class SourceConstant {
 	
 	//这是声音的一些参数数据
 	//音乐和音效的开关
-	public static boolean musicOff = false;//背景音乐
-	public static boolean effictOff = false;//音效
+    public static boolean musicOff = false;//背景音乐  musicOff和effectOff都只是在主线程上修改
+	public static boolean effectOff = false;//音效
 	
 	public static int SOUND_Click=1;//这是菜单界面点击按钮的音效
 	public static int SOUND_Back=2;//这是菜单界面点击按钮的音效
 	public static int SOUND_DropMoney=3;//金币掉落的音效
 	public static float speed=0;//绘制体下落速度
-	public static boolean isBGMusic=false;
+
 	
 	//基本尺寸单元
 	public static float screenWidth = 0;
@@ -528,8 +528,8 @@ public class SourceConstant {
     public static float tvyzr=0.035f*tvbz;
     public static float tvyzh=0.111f*tvbz;
     
-    //==========按钮坐标start==========
-    
+
+    // ------ 上下左右 捕捉 按钮 -----Start-----
     public static float catch_left=800;
     public static float catch_right=1020;
     public static float catch_top=1590;
@@ -558,7 +558,7 @@ public class SourceConstant {
     public static float tod_right=300;
     public static float tod_top=1750;
     public static float tod_bottom=1910;
-    
+    // ------ 上下左右 捕捉 按钮 -----End-----
     
     
     
@@ -604,12 +604,12 @@ public class SourceConstant {
     public static float backyouxi_top=485;
     public static float backyouxi_bottom=610;
     
-    public static float yinxiao_left=290;
+    public static float yinxiao_left=290;       // 背景音乐按钮
     public static float yinxiao_right=790;
     public static float yinxiao_top=675;
     public static float yinxiao_bottom=800;
     
-    public static float yinyue_left=290;
+    public static float yinyue_left=290;        // 音效按钮 实际控制按钮声音
     public static float yinyue_right=790;
     public static float yinyue_top=915;
     public static float yinyue_bottom=1024;
@@ -625,8 +625,7 @@ public class SourceConstant {
     public static float backmenu_top=1320;
     public static float backmenu_bottom=1450;
     
-    public static boolean yinxiaoIsOn=true;
-    public static boolean yinyueIsOn=true;
+
     
     //============奖品收藏===========
     

@@ -33,9 +33,9 @@ public class MoneyThread extends Thread //监听键盘状态的线程
         try {
             while (!mIsStop) {
                 currtime = System.currentTimeMillis();
-                if (moneycount == 20) {
+                if (moneycount == 20) { // 最高20个金币
                     pretime = currtime;
-                } else if (moneycount < 20 && (currtime - pretime > 3000 * 60)) {
+                } else if (moneycount < 20 && (currtime - pretime > 3 * 60  *1000 )) { // 每三分钟增加一个金币
                     moneycount++;
                     pretime = currtime;
                 }

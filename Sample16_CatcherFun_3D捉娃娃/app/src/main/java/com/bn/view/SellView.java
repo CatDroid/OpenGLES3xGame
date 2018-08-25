@@ -116,7 +116,7 @@ public class SellView{
 	    	case MotionEvent.ACTION_DOWN:
 	    		 if(x>sell_left&&x<sell_right&&y>sell_top&&y<sell_bottom)
 	    		 {
-		    		 if(!effictOff){
+		    		 if(!effectOff){
 		    			MainActivity.sound.playMusic(SOUND_Click,0);
 		    		 }
 		    		  background.remove(3);
@@ -129,7 +129,7 @@ public class SellView{
 	    		 }
 	    	 if(x>back_left&&x<back_right&&y>back_top&&y<back_bottom)
 	    	  {
-    			 if(!effictOff){
+    			 if(!effectOff){
     				 MainActivity.sound.playMusic(SOUND_Back,0);
     			 }
 	    		 for(int i=0;i<9;i++)

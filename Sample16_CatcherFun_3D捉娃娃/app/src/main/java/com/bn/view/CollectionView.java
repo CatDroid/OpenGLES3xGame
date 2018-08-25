@@ -196,7 +196,7 @@ public class CollectionView extends BNAbstractView{
 	    	case MotionEvent.ACTION_DOWN:
 	    	    if(x>back_left&&x<back_right&&y>back_top&&y<back_bottom&&!isSale)
 		     	{//点击返回按钮
-	    			 if(!effictOff){
+	    			 if(!effectOff){
 	    				 MainActivity.sound.playMusic(SOUND_Back,0);//播放背景音乐
 	    			 }
 		    		  if(isCollection)

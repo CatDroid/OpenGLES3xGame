@@ -5,6 +5,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.bn.catcherFun.MainActivity;
 import com.bn.catcherFun.MySurfaceView;
 import com.bn.constant.Constant;
+import com.bn.constant.SourceConstant;
 import com.bn.hand.R;
 import com.bn.object.BN2DObject;
 import com.bn.thread.Angle2DThread;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
 import static com.bn.constant.SourceConstant.*;
+
 public class MainView extends BNAbstractView{
 
 	private final static String TAG = "MainView";
@@ -137,22 +139,21 @@ public class MainView extends BNAbstractView{
 			mAngleTh.start();
 		}
 
-		if(!isBGMusic){
-			//创建音乐
-			if(!musicOff){
-				MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.nogame);
-			}
+		//创建音乐
+		if(!musicOff){
+			MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.nogame);
 		}
+
 		 score=new DrawNumber(mv);
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent e) 
 	{
-		if(isSet)//这是游戏设定按钮的标志位  hhl 因为设定界面是弹出窗口的效果,底层还是MainView
+		if(isSet)// MenuView按钮处理 这是游戏设定按钮的标志位  hhl 因为设定界面是弹出窗口的效果 overlay,底层还是MainView
 		{
 			 return mv.menuview.onTouchEvent(e);
-		}else{
+		}else{	 // MainMenu按钮处理
 
 			// 触摸是以左上角为原点
 			float x=Constant.fromRealScreenXToStandardScreenX(e.getX());//获取触控点的坐标
@@ -169,15 +170,14 @@ public class MainView extends BNAbstractView{
 	    		if(x>StartGame_TOUCH_LEFT_x&&x<StartGame_TOUCH_RIGHT_x&&
 						y>StartGame_TOUCH_TOP_y&&y<StartGame_TOUCH_BOTTOM_y&&!isSet&&isStartGm)
 	    		{
-	    			isStartGm=false;
-	    			mv.currView=mv.gameView;
-	    			mv.gameView.reData();
-	    			//创建音乐
-	    			if(!isBGMusic){
-		    			if(!musicOff){
-		    				MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.game);
-		    			}
-	    			}
+	    			isStartGm=false;		// 开始游戏按钮 抬起了 isStartGm控制渲染按钮效果
+					mv.gameView.reData();
+	    			mv.currView=mv.gameView;// 切换到GameView
+
+					if(!musicOff){		//  背景音乐切换为游戏音乐
+						MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.game);
+					}
+
 	    		}else if(x>YXJX_TOUCH_LEFT_x&&x<YXJX_TOUCH_RIGHT_x&&
 						y>YXJX_TOUCH_TOP_y&&y<YXJX_TOUCH_BOTTOM_y&&!isSet&&isYXJX)
 	    		{
@@ -229,42 +229,42 @@ public class MainView extends BNAbstractView{
 						y>StartGame_TOUCH_TOP_y&&y<StartGame_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			isStartGm=true;
-	    			if(!effictOff){
+	    			if(!effectOff){
 	    				MainActivity.sound.playMusic(SOUND_Click,0);
 	    			}
 	    		}else if(x>YXJX_TOUCH_LEFT_x&&x<YXJX_TOUCH_RIGHT_x&&
 						y>YXJX_TOUCH_TOP_y&&y<YXJX_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			isYXJX=true;
-	    			if(!effictOff){
+	    			if(!effectOff){
 	    				MainActivity.sound.playMusic(SOUND_Click,0);
 	    			}
 	    		}else if(x>MainViewSC_TOUCH_LEFT_x&&x<MainViewSC_TOUCH_RIGHT_x&&
 						y>MainViewSC_TOUCH_TOP_y&&y<MainViewSC_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			SCJP=true;
-	    			if(!effictOff){
+	    			if(!effectOff){
 	    				MainActivity.sound.playMusic(SOUND_Click,0);
 	    			}
 	    		}else if(x>GameAbout_TOUCH_LEFT_x&&x<GameAbout_TOUCH_RIGHT_x&&
 						y>GameAbout_TOUCH_TOP_y&&y<GameAbout_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			GameAbout=true;
-	    			if(!effictOff){
+	    			if(!effectOff){
 	    				MainActivity.sound.playMusic(SOUND_Click,0);
 	    			}
 	    		}else if(x>GameSD_TOUCH_LEFT_x&&x<GameSD_TOUCH_RIGHT_x&&
 						y>GameSD_TOUCH_TOP_y&&y<GameSD_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			GameSD=true;
-	    			if(!effictOff){
+	    			if(!effectOff){
 	    				MainActivity.sound.playMusic(SOUND_Click,0);
 	    			}
 	    		}else if(x>GameScore_TOUCH_LEFT_x&&x<GameScore_TOUCH_RIGHT_x&&
 						y>GameScore_TOUCH_TOP_y&&y<GameScore_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			GameScore=true;
-	    			if(!effictOff){
+	    			if(!effectOff){
 	    				MainActivity.sound.playMusic(SOUND_Click,0);
 	    			}
 	    		}else if(x>Gamequit_TOUCH_LEFT_x&&x<Gamequit_TOUCH_RIGHT_x&&
@@ -291,8 +291,9 @@ public class MainView extends BNAbstractView{
 				public void run()
 				{
 					isExit = false;
-					isBGMusic=true;
-					effictOff=true;
+					SourceConstant.musicOff=true;
+					SourceConstant.effectOff =true;
+                    MainActivity.sound.mp.pause();// 如果还不按第二次 那么退出按钮作为关闭按钮和背景音乐功能
 				}
 			}, 2500);
 		}else
@@ -301,6 +302,7 @@ public class MainView extends BNAbstractView{
 		}
 	}
 
+	// 绘制金币数量
 	private void drawMoney()
 	{
 		initdatax=1450-dance*20;
@@ -366,7 +368,7 @@ public class MainView extends BNAbstractView{
 		}
 
 
-		BackText.drawSelf();
+		BackText.drawSelf(); // 绘制游戏的名字
 		drawMoney(); // 开始按钮上面显示的 金币数目
 		
 
@@ -374,7 +376,7 @@ public class MainView extends BNAbstractView{
 			mv.menuview.drawView(gl);
 
 		}else{
-			// 绘制主页上 3D可爱捉娃娃 上的闪烁的星星 star.png 一共4个 分别在不同的位置
+			// 绘制MainView的星星 游戏名字标题'3D可爱捉娃娃'上的闪烁的星星 star.png 一共4个 分别在不同的位置
 			GLES30.glEnable(GLES30.GL_BLEND);
 			GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA,GLES30.GL_ONE_MINUS_SRC_ALPHA);
 			for(int i=0;i<cpng.size();i++){
@@ -383,7 +385,7 @@ public class MainView extends BNAbstractView{
 			GLES30.glDisable(GLES30.GL_BLEND);
 		}
 
-		// 切入到MainView界面时候的过渡效果
+		// 切入到MainView界面时候的 所有按钮渐进的 过渡效果
 		dance++;
 		if(dance>20){
 			dance=20;
@@ -401,8 +403,7 @@ public class MainView extends BNAbstractView{
 		}
 	}
 
-	public void reSetData()
-	{
+	public void reSetData() { // 重置内部状态
 		dance=0;
 	}
 

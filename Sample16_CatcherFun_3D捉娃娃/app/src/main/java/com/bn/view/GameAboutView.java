@@ -35,7 +35,7 @@ public class GameAboutView extends BNAbstractView{
 			case MotionEvent.ACTION_DOWN:
 				 if(x>YXJXBack_TOUCH_LEFT_x&&x<YXJXBack_TOUCH_RIGHT_x&&
 							y>YXJXBack_TOUCH_TOP_y&&y<YXJXBack_TOUCH_BOTTOM_y){
-					 if(!effictOff){
+					 if(!effectOff){
 				    	 MainActivity.sound.playMusic(SOUND_Back,0);
 				     }
 					 mv.mainView.reSetData();
