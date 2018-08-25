@@ -43,8 +43,10 @@ public class MainActivity extends Activity {
         		WindowManager.LayoutParams.FLAG_FULLSCREEN);//去掉标头
         DisplayMetrics dm=new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
-        Constant.ssr=ScreenScaleUtil.calScale(dm.widthPixels, dm.heightPixels);
-        
+        // 华为V10 1080(1088)x2160 使用全屏返回的是 1080x2140
+        Constant.ssr=ScreenScaleUtil. calScale(dm.widthPixels, dm.heightPixels);
+        // 用于做触摸坐标转换 fromRealScreenXToStandardScreenX   物理屏幕坐标 --> 缩放后的屏幕坐标 -->  1080x1920标准屏幕的坐标
+
         sound=new SoundManager(this);
         mGLSurfaceView = new MySurfaceView(this);
         mGLSurfaceView.requestFocus();//获取焦点

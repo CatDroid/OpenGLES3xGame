@@ -31,6 +31,8 @@ public class Constant
 	{
 		return -(y-SCREEN_HEIGHT_STANDARD/2)/(SCREEN_HEIGHT_STANDARD/2);
 	}
+
+	// 物理屏幕坐标 --> 缩放后的屏幕坐标 -->  1080x1920标准屏幕的坐标
 	//实际屏幕x坐标到标准屏幕x坐标
 	public static float fromRealScreenXToStandardScreenX(float rx)
 	{

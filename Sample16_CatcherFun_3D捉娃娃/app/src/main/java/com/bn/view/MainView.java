@@ -153,10 +153,14 @@ public class MainView extends BNAbstractView{
 		{
 			 return mv.menuview.onTouchEvent(e);
 		}else{
-			//Log.d(TAG,"onTouchEvent " + e.getX() + "," + e.getY() );
+
 			// 触摸是以左上角为原点
 			float x=Constant.fromRealScreenXToStandardScreenX(e.getX());//获取触控点的坐标
 			float y=Constant.fromRealScreenYToStandardScreenY(e.getY());
+
+			// adb shell input tap 1079.99 500 1080x2160的V10 不能去到1080只能 [0,1079] 或者 [0,1080)
+			Log.d(TAG,String.format("onTouchEvent (%f,%f) -> (%f %f)" , e.getX(),e.getY(),x,y ));
+
 			switch(e.getAction())
 	    	{
 	    	case  MotionEvent.ACTION_MOVE:
@@ -366,7 +370,7 @@ public class MainView extends BNAbstractView{
 		drawMoney(); // 开始按钮上面显示的 金币数目
 		
 
-		if(isSet){ // 如果打开了设置按钮 先绘制MainView再绘制MenuView 覆盖掉MainView的部分
+		if(isSet){ // 如果打开了设置按钮 先绘制MainView再绘制MenuView 覆盖掉MainView的部分(overlay)
 			mv.menuview.drawView(gl);
 
 		}else{

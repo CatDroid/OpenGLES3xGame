@@ -220,7 +220,7 @@ public class MySurfaceView extends GLSurfaceView {
         }
 
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            // 在华为V10上 选择全屏显示后是 2040x1080  不全屏显示是 1920x1080
+            // 在华为V10(1080(1088)x2160) 选择全屏显示后是 2040x1080  不全屏显示是 1920x1080
             DisplayMetrics dm = new DisplayMetrics();
             activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -238,7 +238,6 @@ public class MySurfaceView extends GLSurfaceView {
             screenHeight = height;
 
             // 分别表示2D和3D的状态 主要区分是 2D是正交投影 3D是透视投影
-            // 把MainVIew的所有按钮做成一个 2D物体 而且用正交投影 缺点是 如果屏幕不是1920x1080就会导致左右或者上下超出屏幕以外
             MatrixState3D.setInitStack();
             MatrixState3D.setProjectFrustum(-ratio, ratio, -1, 1, 1.5f, 100);
             MatrixState3D.setCamera(
@@ -246,7 +245,8 @@ public class MySurfaceView extends GLSurfaceView {
                     TARGET_X, TARGET_Y, TARGET_Z,
                     0, 1, 0);
 
-
+            // 把MainVIew的所有按钮做成一个 2D物体 而且用正交投影
+            // 缺点是 如果屏幕不是1920x1080就会导致左右或者上下超出屏幕以外
             MatrixState2D.setInitStack();
             MatrixState2D.setCamera(0, 0, 5, 0f, 0f, 0f, 0f, 1f, 0f);
             MatrixState2D.setProjectOrtho(-ratio, ratio, -1, 1, 1, 100);
