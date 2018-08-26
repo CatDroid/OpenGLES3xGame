@@ -19,7 +19,6 @@ public class ScoreView extends BNAbstractView{
 	DrawNumber score;
 	float PreviousX;
 	float PreviousY;
-	public static  boolean isPrecent=false;
 	public static List<BN2DObject> backgroundlist=new ArrayList<BN2DObject>();//存放BNObject对象
 	public static List<Integer> Scorelist=new ArrayList<Integer>();//存放BNObject对象
 	public static float[][] scorelocationdata=new float[5][2];
@@ -81,18 +80,16 @@ public class ScoreView extends BNAbstractView{
 		{
 			initdatax=scorelocationdata[i][0];
 			initdatay=scorelocationdata[i][1];
-		    score.drawScore(Scorelist.get(i));
+		    score.drawScore(Scorelist.get(i),false);
 		}
-		
-		
-		isPrecent=true;
+
 		initdatax=900;
 		initdatay=1120;
-		score.drawScore(getcollectionpercent);
-		isPrecent=false;
+		score.drawScore(getcollectionpercent,true);
+
 		initdatax=900;
 		initdatay=1320;
-		score.drawScore(getdolltypecount);
+		score.drawScore(getdolltypecount,false);
 	
 	}
 	
