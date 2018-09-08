@@ -4,6 +4,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import com.bn.MatrixState.MatrixState2D;
 import com.bn.constant.Constant;
+import com.bn.constant.SourceConstant;
+
 import android.opengl.GLES30;
 import static com.bn.constant.SourceConstant.*;
 public class BN2DObject
@@ -125,108 +127,87 @@ public class BN2DObject
 	//初始化着色器
 	public void initShader()
 	{
-		//获取程序中顶点位置属性引用id  
+		// attribute 顶点属性 两个 顶点坐标和纹理坐标
 		maPositionHandle = GLES30.glGetAttribLocation(programId, "aPosition");
-		//获取程序中顶点纹理坐标属性引用id  
 		maTexCoorHandle= GLES30.glGetAttribLocation(programId, "aTexCoor");
-		//获取程序中总变换矩阵引用id
-        muMVPMatrixHandle = GLES30.glGetUniformLocation(programId, "uMVPMatrix");  
-        CLStepHandle=GLES30.glGetUniformLocation(programId, "CLStep");//改变透明度的参数引用Id
-        xHandle=GLES30.glGetUniformLocation(programId, "xPosition");//
+
+		// uniform 程序总变换矩阵引用id
+        muMVPMatrixHandle = GLES30.glGetUniformLocation(programId, "uMVPMatrix");
+		// uniform 改变透明度的参数引用
+        CLStepHandle=GLES30.glGetUniformLocation(programId, "CLStep");
+        xHandle=GLES30.glGetUniformLocation(programId, "xPosition");
 	}
-	public void setY(float y)
-	{
-		this.y=Constant.fromScreenYToNearY(y);//将屏幕y转换成视口y坐标
+
+	// 将屏幕y转换成视口y坐标
+	public void setY(float y) {
+		this.y=Constant.fromScreenYToNearY(y);
 	}
 	
-	public void setX(float x)
-	{
+	public void setX(float x) {
 		this.x=Constant.fromScreenXToNearX(x);
 	}
-	//绘制图形
-	public void drawSelf()
+
+
+	public void drawSelf()	// 绘制图形
 	{        
-		if(!initFlag)
-		{
-			//初始化着色器        
+		if(!initFlag) { 	// 编译shader程序
     		initShader();
     		initFlag=true;
     	}
-    	GLES30.glEnable(GLES30.GL_BLEND);//打开混合
-//    	//设置混合因子
+
+		MatrixState2D.pushMatrix();//保护场景
+
+    	GLES30.glEnable(GLES30.GL_BLEND);// 打开混合
 		GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA,GLES30.GL_ONE_MINUS_SRC_ALPHA);
-    	//制定使用某套shader程序
+
     	GLES30.glUseProgram(programId);
+
+		// BN2DObject的共同点 就是 更新stop loadPostion 和 translate scale rotate
     	GLES30.glUniform1f(CLStepHandle, step);
     	GLES30.glUniform1f(xHandle, loadPosition);
-    	MatrixState2D.pushMatrix();//保护场景
-		MatrixState2D.translate(x,y, 0);//平移
+
+		MatrixState2D.translate(x,y, 0);// 平移 XOY平面 z是近远深度 x,y坐标可以在构造时传入 也可以setX setY更改
 
 		// 根据实例化时候的配置，不同的2D-Object会先做以下缩放或者旋转(z轴),然后都会平移到各自指定位置(XOY平面)
 		if(spng==1){
-			MatrixState2D.scale(step/100,step/100,step/100);
-		}
-		if(spng==1){
-			MatrixState2D.rotate(AngleSpng, 0, 0, 1);
-		}
-		if(spng==2){
-			MatrixState2D.rotate(Angle2D, 0, 0, 1);
-		}
-		if(spng==3){
-			MatrixState2D.rotate(AngleSpng, 0, 0, 1);
-		}
-        if(spng==4){
-        	MatrixState2D.scale(step/100,step/100,step/100);
+			// 控制缩放 如果不设置，为给定的width和height
+			// scale 5~30 --> 0.05~0.3
+			MatrixState2D.scale(SourceConstant.step/100,SourceConstant.step/100,SourceConstant.step/100);
+			MatrixState2D.rotate(SourceConstant.AngleSpng, 0, 0, 1);
+		}else if (spng==2){
+			MatrixState2D.rotate(SourceConstant.Angle2D, 0, 0, 1);
+		}else if (spng==3){
+			MatrixState2D.rotate(SourceConstant.AngleSpng, 0, 0, 1);
+		}else if (spng==4){
+        	MatrixState2D.scale(SourceConstant.step/100,SourceConstant.step/100,SourceConstant.step/100);
         }
-    	//将最终变换矩阵传入shader程序
-    	GLES30.glUniformMatrix4fv
-    	(
-    			muMVPMatrixHandle, 
-    			1, 
-    			false, 
-    			MatrixState2D.getFinalMatrix(), 
-    			0
-    	); 
-    	
-    	//为画笔指定顶点位置数据
-    	GLES30.glVertexAttribPointer  
-    	(
-    			maPositionHandle,
-    			3, 
-    			GLES30.GL_FLOAT,
-    			false,
-    			3*4,
-    			mVertexBuffer
-    			);
-    	//为画笔指定顶点纹理坐标数据
-    	GLES30.glVertexAttribPointer
-    	(
-    			maTexCoorHandle,
-    			2,
-    			GLES30.GL_FLOAT,
-    			false,
-    			2*4,
-    			mTexCoorBuffer
-    			);   
-    	//允许顶点位置数据数组
+
+
+    	// 将最终变换矩阵传入shader程序
+    	GLES30.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, MatrixState2D.getFinalMatrix(), 0);
+
+		// 更新顶点属性
+    	GLES30.glVertexAttribPointer(maPositionHandle, 3, GLES30.GL_FLOAT, false, 3*4, mVertexBuffer);
+    	GLES30.glVertexAttribPointer(maTexCoorHandle, 2, GLES30.GL_FLOAT, false, 2*4, mTexCoorBuffer);
     	GLES30.glEnableVertexAttribArray(maPositionHandle);  
     	GLES30.glEnableVertexAttribArray(maTexCoorHandle);  
     	
-    	//绑定纹理
+    	// 绑定纹理
     	GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
     	GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,texId);
     	
-    	//绘制纹理矩形--条带法
+    	// 绘制纹理矩形--条带法
     	GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, vCount); 
     	
-    	//关闭混合
+    	// 关闭混合
+		GLES30.glDisable(GLES30.GL_BLEND);
 
-    	MatrixState2D.popMatrix();//恢复场景
-    	GLES30.glDisable(GLES30.GL_BLEND);
-    
-    	
+		// 恢复场景
+    	MatrixState2D.popMatrix();
 	}
-	
+
+
+	// 这个draw只做平移 而且不是用构造时候传入的 ，而是每次draw时候传入
 	public void drawSelf(float lx,float ly)
 	{        
 		if(!initFlag)
@@ -249,11 +230,12 @@ public class BN2DObject
 
 		lx=Constant.fromScreenXToNearX(lx);
 		ly=Constant.fromScreenYToNearY(ly);
-		MatrixState2D.translate(lx,ly, 0);//平移
+		MatrixState2D.translate(lx,ly, 0);// 只做 平移
 
 		// 将最终变换矩阵传入shader程序
 		GLES30.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, MatrixState2D.getFinalMatrix(), 0);
 
+		// 更新顶点属性
 		// size 该顶点属性的组件数量，比如顶点坐标 组件数量是4，纹理坐标 组件数量是2，法向量 组件数量是4
 		GLES30.glVertexAttribPointer(maPositionHandle, 3, GLES30.GL_FLOAT, false, 3*4, mTexCoorBuffer);
 		GLES30.glVertexAttribPointer(maTexCoorHandle, 2, GLES30.GL_FLOAT, false, 2*4, mTexCoorBuffer);

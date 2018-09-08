@@ -21,8 +21,10 @@ public class ShaderManager {
             {"holebox_vertex.glsl", "holebox_frag.glsl"},
             //4  顶点 做MVP 并把原来的顶点坐标和纹理坐标给到frag  片元 根据片元距离原点距离 计算颜色
             {"vertex_lz.glsl", "frag_lz.glsl"},
-            //5  顶点 只做MVP  片元 根据传入管线的uniform修改整个图片的alpha(动态修改整体的透明度)
-            //  MainView的游戏标题的4个闪烁的星星 Clpng BN2DObject spng=1 传入管线step SwitchThread 5~30
+            //5  顶点 只做MVP
+            //   片元 根据传入管线的uniform修改整个图片的alpha(动态修改整体的透明度)
+            //   作用 做闪烁效果 时刻变大变小旋转闪烁
+            //   用例 MainView的游戏标题的4个闪烁的星星 Clpng BN2DObject spng=1 传入管线step SwitchThread 5~30
             {"vertex_spng.glsl", "frag_spng.glsl"},
     };
     private static String[] mVertexShader = new String[shaderCount];

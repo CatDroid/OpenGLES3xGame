@@ -23,7 +23,7 @@ public class SwitchThread extends Thread {
     public void run() {
         while (!mIsStop) {//循环定时移动炮弹
             try {
-                if (ismin) {
+                if (ismin) { //   step 取值范围 [5,30]
                     step -= 1;
                     if (step < 5) {
                         ismin = false;
