@@ -21,14 +21,22 @@ public class Constant
 		*   ? = size  / (SCREEN_HEIGHT_STANDARD/2)
 		* */
 	}
-	//屏幕x坐标到视口x坐标
-	public static float fromScreenXToNearX(float x)
-	{
+
+	/** 屏幕x坐标到视口x坐标 和 屏幕y坐标到视口y坐标  视口坐标就是要归一化
+	 *
+	 *
+	 * 	1. 原点从左上角 改成 中心  只需要 -WIDTH/2 或者 -HEIGHT/2
+	 * 	2. 归一化
+	 * 			因为 setProjectOrtho 正交变换 设置为 -radio,radio,-1,1
+	 * 			就是 width/height,width/height,height/height,height/height
+	 * 			所以 这里除以 HEIGHT/2 作为归一化
+	 *
+ 	 */
+	public static float fromScreenXToNearX(float x) {
 		return (x-SCREEN_WIDTH_STANDARD/2)/(SCREEN_HEIGHT_STANDARD/2);
 	}
-	//屏幕y坐标到视口y坐标
-	public static float fromScreenYToNearY(float y)
-	{
+
+	public static float fromScreenYToNearY(float y) {
 		return -(y-SCREEN_HEIGHT_STANDARD/2)/(SCREEN_HEIGHT_STANDARD/2);
 	}
 
