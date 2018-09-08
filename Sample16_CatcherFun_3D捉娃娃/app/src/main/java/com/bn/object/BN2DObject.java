@@ -74,6 +74,7 @@ public class BN2DObject
 		vCount=4;//顶点个数
 		width=Constant.fromPixSizeToNearSize(width);//屏幕宽度转换成视口宽度
 		height=Constant.fromPixSizeToNearSize(height);//屏幕高度转换成视口高度
+
 		//初始化顶点坐标数据
 		float vertices[]=new float[] // hhl 也是做了归一化 按高为最长边
 		{
@@ -87,35 +88,40 @@ public class BN2DObject
 		mVertexBuffer=vbb.asFloatBuffer();//转换为Float型缓冲
 		mVertexBuffer.put(vertices);//向缓冲区中放入顶点坐标数据
 		mVertexBuffer.position(0);//设置缓冲区起始位置
+
 		float[] texCoor=new float[12];//初始化纹理坐标数据
 		//其他图形的纹理坐标
 		if(!isLoad)
 		{
 			texCoor=new float[]{
-					0,0,0,1,1,0,
-					1,1,1,0,0,1};
+					0,0,0,1,
+					1,0,1,1,
+					//1,0,0,1
+			};
 		}else
 		{	// hhl 像load.png这样 一张纹理图中包含5x5的小图 连续图片 ，只需要显示纹理图中的其中一个
 			//给出一副纹理图的行跟列，这里就在对应的纹理图的地方，计算出来相应的纹理坐标
 			float sstep=(float)1/LZ;
 			float tstep=(float)1/HZ;
-			texCoor=new float[]
+			texCoor=new float[] // han 和 lie 从1开始 [1,5]
 					{
 					   sstep*han-sstep,	tstep*lie-tstep,
 					   sstep*han-sstep,	tstep*lie,
 					   sstep*han,		tstep*lie-tstep,
-					   
 					   sstep*han,tstep*lie,
-					   sstep*han,tstep*lie-tstep,
-					   sstep*han-sstep,tstep*lie
+
+					   //sstep*han,tstep*lie-tstep,
+					   //sstep*han-sstep,tstep*lie
 					};
 		}
-		ByteBuffer cbb=ByteBuffer.allocateDirect(texCoor.length*4);//创建顶点纹理坐标数据缓冲
-		cbb.order(ByteOrder.nativeOrder());//设置字节顺序
-		mTexCoorBuffer=cbb.asFloatBuffer();//转换为Float型缓冲
-		mTexCoorBuffer.put(texCoor);//向缓冲区中放入顶点着色数据
-		mTexCoorBuffer.position(0);//设置缓冲区起始位置
+		ByteBuffer cbb=ByteBuffer.allocateDirect(texCoor.length*4);
+		cbb.order(ByteOrder.nativeOrder());
+		mTexCoorBuffer=cbb.asFloatBuffer();
+		mTexCoorBuffer.put(texCoor);
+		mTexCoorBuffer.position(0);
 	}
+
+
 	//初始化着色器
 	public void initShader()
 	{
@@ -229,57 +235,42 @@ public class BN2DObject
 			initShader();
 			initFlag=true;
 		}
-		GLES30.glEnable(GLES30.GL_BLEND);//打开混合
-		//设置混合因子
+
+		// 保护场景
+		MatrixState2D.pushMatrix();
+
+		// 打开混合 设置混合因子
+		GLES30.glEnable(GLES30.GL_BLEND);
 		GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA,GLES30.GL_ONE_MINUS_SRC_ALPHA);
-		//制定使用某套shader程序
+
+
 		GLES30.glUseProgram(programId);
 		
-		MatrixState2D.pushMatrix();//保护场景
+
 		lx=Constant.fromScreenXToNearX(lx);
 		ly=Constant.fromScreenYToNearY(ly);
 		MatrixState2D.translate(lx,ly, 0);//平移
-		//将最终变换矩阵传入shader程序
-		GLES30.glUniformMatrix4fv
-		(
-				muMVPMatrixHandle, 
-				1, 
-				false, 
-				MatrixState2D.getFinalMatrix(), 
-				0
-				); 
-		//为画笔指定顶点位置数据
-		GLES30.glVertexAttribPointer  
-		(
-				maPositionHandle,
-				3, 
-				GLES30.GL_FLOAT,
-				false,
-				3*4,
-				mVertexBuffer
-				);
-		//为画笔指定顶点纹理坐标数据
-		GLES30.glVertexAttribPointer
-		(
-				maTexCoorHandle,
-				2,
-				GLES30.GL_FLOAT,
-				false,
-				2*4,
-				mTexCoorBuffer
-				);   
-		//允许顶点位置数据数组
+
+		// 将最终变换矩阵传入shader程序
+		GLES30.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, MatrixState2D.getFinalMatrix(), 0);
+
+		// size 该顶点属性的组件数量，比如顶点坐标 组件数量是4，纹理坐标 组件数量是2，法向量 组件数量是4
+		GLES30.glVertexAttribPointer(maPositionHandle, 3, GLES30.GL_FLOAT, false, 3*4, mTexCoorBuffer);
+		GLES30.glVertexAttribPointer(maTexCoorHandle, 2, GLES30.GL_FLOAT, false, 2*4, mTexCoorBuffer);
 		GLES30.glEnableVertexAttribArray(maPositionHandle);  
 		GLES30.glEnableVertexAttribArray(maTexCoorHandle);  
 		
-		//绑定纹理
+
 		GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
 		GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,texId);
-		
-		//绘制纹理矩形--条带法
-		GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, vCount); 
-		//关闭混合
+
+		// 绘制纹理矩形--条带法
+		GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, vCount);
+
+		// 关闭混合
 		GLES30.glDisable(GLES30.GL_BLEND);
-		MatrixState2D.popMatrix();//恢复场景
+
+		// 恢复场景
+		MatrixState2D.popMatrix();
 	}
 }
