@@ -10,10 +10,10 @@ in vec3 vPosition;
 out vec4 fragColor;
 void main()                         
 {               
-    vec4 colorTL = texture(sTexture, vTextureCoord); 
+    vec4 colorTL = texture(sTexture, vTextureCoord);
     vec4 colorT;
     float disT=distance(vPosition,vec3(0.0,0.0,0.0));
-    float tampFactor=(1.0-disT/bj)*sjFactor;
+    float tampFactor=(1.0-disT/bj)*sjFactor; // 越往圆心 值越大
     vec4 factor4=vec4(tampFactor,tampFactor,tampFactor,tampFactor);
     colorT=clamp(factor4,endColor,startColor);
     colorT=colorT*colorTL.a;  
