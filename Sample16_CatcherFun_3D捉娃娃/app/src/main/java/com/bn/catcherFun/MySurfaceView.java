@@ -239,7 +239,7 @@ public class MySurfaceView extends GLSurfaceView {
             // 把MainVIew的所有按钮做成一个 2D物体 而且用正交投影
             // 缺点是 如果屏幕不是1920x1080就会导致左右或者上下超出屏幕以外
             MatrixState2D.setInitStack();
-            MatrixState2D.setCamera(0, 0, 5, 0f, 0f, 0f, 0f, 1f, 0f);
+            MatrixState2D.setCamera(0, 0, 5, 0f, 0f, 0f, 0f, 1f, 0f); // 正交变换 没有影响
             MatrixState2D.setProjectOrtho(-ratio, ratio, -1, 1, 1, 100);
             MatrixState2D.setLightLocation(0, 50, 0); // 点光源 固定位置
 

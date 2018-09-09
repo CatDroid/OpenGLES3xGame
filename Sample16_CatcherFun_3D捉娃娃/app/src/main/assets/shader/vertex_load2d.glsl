@@ -8,5 +8,6 @@ void main()
 {                            		
    gl_Position = uMVPMatrix * vec4(aPosition,1); //根据总变换矩阵计算此次绘制此顶点位置
    vTextureCoord = aTexCoor;//将接收的纹理坐标传递给片元着色器
-   vxPosition=gl_Position.x;
+   vxPosition = aPosition.x ;// gl_Position / 1.7 // 按照正交变换的公式 (2/(1080/1920-(1080/1920)))=1.7 )
+   //vxPosition = gl_Position.x ;// 正交变换的  是x坐标乘以了1.7
 }                      

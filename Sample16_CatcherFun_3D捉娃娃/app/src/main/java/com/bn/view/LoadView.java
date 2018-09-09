@@ -17,6 +17,7 @@ import com.bn.util.manager.ShaderManager;
 import com.bn.util.manager.TextureManager;
 
 import android.opengl.GLES30;
+import android.util.Log;
 import android.view.MotionEvent;
 
 public class LoadView extends BNAbstractView {
@@ -47,18 +48,19 @@ public class LoadView extends BNAbstractView {
                         TextureManager.getTextures("load.png"),
                         ShaderManager.getShader(2)));
             }
-        }
-        loadjm.add(
+        }// 动画
+
+        loadjm.add( // 进度条 固定粉红色 lu.png 256x16 并且左右有空白透明的部分
                 new BN2DObject(
                         540, 1680, 900, 20,
-                        TextureManager.getTextures("lu1.png"),
-                        ShaderManager.getShader(2))
+                        TextureManager.getTextures("lu1.png"),// 256x16  左右有10个像素是透明的 只有中间是透明的 拉长到900的话，估计有左右有36个像素是透明的(10/256=?/900)
+                        ShaderManager.getShader(2)) // spng = 0
         );
-        loadjm.add(
-                new BN2DObject(
-                        540, 1680, 900, 20,
-                        TextureManager.getTextures("lu.png"),
-                        ShaderManager.getShader(1)));
+        loadjm.add( // 进度
+                new BN2DObject( // 540 是这个BN2DObject要渲染要的中心点 不是左上角
+                        540, 1680, 900, 20, // 要画出来的宽度是900 对应frag_load2d.glsl
+                        TextureManager.getTextures("lu.png"),// 256x8 完全透明 要被拉大到900x20
+                        ShaderManager.getShader(1))); // spng = 0
 
         BackText =
                 new BN2DObject(
@@ -80,7 +82,7 @@ public class LoadView extends BNAbstractView {
     }
 
 
-    public void initBNView(int index) {
+    private void initBNView(int index) {
         switch (index) {
             case 0:
                 break;
@@ -224,26 +226,30 @@ public class LoadView extends BNAbstractView {
     @Override
     public void drawView(GL10 gl) {
         GLES30.glDisable(GLES30.GL_DEPTH_TEST);
-        for (int j = 0; j < loadjm.size() - 1; j++) {
-            loadjm.get(j).drawSelf();
-        }
+        //for (int j = 0; j < loadjm.size() - 1; j++) {
+            loadjm.get(0).drawSelf();// 绘制粉红色进度 spng = 0 其实只是调用loadjm.get(0).drawSelf()
+        //} // spng = 0  getShader(2)
 
         BackText.drawSelf();
         if (!mv.isInitOver) // 如果还没有初始化完毕,就进行下一轮的加载,最后一轮是创建所有的View对象
         {
+
             if (index >= load.size()) {
                 index = 0;
             }//initIndex*2
-            load.get(index).setX(90 + initIndex * 20f);
-            load.get(index).drawSelf();
-            loadPosition = 90 + initIndex * 20f;
-            loadjm.get(1).drawSelf();
+            load.get(index).setX(90 + initIndex * 22.05f);
+            load.get(index).drawSelf(); // 画动画  load.png
+
+            loadPosition = 90 + initIndex *  22.05f; //  initIndex = [0,40]
+            loadjm.get(1).drawSelf(); // 更新进度 红色 和 半透明 spng = 0  getShader(1) 540, 1680, 900, 20,
             index++;
 
             //初始化界面资源
-            initBNView(initIndex);
+            initBNView(initIndex); // 实际只会到40 40之后就会设置isInitOver=true 然后initIndex被reSetData 900/40 = 22.05
             if (initIndex < 41) {
                 initIndex++;//图片索引加1
+            }else{
+                Log.d("TOM","end of Load");
             }
         }
 
