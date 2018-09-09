@@ -237,7 +237,7 @@ public class BN2DObject
 
 		// 更新顶点属性
 		// size 该顶点属性的组件数量，比如顶点坐标 组件数量是4，纹理坐标 组件数量是2，法向量 组件数量是4
-		GLES30.glVertexAttribPointer(maPositionHandle, 3, GLES30.GL_FLOAT, false, 3*4, mTexCoorBuffer);
+		GLES30.glVertexAttribPointer(maPositionHandle, 3, GLES30.GL_FLOAT, false, 3*4, mVertexBuffer);
 		GLES30.glVertexAttribPointer(maTexCoorHandle, 2, GLES30.GL_FLOAT, false, 2*4, mTexCoorBuffer);
 		GLES30.glEnableVertexAttribArray(maPositionHandle);  
 		GLES30.glEnableVertexAttribArray(maTexCoorHandle);  
