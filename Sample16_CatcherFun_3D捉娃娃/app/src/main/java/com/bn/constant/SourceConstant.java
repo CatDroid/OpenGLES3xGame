@@ -259,7 +259,7 @@ public class SourceConstant {
     public static int tvId;
     public static int RigidBodyId;
     public static int ganboxId;
-    public static int HBId;//奖品收藏按钮
+    public static int HBId;// 出口盒子的玻璃围栏 透明度在变化 HB.png 绿色的一张图片
     
     //这是游戏界面中的一个收币箱的图片id与一些数据
     public static int Box1Id;//接金币的下面的箱子

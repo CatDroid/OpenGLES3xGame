@@ -584,13 +584,13 @@ public class GameView extends BNAbstractView {
         hole.drawSelf(holeId);
         MatrixState3D.popMatrix();
 
-        GLES30.glEnable(GLES30.GL_BLEND);//打开混合
-        //设置混合因子
-        GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA);
+
+        GLES30.glEnable(GLES30.GL_BLEND);// 打开混合
+        GLES30.glBlendFunc(GLES30.GL_SRC_ALPHA, GLES30.GL_ONE_MINUS_SRC_ALPHA); // 设置混合因子
         GLES30.glDisable(GL10.GL_CULL_FACE);
         MatrixState3D.pushMatrix();
         MatrixState3D.translate(1.4f, 0.5f, 14.8f);
-        hb.drawSelf(HBId);//这是一个护栏一体的护栏
+        hb.drawSelf(HBId);// 这是出口盒子的玻璃围栏 透明度不断变化 若隐若现 holebox_frag.glsl  HB.png 绿色的一张图片
         MatrixState3D.popMatrix();
         GLES30.glEnable(GL10.GL_CULL_FACE);
         GLES30.glDisable(GLES30.GL_BLEND);

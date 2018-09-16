@@ -9,7 +9,7 @@ void main()
 {  
   vec4 switchColor;
   vec4 finalColor;
-  float bl=ColorCS/100.0;
+  float bl=ColorCS/100.0; // 若隐若现的玻璃围栏
   switchColor = texture(sTexture, vTextureCoord);
   finalColor  =vec4(switchColor.r,switchColor.g,switchColor.b,bl);
   //给此片元颜色值

@@ -25,7 +25,9 @@ public class ShaderManager {
             //   用例 所有的2D按钮 MainView GameVIew的按钮
             {"vertex_2d.glsl", "frag_2d.glsl"},
             //3  顶点 做MVP
-            //   片元 使用传入管线的alpha值
+            //   片元 使用传入管线的alpha值 ColorCS/100.0作为纹理采样后颜色的alpha值
+            //   作用 围栏的玻璃透明度 不断变化 若隐若现
+            //   用例 只用于 HB.obj 出口箱子的玻璃围栏 HB.png 绿色的一张图片
             {"holebox_vertex.glsl", "holebox_frag.glsl"},
             //4  顶点 做MVP 并把原来的顶点坐标和纹理坐标给到frag
             //   片元 根据片元距离原点距离(物体当前位置的alpha值) 和  粒子剩余生命时间(整体的alpha值) 和 纹理(给出形状) 确定颜色
