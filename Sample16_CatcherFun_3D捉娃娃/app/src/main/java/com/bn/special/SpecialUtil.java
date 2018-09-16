@@ -19,10 +19,10 @@ public class SpecialUtil
 	}
 	public void initSpecial()
 	{
-		//总共有六种粒子系统
-		count=ParticleDataConstant.START_COLOR.length;
-		fpfd=new ParticleForDraw[count];//6组绘制着，6种颜色
-		for(int i=0;i<count;i++)
+		// 总共有 "六种粒子系统"
+		count = ParticleDataConstant.START_COLOR.length;
+		fpfd = new ParticleForDraw[count];//6组绘制着，6种颜色
+		for(int i=0 ; i<count ; i++ )
 		{
 			ParticleDataConstant.CURR_INDEX=i;
 			if(i==0)//火焰0

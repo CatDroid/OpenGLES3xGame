@@ -11,22 +11,25 @@ public class ShaderManager {
     private final static String[][] shaderName = {
             //0  顶点 只做MVP 传递纹理坐标到varying管线
             //   片元 只做texture2D,
-            //   作用 最普通的program，用于所有用3dMax导出的.obj模型渲染(LoadedObjectVertexNormalTexture)
+            //   作用 绘制模型着色器 最普通的program，用于所有用3dMax导出的.obj模型渲染(LoadedObjectVertexNormalTexture)
             //   用例 所有的3D物体如gan.obj dun.obj niu.obj tv.obj等
             {"vertex.glsl", "frag.glsl"},
             //1  顶点 做MVP 并把MVP后的x坐标给到frag
             //   片元 根据x坐标选择texture2d还是固定颜色
-            //   作用 物体不同的位置使用不同的颜色
+            //   作用 绘制进度条着色器 物体不同的位置使用不同的颜色
             //   用例 LoadView loadjm[1]进度条 BN2DObject spng=0 传入管线loadPosition 90+0*20 ~ 90+40*22.5 40*22.5=900
             {"vertex_load2d.glsl", "frag_load2d.glsl"},
             //2  顶点 只做MVP 传递纹理坐标到varying管线
             //   片元 只做texture2D,
-            //   作用 最普通 跟0一样
+            //   作用 绘制2D界面着色器 最普通 跟0一样
             //   用例 所有的2D按钮 MainView GameVIew的按钮
             {"vertex_2d.glsl", "frag_2d.glsl"},
-            //3  顶点 做MVP  片元 使用传入管线的alpha值
+            //3  顶点 做MVP
+            //   片元 使用传入管线的alpha值
             {"holebox_vertex.glsl", "holebox_frag.glsl"},
-            //4  顶点 做MVP 并把原来的顶点坐标和纹理坐标给到frag  片元 根据片元距离原点距离 计算颜色
+            //4  顶点 做MVP 并把原来的顶点坐标和纹理坐标给到frag
+            //   片元 根据片元距离原点距离(物体当前位置的alpha值) 和  粒子剩余生命时间(整体的alpha值) 和 纹理(给出形状) 确定颜色
+            //   作用 粒子系统着色器
             {"vertex_lz.glsl", "frag_lz.glsl"},
             //5  顶点 只做MVP
             //   片元 根据传入管线的uniform修改整个图片的alpha(动态修改整体的透明度)

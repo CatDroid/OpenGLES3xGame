@@ -82,8 +82,7 @@ public class ParticleForDraw
     }
 
     //初始化着色器
-    public void initShader()
-    {
+    public void initShader() {
         //获取程序中顶点位置属性引用id  
         maPositionHandle = GLES30.glGetAttribLocation(mProgram, "aPosition");
         //获取程序中顶点纹理坐标属性引用id  
@@ -100,8 +99,8 @@ public class ParticleForDraw
         muEndColor=GLES30.glGetUniformLocation(mProgram, "endColor");
     }
     
-    public void drawSelf(float sj,float[] startColor,float[] endColor)
-    {        
+    public void drawSelf(float sj,float[] startColor,float[] endColor) {
+
     	 //制定使用某套shader程序
     	 GLES30.glUseProgram(mProgram);  
          //将最终变换矩阵传入shader程序

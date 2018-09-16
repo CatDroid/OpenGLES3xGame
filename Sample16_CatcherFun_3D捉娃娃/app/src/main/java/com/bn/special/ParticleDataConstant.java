@@ -6,7 +6,7 @@ public class ParticleDataConstant
 {
 	//当前索引  
     public static int CURR_INDEX=5; 
-    //起始颜色
+    //起始颜色 frag_lz.glsl clamp最大值 也就是一开始粒子的颜色 然后逐渐衰弱到END_COLOR
     public static final float[][] START_COLOR=
 	{
     	{0.7569f,0.2471f,0.1176f,1.0f},	//0-普通火焰
@@ -14,14 +14,14 @@ public class ParticleDataConstant
     	{0.9882f,0.9765f,0.0118f,1.0f},	//黄色
     	{0.9882f,0.0196f,0.8863f,1.0f},	//粉红色
     	
-    	
+
     	
     	{0.9804f,0.9804f,0.9804f,1.0f},//白色
     	{0.9882f,0.9765f,0.0118f,1.0f},//黄色
     	{0.9882f,0.9765f,0.0118f,1.0f},//黄色
 	};
     
-    //终止颜色
+    //终止颜色 frag_lz.glsl  clamp最小值
     public static final float[][] END_COLOR=
 	{
     	{0.0f,0.0f,0.0f,0.0f},//0-普通火焰
@@ -30,7 +30,8 @@ public class ParticleDataConstant
     	
     	{0.9882f,0.0196f,0.8863f,0.0f},//粉红色
     	{0.1608f,0.9725f,0.2157f,0.0f},//绿色
-    	{0.1608f,0.9725f,0.2157f,0.0f},//绿色
+    	{0.1608f,0.9725f,0.2157f,0.0f},//绿色  hhl 可以单步调试改成{0.0f,0.0f,1.0f,1.0f},//蓝色
+
 	};
     
     //源混合因子
@@ -52,7 +53,8 @@ public class ParticleDataConstant
     	GLES30.GL_ONE,
     	GLES30.GL_ONE,
     	GLES30.GL_ONE,
-    	GLES30.GL_ONE,
+		GLES30.GL_ONE,  // hhl 可以单步调试改成 GLES30.GL_ONE_MINUS_SRC_ALPHA,
+
 	};
     
     //混合方式
@@ -102,7 +104,7 @@ public class ParticleDataConstant
     	
     	0.03f,
     	0.03f,
-    	0.01f,
+    	0.01f, // 一个粒子的实际消耗时间 ParticleSystem.update (MAX_LIFE_SPAN/LIFE_SPAN_STEP) * THREAD_SLEEP
     };
     
     //粒子发射的X左右范围

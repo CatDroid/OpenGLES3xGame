@@ -195,6 +195,8 @@ public class LoadView extends BNAbstractView {
 
             case 39:
                 Special = new SpecialUtil();
+                // hhl 一开始就启动了粒子系统和线程
+                // ??? 但是 SpecialUtil.drawSpecial的时候才开始会设置 SpecialBZ = 5/2 (好垃圾的代码)
 
 					/*
                         下面的View都不是基于android.view.View，而只是实现了BNAbstractView接口
