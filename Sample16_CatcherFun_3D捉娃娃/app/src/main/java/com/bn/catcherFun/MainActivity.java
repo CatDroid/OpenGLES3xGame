@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
     static private final String TAG = "MainActivity" ;
 
 	private MySurfaceView mGLSurfaceView;
-	public static SoundManager sound;
+
 	public static SharedPreferences.Editor editor;
 	public static SharedPreferences sp;
 	@Override
@@ -47,7 +47,10 @@ public class MainActivity extends Activity {
         Constant.ssr=ScreenScaleUtil. calScale(dm.widthPixels, dm.heightPixels);
         // 用于做触摸坐标转换 fromRealScreenXToStandardScreenX   物理屏幕坐标 --> 缩放后的屏幕坐标 -->  1080x1920标准屏幕的坐标
 
-        sound=new SoundManager(this);
+
+        SoundManager sm = SoundManager.getInstance(false);
+        if(sm!=null)sm.init(getApplicationContext());
+
         mGLSurfaceView = new MySurfaceView(this);
         mGLSurfaceView.requestFocus();//获取焦点
         mGLSurfaceView.setFocusableInTouchMode(true);//设置为可触控
@@ -76,10 +79,9 @@ public class MainActivity extends Activity {
          // GLSurfaceView.onPause会导致EGLContext销毁
          // 开启不保留活动会把Activity销毁导致GLSurfaceView也会销毁,会重新加载资源
 //        mGLSurfaceView.onResume();
-        if(MainActivity.sound.mp!=null)
-   		{
-        	MainActivity.sound.mp.start();
-   		}
+
+         SoundManager.instance().resumeBackGroundMusic();
+
     }
 
     @Override
@@ -87,10 +89,7 @@ public class MainActivity extends Activity {
         Log.w(TAG,"[onPause]");
         super.onPause();
 //        mGLSurfaceView.onPause();
-        if(MainActivity.sound.mp!=null)
-   		{
-        	MainActivity.sound.mp.pause();
-   		}
+        SoundManager.instance().pauseBackGroundMusic();
     }
 
     @Override
@@ -118,8 +117,6 @@ public class MainActivity extends Activity {
         mGLSurfaceView.destroy();
         mGLSurfaceView = null;
 
-        sound.destroy();
-        sound = null;
-
+        SoundManager.instance().destroy();
     }
 }

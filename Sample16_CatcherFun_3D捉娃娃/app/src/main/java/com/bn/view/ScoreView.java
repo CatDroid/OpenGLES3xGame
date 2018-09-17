@@ -10,6 +10,7 @@ import com.bn.constant.Constant;
 import com.bn.object.BN2DObject;
 import com.bn.util.DrawNumber;
 import com.bn.util.manager.ShaderManager;
+import com.bn.util.manager.SoundManager;
 import com.bn.util.manager.TextureManager;
 import android.opengl.GLES30;
 import android.view.MotionEvent;
@@ -112,7 +113,7 @@ public class ScoreView extends BNAbstractView{
 	    	    	 mv.mainView.reSetData();
     			  	 mv.currView=mv.mainView;
 					 if(!effectOff){
-				    		MainActivity.sound.playMusic(SOUND_Back,0);
+						 SoundManager.instance().playMusic(mv.getContext(),SOUND_Back,0);
 				     }
 		     	}
 	    	   

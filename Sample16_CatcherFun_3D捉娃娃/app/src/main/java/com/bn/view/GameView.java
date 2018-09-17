@@ -34,6 +34,7 @@ import com.bn.util.DrawNumber;
 import com.bn.util.RigidBodyHelper;
 import com.bn.util.SliderHelper;
 import com.bn.util.manager.ShaderManager;
+import com.bn.util.manager.SoundManager;
 import com.bn.util.manager.TextureManager;
 import com.bulletphysics.collision.broadphase.AxisSweep3;
 import com.bulletphysics.collision.dispatch.CollisionConfiguration;
@@ -624,7 +625,7 @@ public class GameView extends BNAbstractView {
             dance++;
             if (dance == 62) {
                 if (!effectOff) {
-                    MainActivity.sound.playMusic(SOUND_DropMoney, 0);
+                    SoundManager.instance().playMusic(viewManager.getContext(),SOUND_DropMoney, 0);
                 }
             }
             button.get(9).drawSelf(Money_x + dance * 3f, Money_y + dance * 28);
@@ -644,7 +645,7 @@ public class GameView extends BNAbstractView {
             danceSX++;
             if (danceSX == 62) {
                 if (!effectOff) {
-                    MainActivity.sound.playMusic(SOUND_DropMoney, 0);
+                    SoundManager.instance().playMusic(viewManager.getContext(),SOUND_DropMoney, 0);
                 }
             }
             button.get(9).drawSelf(Money_x + danceSX * 3f, Money_y + danceSX * 28);

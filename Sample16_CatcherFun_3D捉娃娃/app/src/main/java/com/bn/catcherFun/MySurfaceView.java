@@ -15,6 +15,7 @@ import com.bn.constant.SourceConstant;
 import com.bn.hand.R;
 import com.bn.thread.SwitchThread;
 import com.bn.util.manager.ShaderManager;
+import com.bn.util.manager.SoundManager;
 import com.bn.view.BNAbstractView;
 import com.bn.view.GameView;
 import com.bn.view.LoadView;
@@ -86,7 +87,7 @@ public class MySurfaceView extends GLSurfaceView {
                     gameView.isMenu = false; // GameView--MenuView 取消Overlay的MenuView
                 } else {
                     if(!SourceConstant.musicOff){ // GameView-->MainView切换背景音乐
-                        MainActivity.sound.playBackGroundMusic(activity, R.raw.nogame);
+                        SoundManager.instance().playBackGroundMusic(getContext(),R.raw.nogame);
                     }
                     currView = mainView;
                 }
@@ -132,7 +133,7 @@ public class MySurfaceView extends GLSurfaceView {
                     isExit = false;
                     SourceConstant.musicOff = true;
                     SourceConstant.effectOff = true;
-                    MainActivity.sound.mp.pause(); // 如果还不按第二次 那么退出按钮作为关闭按钮和背景音乐功能
+                    SoundManager.instance().pauseBackGroundMusic(); // 如果还不按第二次 那么退出按钮作为关闭按钮和背景音乐功能
                 }// 如果2500ms没有再按退出，那么只是把按钮声音mute了，之后按按钮没有声音
             }, 2500);
         } else {
@@ -247,7 +248,7 @@ public class MySurfaceView extends GLSurfaceView {
                 LoadView lv = new LoadView(MySurfaceView.this);
 
                 if (!musicOff) {//创建音乐
-                    MainActivity.sound.playBackGroundMusic(activity, R.raw.nogame);
+                    SoundManager.instance().playBackGroundMusic(getContext(),R.raw.nogame);
                 }
 
                 currView = lv;

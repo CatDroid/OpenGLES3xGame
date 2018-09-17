@@ -11,6 +11,7 @@ import com.bn.object.BN2DObject;
 import com.bn.thread.Angle2DThread;
 import com.bn.util.DrawNumber;
 import com.bn.util.manager.ShaderManager;
+import com.bn.util.manager.SoundManager;
 import com.bn.util.manager.TextureManager;
 import android.opengl.GLES30;
 import android.os.Handler;
@@ -141,7 +142,7 @@ public class MainView extends BNAbstractView{
 
 		//创建音乐
 		if(!musicOff){
-			MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.nogame);
+			SoundManager.instance().playBackGroundMusic( mv.getContext(),R.raw.nogame);
 		}
 
 		 score=new DrawNumber(mv);
@@ -175,7 +176,7 @@ public class MainView extends BNAbstractView{
 	    			mv.currView=mv.gameView;// 切换到GameView
 
 					if(!musicOff){		//  背景音乐切换为游戏音乐
-						MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.game);
+						SoundManager.instance().playBackGroundMusic(mv.getContext(),R.raw.game);
 					}
 
 	    		}else if(x>YXJX_TOUCH_LEFT_x&&x<YXJX_TOUCH_RIGHT_x&&
@@ -230,42 +231,42 @@ public class MainView extends BNAbstractView{
 	    		{
 	    			isStartGm=true;
 	    			if(!effectOff){
-	    				MainActivity.sound.playMusic(SOUND_Click,0);
+	    				SoundManager.instance().playMusic(mv.getContext(),SOUND_Click,0);
 	    			}
 	    		}else if(x>YXJX_TOUCH_LEFT_x&&x<YXJX_TOUCH_RIGHT_x&&
 						y>YXJX_TOUCH_TOP_y&&y<YXJX_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			isYXJX=true;
 	    			if(!effectOff){
-	    				MainActivity.sound.playMusic(SOUND_Click,0);
+	    				SoundManager.instance().playMusic(mv.getContext(),SOUND_Click,0);
 	    			}
 	    		}else if(x>MainViewSC_TOUCH_LEFT_x&&x<MainViewSC_TOUCH_RIGHT_x&&
 						y>MainViewSC_TOUCH_TOP_y&&y<MainViewSC_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			SCJP=true;
 	    			if(!effectOff){
-	    				MainActivity.sound.playMusic(SOUND_Click,0);
+	    				SoundManager.instance().playMusic(mv.getContext(),SOUND_Click,0);
 	    			}
 	    		}else if(x>GameAbout_TOUCH_LEFT_x&&x<GameAbout_TOUCH_RIGHT_x&&
 						y>GameAbout_TOUCH_TOP_y&&y<GameAbout_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			GameAbout=true;
 	    			if(!effectOff){
-	    				MainActivity.sound.playMusic(SOUND_Click,0);
+	    				SoundManager.instance().playMusic(mv.getContext(),SOUND_Click,0);
 	    			}
 	    		}else if(x>GameSD_TOUCH_LEFT_x&&x<GameSD_TOUCH_RIGHT_x&&
 						y>GameSD_TOUCH_TOP_y&&y<GameSD_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			GameSD=true;
 	    			if(!effectOff){
-	    				MainActivity.sound.playMusic(SOUND_Click,0);
+	    				SoundManager.instance().playMusic(mv.getContext(),SOUND_Click,0);
 	    			}
 	    		}else if(x>GameScore_TOUCH_LEFT_x&&x<GameScore_TOUCH_RIGHT_x&&
 						y>GameScore_TOUCH_TOP_y&&y<GameScore_TOUCH_BOTTOM_y&&!isSet)
 	    		{
 	    			GameScore=true;
 	    			if(!effectOff){
-	    				MainActivity.sound.playMusic(SOUND_Click,0);
+	    				SoundManager.instance().playMusic(mv.getContext(),SOUND_Click,0);
 	    			}
 	    		}else if(x>Gamequit_TOUCH_LEFT_x&&x<Gamequit_TOUCH_RIGHT_x&&
 						y>Gamequit_TOUCH_TOP_y&&y<Gamequit_TOUCH_BOTTOM_y&&!isSet)
@@ -293,7 +294,7 @@ public class MainView extends BNAbstractView{
 					isExit = false;
 					SourceConstant.musicOff=true;
 					SourceConstant.effectOff =true;
-                    MainActivity.sound.mp.pause();// 如果还不按第二次 那么退出按钮作为关闭按钮和背景音乐功能
+					SoundManager.instance().pauseBackGroundMusic(); // 如果还不按第二次 那么退出按钮作为关闭按钮和背景音乐功能
 				}
 			}, 2500);
 		}else

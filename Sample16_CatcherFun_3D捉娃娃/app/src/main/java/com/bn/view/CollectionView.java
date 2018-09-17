@@ -13,6 +13,7 @@ import com.bn.object.LoadedObjectVertexNormalTexture;
 import com.bn.util.DrawLine;
 import com.bn.util.DrawNumber;
 import com.bn.util.manager.ShaderManager;
+import com.bn.util.manager.SoundManager;
 import com.bn.util.manager.TextureManager;
 import android.opengl.GLES30;
 import android.view.MotionEvent;
@@ -197,7 +198,7 @@ public class CollectionView extends BNAbstractView{
 	    	    if(x>back_left&&x<back_right&&y>back_top&&y<back_bottom&&!isSale)
 		     	{//点击返回按钮
 	    			 if(!effectOff){
-	    				 MainActivity.sound.playMusic(SOUND_Back,0);//播放背景音乐
+						 SoundManager.instance().playMusic(mv.getContext(),SOUND_Back,0);//播放背景音乐
 	    			 }
 		    		  if(isCollection)
 		    		  {

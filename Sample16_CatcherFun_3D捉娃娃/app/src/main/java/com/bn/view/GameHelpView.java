@@ -7,6 +7,8 @@ import com.bn.catcherFun.MySurfaceView;
 import com.bn.constant.Constant;
 import com.bn.object.BN2DObject;
 import com.bn.util.manager.ShaderManager;
+import com.bn.util.manager.SoundManager;
+
 import android.opengl.GLES30;
 import android.view.MotionEvent;
 import static com.bn.constant.SourceConstant.*;
@@ -56,7 +58,7 @@ public class GameHelpView extends BNAbstractView{
 					 mv.currView=mv.mainView;
 					 isYXJXTouch=false;
 					 if(!effectOff){
-				    		MainActivity.sound.playMusic(SOUND_Back,0);
+						 SoundManager.instance().playMusic(mv.getContext(),SOUND_Back,0);
 				     }
 				 }
 				break;

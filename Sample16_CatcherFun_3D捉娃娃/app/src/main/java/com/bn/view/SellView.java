@@ -9,6 +9,7 @@ import com.bn.constant.Constant;
 import com.bn.object.BN2DObject;
 import com.bn.util.DrawNumber;
 import com.bn.util.manager.ShaderManager;
+import com.bn.util.manager.SoundManager;
 import com.bn.util.manager.TextureManager;
 import android.opengl.GLES30;
 import android.view.MotionEvent;
@@ -117,7 +118,7 @@ public class SellView{
 	    		 if(x>sell_left&&x<sell_right&&y>sell_top&&y<sell_bottom)
 	    		 {
 		    		 if(!effectOff){
-		    			MainActivity.sound.playMusic(SOUND_Click,0);
+						 SoundManager.instance().playMusic(mv.getContext(),SOUND_Click,0);
 		    		 }
 		    		  background.remove(3);
 		    		  background.add(3,new BN2DObject(560,1500, 300, 
@@ -130,7 +131,7 @@ public class SellView{
 	    	 if(x>back_left&&x<back_right&&y>back_top&&y<back_bottom)
 	    	  {
     			 if(!effectOff){
-    				 MainActivity.sound.playMusic(SOUND_Back,0);
+					 SoundManager.instance().playMusic(mv.getContext(),SOUND_Back,0);
     			 }
 	    		 for(int i=0;i<9;i++)
 		    	    {

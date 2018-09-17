@@ -11,6 +11,7 @@ import com.bn.constant.SourceConstant;
 import com.bn.hand.R;
 import com.bn.object.BN2DObject;
 import com.bn.util.manager.ShaderManager;
+import com.bn.util.manager.SoundManager;
 import com.bn.util.manager.TextureManager;
 
 import android.view.MotionEvent;
@@ -57,7 +58,7 @@ public class MenuView extends BNAbstractView  {
             case MotionEvent.ACTION_DOWN:
                 if (x > backyouxi_left && x < backyouxi_right && y > backyouxi_top && y < backyouxi_bottom && !isCollection) {
                     if (!effectOff) {
-                        MainActivity.sound.playMusic(SOUND_Click, 0);
+                        SoundManager.instance().playMusic(mv.getContext(),SOUND_Click, 0);
                     }
                     if (isSet) {
                         isSet = false;
@@ -78,41 +79,41 @@ public class MenuView extends BNAbstractView  {
                     mv.currView = mv.mainView;
 
                     if (!effectOff) {
-                        MainActivity.sound.playMusic(SOUND_Click, 0);
+                        SoundManager.instance().playMusic(mv.getContext(),SOUND_Click, 0);
                     }
                     if (!musicOff) {
-                        MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.nogame);
+                        SoundManager.instance().playBackGroundMusic(mv.getContext(),R.raw.nogame);
                     }
 
                 }
                 if (x > yinxiao_left && x < yinxiao_right && y > yinxiao_top && y < yinxiao_bottom) {
                     if (!effectOff) {
-                        MainActivity.sound.playMusic(SOUND_Click, 0);
+                        SoundManager.instance().playMusic(mv.getContext(),SOUND_Click, 0);
                     }
                     //这是背景音乐的触控
                     musicOff = !musicOff;
                     if (musicOff) {
-                        if (MainActivity.sound.mp != null) {
-                            MainActivity.sound.mp.pause();
-                            MainActivity.sound.mp = null;
+                        if (SoundManager.instance() != null) {
+                            SoundManager.instance().pauseBackGroundMusic();
+
                         }
                     } else {//创建音乐
                         if (isSet) {                    // MainView -- MenuView
-                            MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.nogame);
+                            SoundManager.instance().playBackGroundMusic(mv.getContext(), R.raw.nogame);
                         }else if (mv.gameView.isMenu) { // GameView -- MenuView
-                            MainActivity.sound.playBackGroundMusic(mv.activity, R.raw.game);
+                            SoundManager.instance().playBackGroundMusic(mv.getContext(), R.raw.game);
                         }
                     }
                 }
                 if (x > yinyue_left && x < yinyue_right && y > yinyue_top && y < yinyue_bottom) {
                     if (!effectOff) {
-                        MainActivity.sound.playMusic(SOUND_Click, 0);
+                        SoundManager.instance().playMusic(mv.getContext(),SOUND_Click, 0);
                     }
                     effectOff = !effectOff;
                 }
                 if (x > collection_left && x < collection_right && y > collection_top && y < collection_bottom) {//奖品收藏按钮
                     if (!effectOff) {
-                        MainActivity.sound.playMusic(SOUND_Click, 0);
+                        SoundManager.instance().playMusic(mv.getContext(),SOUND_Click, 0);
                     }
                     isCollection = true;
                     mv.currView = mv.collectionview;
