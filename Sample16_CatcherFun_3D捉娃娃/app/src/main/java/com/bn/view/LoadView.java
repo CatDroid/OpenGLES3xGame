@@ -38,7 +38,7 @@ public class LoadView extends BNAbstractView {
 
     @Override
     public void initView() {
-        TextureManager.loadingTexture(this.mv, 0, 92);//加载图片资源
+        TextureManager.loadingTexture(this.mv.getResources(), 0, 92);//加载图片资源
         for (int i = 1; i <= 5; i++) {
             for (int j = 1; j <= 5; j++) {
                 load.add(new BN2DObject(
