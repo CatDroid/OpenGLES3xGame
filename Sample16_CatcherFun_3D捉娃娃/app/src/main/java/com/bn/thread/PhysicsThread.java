@@ -24,8 +24,9 @@ public class PhysicsThread extends Thread {
     }
 
     private boolean mIsStop = false;
-    public void quitSync(){
-        mIsStop = true ;
+
+    public void quitSync() {
+        mIsStop = true;
         try {
             interrupt();
             join();
@@ -38,12 +39,19 @@ public class PhysicsThread extends Thread {
         while (!mIsStop) {
             try {
                 origin = SliderHelper.cubeBody.getMotionState().getWorldTransform(new Transform()).origin;//获取箱子位置
-                gv.dynamicsWorld.stepSimulation(TIME_STEP, MAX_SUB_STEPS);//开始模拟
-                delDoll();//调用删除娃娃刚体的方法
+
+                // 物理世界模拟 (进行一次物理模拟)
+                gv.dynamicsWorld.stepSimulation(TIME_STEP, MAX_SUB_STEPS);
+
+                delDoll();// 调用删除娃娃刚体的方法
+
+                // 游戏界面 前后左右按键的响应
                 if ((gv.keyState & 0x01) != 0) {//点击向前按钮
                     if (origin.z <= 14.7f) {
-                        istop = false;
-                        gv.claw.moveBy(new Vector3f(0, 0, 0.05f));//沿Z轴正方向移动
+                        istop = false; // isstop isbottom isright isleft 标记哪个方向已经到了尽头不能移动
+
+                        // 机械手  沿Z轴正方向移动 moveBy调用了很多物理世界API
+                        gv.claw.moveBy(new Vector3f(0, 0, 0.05f));
                         if (origin.z < 14.65f && origin.z > 14.6f) {
                             isbottom = true;//向前按钮消失标志为true
                         }
@@ -75,7 +83,7 @@ public class PhysicsThread extends Thread {
                         }
                     }
                 }
-                Thread.sleep(20);    //当前线程睡眠20毫秒
+                Thread.sleep(20);    //当前线程睡眠20毫秒  hhl 定时物理模拟
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -83,39 +91,58 @@ public class PhysicsThread extends Thread {
         }
     }
 
-    public void delDoll() {
-        if (isupdate)//如果点击刷新按钮
-        {
-            for (int i = 0; i < updatedoll.size(); i++) {
 
+    // 从物理世界删除刚体
+    private void delDoll() {
+        if (isupdate){// 如果点击刷新按钮
+            for (int i = 0; i < updatedoll.size(); i++) {
+                // 从物理世界删除所有的娃娃
                 gv.dynamicsWorld.removeRigidBody(updatedoll.get(i).RigidBodydoll);//从物理世界中删除刚体
 
             }
-            updatedoll.clear();    //清空娃娃刚体列表
-            isupdate = false;//刷新标志位置为false
-            gv.update();//调用刷新娃娃方法
+            updatedoll.clear();     // 清空娃娃刚体列表
+            isupdate = false;       // 刷新标志位置为false
+            gv.update();            // 调用刷新娃娃方法，重新生成娃娃
         }
-        List<BNAbstractDoll> removedoll = new ArrayList<BNAbstractDoll>();//存放要删除的娃娃对象
-        for (int i = 0; i < updatedoll.size(); i++) {
-            Transform posi2 = updatedoll.get(i).RigidBodydoll.getMotionState().getWorldTransform(new Transform());//获取娃娃刚体位置
 
-            if (posi2.origin.z > 14.4f && posi2.origin.x > 0.5f && posi2.origin.y < 1.8f) {//判断娃娃是否处于收纳盒内
+        // 刷新之后 刚好有娃娃 掉到 收纳箱中(带有透明玻璃围栏的盒子)
+        List<BNAbstractDoll> removedoll = new ArrayList<BNAbstractDoll>();//存放要删除的娃娃对象
+
+        for (int i = 0; i < updatedoll.size(); i++) {
+
+            // 获取娃娃刚体位置
+            Transform posi2 = updatedoll.get(i).RigidBodydoll.getMotionState().getWorldTransform(new Transform());
+
+            // 判断娃娃是否处于收纳盒内
+            if (posi2.origin.z > 14.4f && posi2.origin.x > 0.5f && posi2.origin.y < 1.8f) {
+
                 updatedoll.get(i).isInBox = true;
 
+                // 相应获取到的娃娃数量加1
                 int count = dollcount[updatedoll.get(i).bianhao] + 1;
-                dollcount[updatedoll.get(i).bianhao] = count;//相应娃娃数量加1
-                gv.dynamicsWorld.removeRigidBody(updatedoll.get(i).RigidBodydoll);//从物理世界中删除刚体
+                dollcount[updatedoll.get(i).bianhao] = count;
+
+                // 从物理世界中删除刚体
+                gv.dynamicsWorld.removeRigidBody(updatedoll.get(i).RigidBodydoll);
+
+                // 获取到娃娃数量加1
                 removedoll.add(updatedoll.get(i));
-                getcount++;//获取到娃娃数量加1
-                CollectionView.CalculateAward();//调用计算抓到娃娃奖励方法
-                gv.isSuccess = true;//是否抓取成功标志位置为true
-                gv.successId = updatedoll.get(i).bianhao;//记录当前娃娃编号
+                getcount++;
+
+                // 调用计算抓到娃娃奖励方法
+                CollectionView.CalculateAward();
+
+                // 是否抓取成功标志位置为true
+                gv.isSuccess = true;
+
+                // 记录当前娃娃编号
+                gv.successId = updatedoll.get(i).bianhao;
                 break;
             }
-
         }
-        for (int i = 0; i < removedoll.size(); i++)//循环删除指定娃娃对象
-        {
+
+        // 循环删除指定娃娃对象
+        for (int i = 0; i < removedoll.size(); i++){
             updatedoll.remove(removedoll.get(i));
         }
     }
