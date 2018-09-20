@@ -40,20 +40,22 @@ public class ParticleSingle
     	this.fpfd=fpfd;
     }
 
+
+    // 在ParticleSystem线程更新 不收渲染帧率影响
     public void go(float lifeSpanStep)
     {
-    	//粒子进行移动的方法，同时岁数增大的方法
-    	if(SourceConstant.SpecialBZ==5)
-    	{//刷新按钮按下的粒子系统
-    		x1 = x1 + vx1*lifeSpan/6.0f;
-    		y1 = y1 + 0.5f*1*lifeSpan*lifeSpan*2.0f;
-    		z1 = z1 + vz1*lifeSpan/6.0f;
+    	// 粒子进行移动的方法，同时岁数增大的方法
+    	if(SourceConstant.SpecialBZ==5) // 刷新按钮按下的粒子系统
+    	{
+    		x1 = x1 + vx1*lifeSpan/6.0f; 			 // hhl x1 = x1 + (t/6) * vx  跟时间成正比线性关系 恒定速度
+     		y1 = y1 + 0.5f*1*lifeSpan*lifeSpan*2.0f; // hhl y1 = y1 + 0.5*2*t^2   跟时间平方成正比	 加速度是2m/s 不考虑每次的初始速度
+    		z1 = z1 + vz1*lifeSpan/6.0f;			 // hhl z1 = z1 + (t/6) * vz  跟时间成正比线性关系 恒定速度
     	}
     	if(SourceConstant.SpecialBZ==2)
     	{
     		x1 = x1 + vx1*lifeSpan*0.02f;
-    		y1 = y1 - 0.5f*1*lifeSpan*lifeSpan;
-    		z1 = z1 + vz1*lifeSpan*0.2f;
+    		y1 = y1 - 0.5f*1*lifeSpan*lifeSpan;		 // hhl y1 =  y1 - 0.5 * 1 * t^2  方向向下 加速度是1m/s 没有考虑每次的初始速度
+    		z1 = z1 + vz1*lifeSpan*0.2f;			 // hhl 速度公式 vt=v0+at 位移公式 S = (v0) * t + (1/2) * a * (t^2)
     	}
 //    	else{
 //        	x=x+vx;
@@ -65,10 +67,10 @@ public class ParticleSingle
     public void drawSelf(float[] startColor,float[] endColor,float maxLifeSpan){
     	
     	MatrixState3D.pushMatrix();//保护现场
-    	if(SourceConstant.SpecialBZ==5){
+    	if(SourceConstant.SpecialBZ==5){ // 刷新按钮
     		MatrixState3D.translate(x1, y1, z1);
     	}
-    	if(SourceConstant.SpecialBZ==2)
+    	if(SourceConstant.SpecialBZ==2)  // 抓娃娃成功(刷新也可能导致娃娃刚好落到收纳箱中而成功捉娃娃)
     	{
     		MatrixState3D.translate(x1, y1, z1);
     	}

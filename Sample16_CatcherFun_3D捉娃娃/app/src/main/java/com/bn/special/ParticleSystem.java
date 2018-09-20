@@ -138,7 +138,7 @@ public class ParticleSystem implements Comparable<ParticleSystem>
 	 * 但是每个粒子的 初始位置 移动角度 都不一样 随机的
 	 *
 	 *
-	 * update线程 负责 更新 粒子的生命步进 和 位置  不收渲染线程控制(不受渲染线程的帧率控制)
+	 * update线程 负责 更新 粒子的生命步进 和 位置(根据初始的位置和三个方向的速率*生命步进时间)  不受到渲染线程帧率控制
 	 *
 	 * 粒子系统 目前blend都是
 	 * GL_SRC_ALPHA  GL_ONE  这种方式当源色彩走到黑色的话,最终颜色就是背景,类似透明的效果
@@ -157,16 +157,16 @@ public class ParticleSystem implements Comparable<ParticleSystem>
 			{
 				if(SpecialBZ==5)//绘制刷新后出现的粒子系统
 				{
-					//在中心附近产生产生粒子的位置------**/
+					// 在中心附近产生产生粒子的位置------**/
 					float px=(float) (sx+xRange*(Math.random()*2-1.0f));
 					float py=(float) (sy+yRange*(Math.random()*2-1.0f));
-					//随机产生粒子的方位角及仰角
-					double elevation=Math.random()*Math.PI/12+Math.PI*2/12;//仰角
-					double direction=Math.random()*Math.PI*2;//方位角
-					//计算出粒子在XYZ轴方向的速度分量
-					float vy=(float)(2f*Math.sin(elevation));
-					float vx=(float)(2f*Math.cos(elevation)*Math.cos(direction));
-					float vz=(float)(2f*Math.cos(elevation)*Math.sin(direction));
+					// 随机产生粒子的方位角及仰角
+					double elevation = Math.random()*Math.PI/12+Math.PI*2/12;	//	hhl	仰角		(0~1.0)*15 + 30
+					double direction = Math.random()*Math.PI*2;					//  hhl 方位角   0到360度都可以
+					// 计算出粒子 在XYZ轴方向的速度分量
+					float vy=(float)( 2f * Math.sin(elevation));				// 	hhl 速率是2.0
+					float vx=(float)( 2f * Math.cos(elevation) * Math.cos(direction));// hhl 通过俯仰角 方向角 等到对应xyz坐标
+					float vz=(float)( 2f * Math.cos(elevation) * Math.sin(direction));// hhl 三个速度分量 再乘以每次步进的生命时间 得到最后的位置
 					ParticleSingle fsp=new ParticleSingle(px,py,vx,vy,vz,fpfd);
 					alFsp.add(fsp);
 				}
