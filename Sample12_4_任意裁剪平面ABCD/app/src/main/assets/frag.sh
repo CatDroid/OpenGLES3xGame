@@ -9,7 +9,8 @@ in float u_clipDist;
 out vec4 fragColor;//输出到的片元颜色
 void main()                         
 {
-
+// When you divide by zero, you get INF, not NaN.
+// Unless the numerator is also zero, in which case you do get NaN.
 //    if(u_clipDist < 0.0){
             //1.0/0.0=1.0
 //        float var = 1.0/(u_clipDist-u_clipDist); // inf !!
