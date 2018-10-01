@@ -8,7 +8,18 @@ in float u_clipDist;
 
 out vec4 fragColor;//输出到的片元颜色
 void main()                         
-{    
+{
+
+//    if(u_clipDist < 0.0){
+            //1.0/0.0=1.0
+//        float var = 1.0/(u_clipDist-u_clipDist); // inf !!
+//        if(isinf (var)){ // isnan  // isinf
+//            fragColor = vec4(1.0,0.0,0.0,1.0);
+//        }else{
+//            fragColor = vec4(0.0,1.0,0.0,1.0);
+//        }
+//        return ;
+//    }
 	 if(u_clipDist < 0.0) discard; // hhl 增加discard
 
    //将计算出的颜色给此片元
