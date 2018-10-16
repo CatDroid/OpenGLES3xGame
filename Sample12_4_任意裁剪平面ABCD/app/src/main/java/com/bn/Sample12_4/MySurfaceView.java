@@ -51,15 +51,26 @@ class MySurfaceView extends GLSurfaceView {
 		public void onDrawFrame(GL10 gl) {
 
 
-			if (countE >= 2) { // 若参考值大于2 则步进变为-0.01
+//			if (countE >= 2) { // 若参考值大于2 则步进变为-0.01
+//				spanE = -0.01f;
+//			} else if (countE <= 0) { // 若参考值小于0，则步进步进变为0.01
+//				spanE = 0.01f;
+//			}// hhl 也就是conntE在 0到2之间徘徊 步进绝对值是0.01
+//			countE = countE + spanE;
+//			float e[] = { 1, countE - 1, -countE + 1, 0 };//定义裁剪平面解析方程组中4个参数
+
+			if (countE >= 4) {
 				spanE = -0.01f;
-			} else if (countE <= 0) { // 若参考值小于0，则步进步进变为0.01
+			} else if (countE <= -4) {
 				spanE = 0.01f;
-			}// hhl 也就是conntE在 0到2之间徘徊 步进绝对值是0.01
+			}
 			countE = countE + spanE;
-			float e[] = { 1, countE - 1, -countE + 1, 0 };//定义裁剪平面解析方程组中4个参数
+			float e[] = { 1, 1, 0 , countE};
+			//float e[] = { 1, 1, 0 , 2}; // x+y+2 = 0 ;
+
 			// hhl D总是0
 			// 也就是是 Ax+By+Cy+D=0 D=0 A=1 ==> x+By+Cz=0;  平面在x轴交叉x=1 y轴从-1到1 同时z轴从1到-1
+			// 如果D!=0 说明这个任意裁剪平面不经过原点
 
 			GLES30.glClear(GLES30.GL_DEPTH_BUFFER_BIT//清除深度缓冲与颜色缓冲
 					| GLES30.GL_COLOR_BUFFER_BIT);
