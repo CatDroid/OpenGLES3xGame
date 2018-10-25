@@ -37,8 +37,8 @@ import android.opengl.GLES30;
         final float UNIT_SIZE=0.48f;
         float vertices[]=new float[]
         {
-        		-ratio*UNIT_SIZE,UNIT_SIZE,0,
-        		-ratio*UNIT_SIZE,-UNIT_SIZE,0,
+        		-ratio*UNIT_SIZE,UNIT_SIZE,0, // hhl 宽比高是 radio  所以如果高是0.48f (0.5) 的话 宽就要radio*0.48
+        		-ratio*UNIT_SIZE,-UNIT_SIZE,0,// hhl 矩形在z=0深度 XoY平面
         		ratio*UNIT_SIZE,-UNIT_SIZE,0,
         		
         		ratio*UNIT_SIZE,-UNIT_SIZE,0,

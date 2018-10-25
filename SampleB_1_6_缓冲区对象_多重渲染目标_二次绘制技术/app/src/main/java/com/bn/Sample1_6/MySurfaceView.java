@@ -7,6 +7,7 @@ import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
+import android.util.Log;
 import android.view.MotionEvent;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -167,26 +168,28 @@ class MySurfaceView extends GLSurfaceView
 			//设置视窗大小及位置 
 			GLES30.glViewport(0, 0, GEN_TEX_WIDTH, GEN_TEX_HEIGHT);
 			//绑定帧缓冲id
-			GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER,frameBufferId );//frameBufferId
+			GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER,frameBufferId );// hhl 当前FBO设置为带有4个颜色附件(纹理)的FBO
     		//清除深度缓冲与颜色缓冲
 			GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
             //设置透视投影
             MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 2, 100);
             //调用此方法产生摄像机9参数位置矩阵
-            MatrixState.setCamera(0,0,3,0f,0f,-1f,0f,1.0f,0.0f);
+            MatrixState.setCamera(0,0,3,   0f,0f,-1f,   0f,1.0f,0.0f);
             
             MatrixState.pushMatrix();//保护现场
-            MatrixState.translate(0f, -15f, -70f);//坐标系推远
+            MatrixState.translate(0f, -15f, -70f);//坐标系推远 hhl z=-70 因为茶壶比较大 另外在物体坐标系中茶壶的底部为原点 所以要向下移动
             //绕Y轴、X轴旋转
             MatrixState.rotate(yAngle, 0, 1, 0);
             MatrixState.rotate(xAngle, 1, 0, 0);
             if(lovo!=null)//若加载的物体部位空则绘制物体
             {
-            	lovo.drawSelf(textureIdGHXP);
+            	lovo.drawSelf(textureIdGHXP);// hhl 先把茶壶画到一个FBO的4个纹理中
             }
             MatrixState.popMatrix();//恢复现场
 		}
-		
+
+		float cameraX= 1 ;
+		float step = 0.2f;
 		@SuppressLint("NewApi")
 		public void drawShadowTexture()//绘制生成的矩形纹理
 		{
@@ -200,11 +203,20 @@ class MySurfaceView extends GLSurfaceView
             //设置正交投影
             MatrixState.setProjectOrtho(-ratio, ratio, -1, 1, 2, 100);
             //调用此方法产生摄像机9参数位置矩阵
-            MatrixState.setCamera(0,0,3,0f,0f,0f,0f,1.0f,0.0f);
+			cameraX += step;
+			if(cameraX >= 1f){
+				step = - 0.01f;
+			}else if(cameraX <=-1f ){
+				step = 0.01f;
+			}
+            MatrixState.setCamera(
+					cameraX,0, 3, //3, z=3>>8这样影响不大,主要是正交投影是从2到100，但是如果改x和y的话就影响就比较明细，因为正交投影的坐标是摄像头坐标中的
+					cameraX,0f,0f,// 如果这里还是 0,0,0 那么摄像机坐标在cameraX,0,3移动并望向原点(0,0,0)那么图案就会压了变形(相当于斜着看)
+					0f,1.0f,0.0f);
             
             MatrixState.pushMatrix();
-            MatrixState.translate(-ratio/2, 0.5f, 0);
-            tr.drawSelf(textureIds[0]);//绘制纹理矩形
+            MatrixState.translate(-ratio/2, 0.5f, 1);// 0 );
+            tr.drawSelf(textureIds[0]);//绘制纹理矩形 hhl 把4个为纹理作为原图画到屏幕上 由于纹理是按屏幕比例的,所以为例坐标直接是0和1
             MatrixState.popMatrix();
             
             MatrixState.pushMatrix();
@@ -213,7 +225,7 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.popMatrix();
             
             MatrixState.pushMatrix();
-            MatrixState.translate(-ratio/2, -0.5f, 0);
+            MatrixState.translate(-ratio/2, -0.5f, 1);// 0 );
             tr.drawSelf(textureIds[2]);//绘制纹理矩形
             MatrixState.popMatrix();
             
@@ -234,9 +246,14 @@ class MySurfaceView extends GLSurfaceView
         	SCREEN_WIDTH=width;
         	SCREEN_HEIGHT=height;
             ratio = (float) width / height;//计算GLSurfaceView的宽高比
+
+			int[] maxColorAttachment = new int[1];
+			GLES30.glGetIntegerv(GLES30.GL_MAX_COLOR_ATTACHMENTS,maxColorAttachment,0);
+			Log.w("TOM","最大颜色附件数目是 " + maxColorAttachment[0]); // 最大颜色附件数目是 8
+
             initFBO();
             textureIdGHXP=initTexture(R.drawable.ghxp);//加载国画小品纹理图
-            tr=new TextureRect(MySurfaceView.this,ratio);//创建矩形绘制对象
+            tr=new TextureRect(MySurfaceView.this,ratio);//创建矩形绘制对象 hhl 矩形与屏幕成比例
         }
         
 		public void onSurfaceCreated(GL10 gl, EGLConfig config) 
