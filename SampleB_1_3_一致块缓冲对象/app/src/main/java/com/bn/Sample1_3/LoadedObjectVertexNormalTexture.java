@@ -93,7 +93,7 @@ public class LoadedObjectVertexNormalTexture {
         //Log.e("TOM","1 " + GLES30.glGetError());
 
         //  一致缓冲对象  绑定到 一致块索引/一致绑定点(uniform binding point)
-        GLES30.glBindBufferBase(GLES30.GL_UNIFORM_BUFFER, uboHandle, uboHandle);
+        GLES30.glBindBufferBase(GLES30.GL_UNIFORM_BUFFER, blockIndex, uboHandle);
                                                     // 将一致缓冲对象绑定到一致块
                                                     // hhl 不是用glBindBuffer(GL_UNIFORM_BUFFER,uboHandle)
         //Log.e("TOM","2 " + GLES30.glGetError());
