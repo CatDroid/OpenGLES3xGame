@@ -201,3 +201,191 @@
    ```
 
    
+
+## 一致缓冲对象
+
+ES3.0支持一致块 和 一致缓冲对象
+
+一致块中的不同类型的一致变量在一致块内的组织规律：
+
+| 类型                      | 对齐                                                         |
+| ------------------------- | ------------------------------------------------------------ |
+| bool/int/uint/float类型   | 这种一致块成员在内存中有特定偏移，分别作为单个bool/int/uint/float变量 |
+| bool/int/uint/float的向量 | 连续内存，起始于特定偏移，第一个分量位于最低偏移量           |
+| C列R行列主矩阵            | 当成一个C列的浮点型向量 的 数组 对待 <br />每个向量包含R个分量<br />两个向量之间的偏移量，叫做列步幅<br />通过glGetActiveUniformsiv(GL_UNIFORM_MATRIX_STRIDE)获取 |
+| R行C列行主矩阵            | 同上                                                         |
+| 数组                      | 数组成员0位于最低偏移处<br />数组元素之间的偏移量是一个常数，叫做数组步幅<br />通过glGetActiveUniformsiv(GL_UNIFORM_ARRAY_STRIDE)获取 |
+
+__GLSL 默认使用的uniform内存布局叫做共享布局(shared layout)__，叫共享是因为一旦偏移量被硬件定义，它们就会持续地被多个程序所共享。使用共享布局，GLSL可以为了优化而重新放置uniform变量，只要变量的顺序保持完整。__因为我们不知道每个uniform变量的偏移量是多少__，所以我们也就不知道如何精确地填充uniform缓冲。我们可以使用像glGetUniformIndices这样的函数来查询这个信息
+
+__由于共享布局给我们做了一些空间优化。通常在实践中并不适用分享布局，而是使用std140布局。__std140通过一系列的规则的规范声明了它们各自的偏移量，std140布局为每个变量类型显式地声明了内存的布局。由于被显式的提及，我们就可以手工算出每个变量的偏移量。
+
+每个变量都有一个基线对齐(base alignment)，它等于在一个uniform块中这个变量所占的空间（包含边距），这个基线对齐是使用std140布局原则计算出来的。然后，我们为每个变量计算出它的对齐偏移(aligned offset)，这是一个变量从块（block）开始处的字节偏移量。变量对齐的字节偏移一定等于它的基线对齐的倍数。
+
+准确的布局规则可以在OpenGL的uniform缓冲规范中得到，但我们会列出最常见的规范。GLSL中每个变量类型比如__int、float和bool被定义为4字节，每4字节被表示为N__。
+
+| 类型                  | 布局规范                                                 |
+| --------------------- | -------------------------------------------------------- |
+| 像int和bool这样的标量 | 每个标量的基线为N                                        |
+| 向量                  | 每个向量的基线是2N或4N大小。这意味着vec3的基线为4N       |
+| 标量与向量数组        | 每个元素的基线与vec4的相同                               |
+| 矩阵                  | 被看做是存储着大量向量的数组，每个元素的基数与vec4相同   |
+| 结构体                | 根据以上规则计算其各个元素，并且间距必须是vec4基线的倍数 |
+
+更加具体来说:
+
+| **变量类型**                                                 | **变量大小/偏移量**                                          |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 标量数据类型（bool,int,uint,float）                          | 基于基本机器类型的标量值大小（例如，sizeof(GLfloat)）        |
+| 二元向量(bvec2,ivec2,uvec2,vec2)                             | 标量类型大小的两倍                                           |
+| 三元向量(bvec3,ivec3,uvec3,vec3)                             | 标量类型大小的四倍                                           |
+| 四元向量(bvec4,ivec4,uvec4,vec4)                             | 标量类型大小的四倍                                           |
+| 标量的数组或向量                                             | 数组中每个元素大小是基本类型的大小，偏移量是其索引值（从0开始）与元素大小的乘积。整个数组必须是vec4类型的大小的整数倍（不足将在尾部填充） |
+| 一个或多个C列R行列主序矩阵组成的数组                         | 以C个向量（每个有R个元素）组成的数组形式存储。会像其他数组一样填充。<br />如果变量是M个列主序矩阵的数组，那么它的存储形式是：M*C个向量（每个有R个元素）组成的数组。 |
+| 一个或多个R行C列的行主序矩阵组成的数组<br />layout (std140,row_major) | 以R个向量（每个有C个元素）组成的数组。默认像其他数组一样填充。<br />如果变量是M个行主序矩阵组成的数组，则存储形式是M*R个向量（每个有C个元素）组成的数组。 |
+| 单个结构体或多个结构体组成的数组                             | 单个结构体成员的偏移量和大小可以由前面的规则计算出。结构大小总是vec4大小的整数倍（不足在后面补齐）。<br />由结构组成的数组，偏移量的计算需要考虑单个结构的对齐和补齐。结构的成员偏移量由前面的规则计算出。 |
+
+
+
+```
+layout (std140) uniform ExampleBlock
+{
+                     // base alignment ----------  // aligned offset
+    float value;     // 4                          // 0
+    vec3 vector;     // 16                         // 16 (必须是16的倍数，因此 4->16)
+    mat4 matrix;     // 16                         // 32  (第 0 行)
+                     // 16                         // 48  (第 1 行)
+                     // 16                         // 64  (第 2 行)
+                     // 16                         // 80  (第 3 行)
+    float values[3]; // 16 (数组中的标量与vec4相同)//96 (values[0])
+                     // 16                        // 112 (values[1])
+                     // 16                        // 128 (values[2])
+    bool boolean;    // 4                         // 144
+    int integer;     // 4                         // 148
+};
+```
+
+```
+uniform MyDataBlock
+{
+	vec3 uLightLocation;	//光源位置    offset = 0
+	vec3 uCamera;			//摄像机位置  offset = 12  
+} mb;
+
+layout (std140) uniform MyDataBlock
+{
+	vec3 uLightLocation;	//光源位置    offset = 0
+	vec3 uCamera;			//摄像机位置  offset = 16 (std140的话,vec3会补上一个float)
+
+} mb;
+
+```
+
+
+
+函数`glBindBufferBase`接收一个目标、一个绑定点索引和一个uniform缓冲对象作为它的参数 
+
+使用`glBindBufferRange`函数，这个函数还需要一个偏移量和大小作为参数，这样你就可以只把一定范围的uniform缓冲绑定到一个绑定点上了。使用`glBindBufferRage`函数，你能够将多个不同的uniform块链接到同一个uniform缓冲对象上 
+
+调用`glUniformBlockBinding`函数来把uniform块设置到一个特定的绑定点上。函数的第一个参数是一个程序对象，接着是一个uniform块索引（uniform block index）和打算链接的绑定点 
+
+glUniformBlockBinding 设置程序的状态
+
+glBindBufferRange  设置上下文的状态 ( 也即是 UBO 是指向 参数给定的 绑定点(而非索引点)   )，如果当前使用的program中的一致块没有调用(glUniformBlockBinding )，那么一致块索引就会用跟""索引""同样号码的当前上下文的 绑定点（相当于调用了glUniformBlockBinding( program , 索引 , 索引 ); ）
+
+一致绑定点：
+
+![1540649790972](1540649790972.png)
+
+编程套路：
+
+```
+init:
+		// Step.1 获取一致块的索引
+		int blockIndex = GLES30.glGetUniformBlockIndex(mProgram, "MyDataBlock");
+		
+		// Step.2 一致块索引 指向 一致绑定点(uniform binding point) (e.g 2) 
+		//        OpenGL4.2起，可添加布局标识符来储存一个uniform块的绑定点
+		//        layout(std140, binding = 2) 这样就不用调用 glUniformBlockBinding
+        GLES30.glUniformBlockBinding(mProgram,blockIndex, blockIndex );
+        
+        // Step.3 获取一致块的尺寸
+        int[] blockSizes = new int[1];
+        GLES30.glGetActiveUniformBlockiv(mProgram, blockIndex, GLES30.GL_UNIFORM_BLOCK_DATA_SIZE, blockSizes, 0);
+        int blockSize = blockSizes[0];
+
+        // Step.4 获取一致块成员的偏移
+        //     .4.a 声明一致块内的成员名称数组
+        String[] names = {"MyDataBlock.uLightLocation", "MyDataBlock.uCamera"};
+        //     .4.b 声明对应的成员索引数组
+        int[] uIndices = new int[names.length];
+        //     .4.c 获取一致块内的成员索引
+        GLES30.glGetUniformIndices(mProgram, names, uIndices, 0);
+        //     .4.d 获取一致块内的成员偏移量
+        int[] offset = new int[names.length];
+        GLES30.glGetActiveUniformsiv(mProgram, 2, uIndices, 0, GLES30.GL_UNIFORM_OFFSET, offset, 0);
+       
+         // Step.5 开辟存放一致缓冲所需数据的内存缓冲(每个一致块成员都按照偏移)
+        ByteBuffer ubb = ByteBuffer.allocateDirect(blockSize);
+        ubb.order(ByteOrder.nativeOrder());             // 设置字节顺序
+        FloatBuffer uBlockBuffer = ubb.asFloatBuffer(); // 转换为Float型缓冲
+
+        float[] data = MatrixState.lightLocation;       // 将光源位置数据送入内存缓冲
+        uBlockBuffer.position(offset[0] / BYTES_PER_FLOAT);// 注意position这里是float为单位
+        uBlockBuffer.put(data);
+        float[] data1 = MatrixState.cameraLocation;     // 将摄像机位置数据送入内存缓冲
+        uBlockBuffer.position(offset[1] / BYTES_PER_FLOAT);
+        uBlockBuffer.put(data1);
+
+        uBlockBuffer.position(0);
+        
+         // Step.6 创建一致块缓冲对象 并绑定，更新数据
+        int[] uboHandles = new int[1];              // 用于存储一致缓冲对象编号的数组
+        GLES30.glGenBuffers(1, uboHandles, 0);      // 创建一致缓冲对象
+        uboHandle = uboHandles[0];                  // 获取一致缓冲对象编号
+        GLES30.glBindBuffer(GLES30.GL_UNIFORM_BUFFER,uboHandle); // 编号绑定为一致块对象
+        GLES30.glBufferData(GLES30.GL_UNIFORM_BUFFER, blockSize, uBlockBuffer, GLES30.GL_DYNAMIC_DRAW); // 将光源位置、摄像机位置总数据内存缓冲中的数据送入一致缓冲
+        GLES30.glBindBuffer(GLES30.GL_UNIFORM_BUFFER,0);
+        ....
+        
+draw:
+		// Step.7 将UBO绑定到 一致块索引/一致绑定点
+		GLES30.glBindBufferBase(GLES30.GL_UNIFORM_BUFFER, blockIndex, uboHandle);
+		...
+
+```
+
+
+
+## 映射缓冲区
+
+1.  glMapBufferRange 可以映射部分VBO，但是如果加上了GL_MAP_INVALIDATE_BUFFER_BIT 会出现其他部分被丢弃的情况，改成用GL_MAP_INVALIDATE_RANGE_BIT更加合适，除非更新范围以外内容真的不需要
+
+2. glMapBufferRange访问标记
+
+   | 访问标记                     | 作用                                                         |
+   | ---------------------------- | ------------------------------------------------------------ |
+   | GL_MAP_READ_BIT              | 缓冲数据仓储映射用以读入                                     |
+   | GL_MAP_WRITE_BIT             | 缓冲数据仓储映射用以写出                                     |
+   | GL_MAP_INVALIDATE_RANGE_BIT  | 告诉OpenGL我们不再在乎指定区域内的数据，在执行glBufferData之前，只能与GL_MAP_READ_BIT组合 |
+   | GL_MAP_INVALIDATE_BUFFER_BIT | 告诉OpenGL我们不再在乎整个缓冲的数据，在执行glBufferData之前，只能与GL_MAP_READ_BIT组合 |
+   | GL_MAP_FLUSH_EXPLICIT_BIT    | 表示应用程序会显式调用glFlushMappedBufferRange方法刷新子范围的操作，不可以GL_MAP_WRITE_BIT组合使用 |
+   | GL_MAP_UNSYNCHRONIZED_BIT    | ???                                                          |
+
+3. glUmMapBuffer
+
+   a. map之后必须调用，否则后续渲染管线绘制时无法使用VBO中的数据
+
+   b. umap返回后 不能再用map返回的映射地址，如果顶点缓冲区对象数据存储中的数据在缓冲区映射后被破坏了，umap返回false
+
+   ​                                         
+
+    
+
+    
+
+    
+
+    
+
+    
