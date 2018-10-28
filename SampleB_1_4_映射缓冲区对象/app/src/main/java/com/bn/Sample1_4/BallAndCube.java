@@ -146,6 +146,8 @@ public class BallAndCube
         			    s2=0.5f+x10Temp/length2;
             			t2=(-0.5f+z10Temp/length2)*-1;
         			}
+
+        			// 退出水平一圈后 , 再加入到最后
         			//球
         			alVertix2.add(x1Temp);alVertix2.add(y1Temp);alVertix2.add(z1Temp);
         			//正方体
@@ -156,11 +158,11 @@ public class BallAndCube
 
 
 
-        		// 对于俯仰角度 在 大于45 和 小于-45 y坐标固定是正方体的上面=length(正方体边长的一半)
+        		// 对于俯仰角度 在 大于45 和 小于-45 y坐标固定是正方体的上面=length(正方体边长的一半)或者下面=-length
         		if(vAngle>45){//如果vAngle大于45时，对应正方体的上面
-        			if(Math.abs(x1)>Math.abs(z1)){
+        			if(Math.abs(x1)>Math.abs(z1)){// hhl ????????????
         				if(x1>0){
-        					x10=(float) xozLength;
+        					x10=(float) xozLength; // hhl 按照 与正方体交接的圆边 要 映射到 正方体正方形的边界
         				}else{
         					x10=(float) -xozLength;
         				}
@@ -173,20 +175,20 @@ public class BallAndCube
         				}
         				x10=(float) (z10/Math.tan(Math.toRadians(hAngle)));
         			}
-        			y10=length; 			// 球表面上的点 映射到正方体的上面 y坐标固定
-        			s1=0.5f + x10 / length2;// 根据正方体表面上的点的x和z坐标,纹理坐标从0~1.0 正方体边长length2 范围在[-length2/2,length2/2]
-        			t1=0.5f + z10 / length2;// -0.5 < z10 / length2 < 0.5
+        			y10=length; 			// hhl 球表面上的点 映射到正方体的上面 y坐标固定
+        			s1=0.5f + x10 / length2;// hhl 根据正方体表面上的点的x和z坐标,纹理坐标从0~1.0 正方体边长length2 范围在[-length2/2,length2/2]
+        			t1=0.5f + z10 / length2;// hhl -0.5 < z10 / length2 < 0.5
         		}
         		else  if(vAngle<(-45))
         		{//如果vAngle小于-45时，对应正方体的下面
-        			if(Math.abs(x1)>Math.abs(z1)){
+        			if(Math.abs(x1)>Math.abs(z1)){ // hhl 跟vAngle>45一样
         				if(x1>0){
         					x10=(float) xozLength;
         				}else{
         					x10=(float) -xozLength;
         				}
         				z10=(float) (x10*Math.tan(Math.toRadians(hAngle)));
-        			}else{
+        			}else{							// hhl 跟vAngle>45一样
         				if(z1>0){
         					z10=(float) xozLength;
         				}else{
@@ -194,13 +196,13 @@ public class BallAndCube
         				}
         				x10=(float) (z10/Math.tan(Math.toRadians(hAngle)));
         			}
-        			y10=-length;
-        			s1=0.5f+x10/length2;
-        			t1=1-(0.5f+z10/length2);
+        			y10=-length; 			// hhl 跟yAngle>45的区别只是在这里
+        			s1= 0.5f + x10/length2;
+        			t1= 1 - (0.5f+z10/length2);// hhl 跟yAngle>45的区别只是在这里
         			
         		}
-        		else{            			
-        			if(Math.abs(x1)>Math.abs(z1))
+        		else{// hhl 在45和-45以内的部分,球体到正方体的y坐标不变,即垂直于y轴,将球表面点映射到正方体表面
+        			if(Math.abs(x1)>Math.abs(z1)) // hhl 代表映射到 x=length 或者 x=-length平面
             		{//x>z
             			if(x1>0){
             				x10=length;
@@ -215,7 +217,7 @@ public class BallAndCube
             		}else{
             			if(z1>0)
             			{
-            				z10=length;
+            				z10=length; // 球面的点 到 正方体 的点 还是同一个水平角方向
             				x10=(float)(z10/Math.tan(Math.toRadians(hAngle)));
             				s1=0.5f+x10/length2;
             			}else{
@@ -235,7 +237,9 @@ public class BallAndCube
         		//将纹理坐标放入列表中
         		alVertixTexCoor.add(s1); alVertixTexCoor.add(t1);        		
         	}
-        	
+
+			// 在计算垂直角度=50的同时，会再计算垂直角度45的(按照xAngle>45的方式映射到正方体)，并放到50度后面，
+			// 跟后面计算45度不一样在于映射的正方体方式不同，
         	if(vAngle==50||vAngle==-45)
         	{       		
         		for(int i=0;i<alVertix2.size()/3;i++)
@@ -265,20 +269,27 @@ public class BallAndCube
 
     	//外面卷绕，防止出现断裂情况==========start=============
     	int w = (int) (360 / angleSpan);
-    	for(int i = 0; i <(w+2); i++){
-    		for(int j = 0; j < w; j++){
-    			int x = i * w + j;
-    			alVertixIndice.add(x); // 绘制方法是 三角形  所以6个顶点的索引 构成一个长方形/格子
-    			alVertixIndice.add(x + w);
-    			alVertixIndice.add(x + 1);
-    			alVertixIndice.add(x + 1);
-    			alVertixIndice.add(x + w);
-    			alVertixIndice.add(x + w + 1);
-    		}
-    	}
+		{
+			int i,j = 0 ;
+			for( i = 0; i <(w/2+2); i++){ // hhl Fix bug 最大的索引 应该跟顶点的数目一样
+				for( j = 0; j < w; j++){
+					int x = i * w + j;
+					alVertixIndice.add(x); // 绘制方法是 三角形  所以6个顶点的索引 构成一个长方形/格子
+					alVertixIndice.add(x + w);
+					alVertixIndice.add(x + 1);
+					alVertixIndice.add(x + 1);
+					alVertixIndice.add(x + w);
+					alVertixIndice.add(x + w + 1);
+				}
+			}
+			Log.e("TOM","max index = " + (i * w + j)); // max index = 2808
+		}
+
+
     	//外面卷绕，防止出现断裂情况==========end=============
     	
         vCount=alVertix.size()/3;//顶点的数量为坐标值数量的1/3，因为一个顶点有3个坐标
+		Log.e("TOM","max vertex num = " +vCount ); //  max vertex num = 2808
         
         iCount=alVertixIndice.size();
         vertices=new float[vCount*3];
