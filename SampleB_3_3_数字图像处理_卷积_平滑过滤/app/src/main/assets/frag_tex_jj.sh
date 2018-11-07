@@ -11,10 +11,17 @@ void main() {
 	vec2 offset6=vec2(-1.0,1.0); vec2 offset7=vec2(0.0,1.0); vec2 offset8=vec2(1.0,1.0); 
 
 	// 2. 卷积内核中各个位置的值
-	float kernelValue0 = 1.0; float kernelValue1 = 1.0; float kernelValue2 = 1.0;
-	float kernelValue3 = 1.0; float kernelValue4 = 1.0; float kernelValue5 = 1.0;
-	float kernelValue6 = 1.0; float kernelValue7 = 1.0; float kernelValue8 = 1.0;
+	// 平滑 敦化
+	//float kernelValue0 = 1.0; float kernelValue1 = 1.0; float kernelValue2 = 1.0;
+	//float kernelValue3 = 1.0; float kernelValue4 = 1.0; float kernelValue5 = 1.0;
+	//float kernelValue6 = 1.0; float kernelValue7 = 1.0; float kernelValue8 = 1.0;
+	//const float scaleFactor = 1.0/9.0; // 给出最终求和时的加权因子(为调整亮度) hhl 就是平均
 
+    // 拉普拉斯算子 (一种二阶的边缘检测算子)
+	float kernelValue0 = 0.0; float kernelValue1 = 1.0; float kernelValue2 = 0.0;
+	float kernelValue3 = 1.0; float kernelValue4 = -4.0; float kernelValue5 = 1.0;
+	float kernelValue6 = 0.0; float kernelValue7 = 1.0; float kernelValue8 = 0.0;
+    const float scaleFactor = 0.9 ;
 
 	// 3. 获取卷积内核中各个元素对应像素的颜色值
 	vec4 cTemp0,cTemp1,cTemp2,cTemp3,cTemp4,cTemp5,cTemp6,cTemp7,cTemp8;	
@@ -35,6 +42,8 @@ void main() {
 	     kernelValue6*cTemp6+kernelValue7*cTemp7+kernelValue8*cTemp8;
 
     // 5. 进行亮度加权后将最终颜色传递给渲染管线
-    const float scaleFactor = 1.0/9.0; // 给出最终求和时的加权因子(为调整亮度) hhl 就是平均
+
   	fFragColor = sum * scaleFactor;
+
+  	//fFragColor =  vec4(1.0)-sum* scaleFactor; // 将结果图像颜色置反
 }         
