@@ -18,10 +18,16 @@ void main() {
 	//const float scaleFactor = 1.0/9.0; // 给出最终求和时的加权因子(为调整亮度) hhl 就是平均
 
     // 拉普拉斯算子 (一种二阶的边缘检测算子)
-	float kernelValue0 = 0.0; float kernelValue1 = 1.0; float kernelValue2 = 0.0;
-	float kernelValue3 = 1.0; float kernelValue4 = -4.0; float kernelValue5 = 1.0;
-	float kernelValue6 = 0.0; float kernelValue7 = 1.0; float kernelValue8 = 0.0;
-    const float scaleFactor = 0.9 ;
+//	float kernelValue0 = 0.0; float kernelValue1 = 1.0; float kernelValue2 = 0.0;
+//	float kernelValue3 = 1.0; float kernelValue4 = -4.0; float kernelValue5 = 1.0;
+//	float kernelValue6 = 0.0; float kernelValue7 = 1.0; float kernelValue8 = 0.0;
+//    const float scaleFactor = 0.9 ;
+
+    // 锐化 拉普拉斯算子+原像素
+	float kernelValue0 = 0.0; float kernelValue1 = -1.0; float kernelValue2 = 0.0;
+	float kernelValue3 = -1.0; float kernelValue4 = 5.0; float kernelValue5 = -1.0;
+	float kernelValue6 = 0.0; float kernelValue7 = -1.0; float kernelValue8 = 0.0;
+    const float scaleFactor = 1.0f ;
 
 	// 3. 获取卷积内核中各个元素对应像素的颜色值
 	vec4 cTemp0,cTemp1,cTemp2,cTemp3,cTemp4,cTemp5,cTemp6,cTemp7,cTemp8;	
