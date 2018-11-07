@@ -29,6 +29,12 @@ void main() {
 	float kernelValue6 = 0.0; float kernelValue7 = -1.0; float kernelValue8 = 0.0;
     const float scaleFactor = 1.0f ;
 
+    // 浮雕效果的卷积核 (后面还需要灰度化)
+//	float kernelValue0 = 2.0; float kernelValue1 = 0.0; float kernelValue2 = 2.0;
+//	float kernelValue3 = 0.0; float kernelValue4 = 0.0; float kernelValue5 = 0.0;
+//	float kernelValue6 = 3.0; float kernelValue7 = 0.0; float kernelValue8 = -6.0;
+//	const float scaleFactor = 1.0f ;
+
 	// 3. 获取卷积内核中各个元素对应像素的颜色值
 	vec4 cTemp0,cTemp1,cTemp2,cTemp3,cTemp4,cTemp5,cTemp6,cTemp7,cTemp8;	
 	cTemp0=texture(sTexture, vTextureCoord.st + offset0.xy/512.0); // hhl offset0.xy 代表偏移为1,然后纹理图的尺寸是512,归一化就是1.0/512
@@ -48,8 +54,7 @@ void main() {
 	     kernelValue6*cTemp6+kernelValue7*cTemp7+kernelValue8*cTemp8;
 
     // 5. 进行亮度加权后将最终颜色传递给渲染管线
-
+//    sum = vec4((sum.r+sum.g+sum.a)/3.0);        // 彩色图片灰度化
   	fFragColor = sum * scaleFactor;
-
   	//fFragColor =  vec4(1.0)-sum* scaleFactor; // 将结果图像颜色置反
 }         
