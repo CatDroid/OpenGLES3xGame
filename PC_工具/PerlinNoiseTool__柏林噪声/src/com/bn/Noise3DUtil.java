@@ -42,7 +42,7 @@ public class Noise3DUtil {
 		for (int i = 0; i < size; i++) {
 			for (int j = 0; j < size; j++) {
 				for (int k = 0; k < size; k++) {
-					double val = noise(++X_CURR, ++Y_CURR, ++Y_CURR, amp);
+					double val = noise(++X_CURR, ++Y_CURR, ++Y_CURR, amp); // 返回0~1  0~255
 					int gray = (int) val;
 					result[i][j][k] = gray;
 				}
@@ -111,7 +111,7 @@ public class Noise3DUtil {
 	}
 
 	// RGBA各自一个倍频 (R 是 倍频1(2*2->64*64)  G是倍频2(4*4->64*64)  B是倍频3(8*8->64*64)  A是倍频4((16*16->64*64)) )
-	// 4个倍频 都是等幅度的
+	// 4个倍频 都是等幅度的  而且固定只会产生4个倍频 
 	public static int[][][][] calSYBP_BPFL() {
 		final int PLS4 = 4;
 
