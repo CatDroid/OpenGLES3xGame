@@ -22,7 +22,66 @@
 
    
 
+### Obj和mtl文件
 
+[obj 和 mtl文件格式]: https://www.jianshu.com/p/b52e152d44a9
+[mtl格式]: https://www.cnblogs.com/wiki3d/p/objfile.html
+
+案例参照  obj_mtl_Example/ningning.max 导出的 ningning.obj和ningning.mtl 依赖贴图 ningning.tif
+
+#### 注意
+
+3dMax导出的纹理图坐标跟Android的上下镜像
+
+已知三角形3个顶点可以根据与其他三角形顶点一样的顺序 v1-v2 v1-v3 然后叉乘这两个
+
+#### obj 模型文件
+
+__mtllib__ ningning.mtl  指定使用的模型文件
+
+v 顶点坐标
+
+vn 法向量
+
+vt 纹理坐标
+
+g  卷绕组/物体
+
+usemtl  这组卷绕对应哪个材质
+
+f 一个三角形卷绕索引(顶点坐标 纹理坐标 法向量)
+
+
+
+#### mtl材质文件
+
+```
+newmtl mymtl_1
+	# shininess of the material 反射系数 定义了反射高光度 反射指数值，该值越高则高光越密集，一般取值范围在0~1000
+	# Ns 32
+	# 指定材质表面的光密度，即折射值 
+	# 可在0.001到10之间进行取值。若取值为1.0，光在通过物体的时候不发生弯曲。玻璃的折射率为1.5
+	# Ni 1.500000
+	# 参数factor表示物体融入背景的数量，取值范围为0.0~1.0
+	# 取值为1.0表示完全不透明，取值为0.0时表示完全透明。
+	# 当新创建一个物体时，该值默认为1.0，即无渐隐效果
+	d  1.0000
+	# 透明度(1-d)
+	Tr 0.0000
+	# 滤光投射率
+	Tf 1.0000 1.0000 1.0000 
+	# 材质的光照模型 可接0~10范围内的数字参数
+	illum 2
+	# 环境反射 ambient color
+	Ka 0.050000 0.050000 0.050000
+	# 漫反射 diffuse color
+	Kd 0.500000 0.500000 0.500000
+	# 镜反射 specular color
+	# Ks 0.350000 0.350000 0.350000 
+	# 为漫反射指定颜色纹理文件
+	map_Ka brazier.jpg
+	map_Kd brazier.jpg
+```
 
 
 

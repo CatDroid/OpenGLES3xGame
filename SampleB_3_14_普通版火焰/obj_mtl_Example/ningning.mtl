@@ -1,0 +1,114 @@
+# 3ds Max Wavefront OBJ Exporter v0.97b - (c)2007 guruware
+# File Created: 02.12.2018 21:23:33
+
+newmtl l47_face_mat
+	Ns 500.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.3000 0.3000 0.3000
+	Kd 0.7000 0.7000 0.7000
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\BaiduYunDownload\ningning\ningning.bmp
+	map_Kd D:\BaiduYunDownload\ningning\ningning.bmp
+
+newmtl l47_face_mat1
+	Ns 500.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 0.3000 0.3000 0.3000
+	Kd 0.7000 0.7000 0.7000
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\BaiduYunDownload\ningning\ningning.bmp
+	map_Kd D:\BaiduYunDownload\ningning\ningning.bmp
+
+newmtl l47_face_sprite
+	Ns 500.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 1.0000 1.0000 1.0000
+	Kd 1.0000 1.0000 1.0000
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+
+newmtl l47_face_sprite1
+	Ns 500.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 1.0000 1.0000 1.0000
+	Kd 1.0000 1.0000 1.0000
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\BaiduYunDownload\ningning\ningning.tif
+	map_Kd D:\BaiduYunDownload\ningning\ningning.tif
+	map_d D:\BaiduYunDownload\ningning\ningning.tif
+
+newmtl l47_nene_sprite
+	Ns 500.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 1.0000 1.0000 1.0000
+	Kd 1.0000 1.0000 1.0000
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\BaiduYunDownload\ningning\ningning.bmp
+	map_Kd D:\BaiduYunDownload\ningning\ningning.bmp
+
+newmtl l47_nene_sprite1
+	Ns 500.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 1.0000 1.0000 1.0000
+	Kd 1.0000 1.0000 1.0000
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\BaiduYunDownload\ningning\ningning.tif
+	map_Kd D:\BaiduYunDownload\ningning\ningning.tif
+	map_d D:\BaiduYunDownload\ningning\ningning.tif
+
+newmtl l47_nene
+	Ns 500.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 1.0000 1.0000 1.0000
+	Kd 1.0000 1.0000 1.0000
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\BaiduYunDownload\ningning\ningning.bmp
+	map_Kd D:\BaiduYunDownload\ningning\ningning.bmp
+
+newmtl l47_nene1
+	Ns 500.0000
+	Ni 1.5000
+	d 1.0000
+	Tr 0.0000
+	Tf 1.0000 1.0000 1.0000 
+	illum 2
+	Ka 1.0000 1.0000 1.0000
+	Kd 1.0000 1.0000 1.0000
+	Ks 0.0000 0.0000 0.0000
+	Ke 0.0000 0.0000 0.0000
+	map_Ka D:\BaiduYunDownload\ningning\ningning.bmp
+	map_Kd D:\BaiduYunDownload\ningning\ningning.bmp
