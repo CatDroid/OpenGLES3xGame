@@ -26,18 +26,66 @@
 ### 粒子系统
 
 * 每个粒子的当前生命时间 ，可以通过顶点坐标(要传4个值,x,y,z,w)，最后的一个w，顺带传入渲染管线，shader中计算MVP的时候使用vec4(x,y,z,1.0)即可
+
 * 也可以把顶点坐标(x,y,z,w)的z，作为当前粒子水平方向移动速度，案例中，根据每个粒子距离火炬中心的大小比例设置这个水平速度，每次更新x值，就通过 x=x+z 就得到
+
 * 火焰是一个粒子，矩形的，所以要跟随摄像头旋转，通过旋转角度，来始终保持面向摄像头
+
 * 当前粒子的衰减因子= 1 - 生命时间/最大生命
+
 * ~~当前粒子的当前片元因子 = (1 - 中心距离/半径 ) * 衰减因子~~
+
 * ~~中心距离可以用物体坐标系  distance(vPosition.xyz, vec3( 0., 0., 0.) )~~
+
 * 修正：
+
   * 每个粒子，每次传入渲染管线，在物体坐标系坐标，都不是以vec3(0,0,0)为中心点的，而是有偏移xRange和yRange的，并且往x轴移动和往y轴正方向移动，所以要计算片元到粒子中心的距离，来计算衰减因子，是不能的，如果要做粒子中心颜色比较大 边缘比较浅色，直接修改__纹理贴图的alpha通道__
   * 也就是纹理贴图的alpha通道，既作为形状，也作为由里往外淡色
-  * 案例做的效果是：计算当前片元/粒子， 与火盘中心点(物体坐标系坐标是vec3(0,0,0))的距离，这样越远离火盘底部，火苗颜色越小
+  * 案例做的效果是：计算当前片元/粒子， 与火盘中心点(物体坐标系坐 标是vec3(0,0,0))的距离，这样越远离火盘底部，火苗颜色越小
+
 * 粒子的颜色由  初始颜色和终止颜色，根据因子，插值而成 colorT = clamp(factor4, endColor,startColor); 
+
 * 粒子的纹理贴图 用 它的alpha通道来形成粒子形状 colorT = colorT * colorTL.a;
-* 
+
+* 渲染每个粒子系统的时候，是关闭深度测试的，所有不同粒子系统(火炬)，要先经过排序，然后再渲染，保证alpha混合正常，排序通过计算不同__火炬/火盘的中心位置与摄像头之间的距离__
+
+  ```
+  	@Override
+  	public int compareTo(ParticleSystem another) {// 重写的比较两个火焰离摄像机距离的方法
+  
+  		float xs=positionX-cx;
+  		float zs=positionZ-cz;
+  		
+  		float xo=another.positionX-cx;
+  		float zo=another.positionZ-cz;
+  		
+  		float disA = xs*xs + zs*zs ;
+  		float disB = xo*xo + zo*zo;
+  		return ((disA-disB)==0)?0:((disA-disB)>0)?-1:1;  
+  	}
+  ```
+
+* 混合方式
+
+  ```
+  GL_FUNC_SUBTRACT                 ScSs - DcDs
+  GL_FUNC_REVERSE_SUBTRACT  		 DcDs - ScSs
+  ```
+
+* GL_FUNC_ADD
+
+  ```
+   GL_FUNC_ADD 情况下 ,
+   GL_ONE + GL_ONE 比 GL_SRC_ALPHA + GL_ONE 要明亮 
+  ```
+
+* 粒子的矩形 
+
+  
+
+
+
+
 
 
 
