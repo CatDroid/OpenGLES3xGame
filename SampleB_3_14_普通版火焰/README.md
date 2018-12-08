@@ -79,11 +79,42 @@
    GL_ONE + GL_ONE 比 GL_SRC_ALPHA + GL_ONE 要明亮 
   ```
 
-* 粒子的矩形 
+* 粒子的矩形 要面向摄像机，由于案例中4个粒子系统的坐标不一样(火炬盘)，所以要分别计算
+
+  ```
+  public void calculateBillboardDirection()	// 根据摄像机位置计算火焰朝向
+  {
+  	// 由于每个粒子系统都在不同位置，不是在世界坐标系中心，所有不能用MySurfaceView.direction
+  	// 所以要根据每个火炬在世界坐标系中的位置，与摄像头的位置 得到角度
+  	float xspan = positionX - sCameraX;
+  	float zspan = positionZ - sCameraZ;
+  	if(zspan<=0) {
+  		yAngle=(float)Math.toDegrees(Math.atan(xspan/zspan));	
+  	} else {
+  		yAngle=180+(float)Math.toDegrees(Math.atan(xspan/zspan));
+  	}
+  }
+  ```
 
   
 
+### Matrix.setLookAtM
 
+```
+public static void setLookAtM(float[] rm, int rmOffset,
+            float eyeX, float eyeY, float eyeZ,
+            float centerX, float centerY, float centerZ, float upX, float upY,
+            float upZ)
+```
+
+* 摄像头位置eye = (eyeX,eyeY,eyeZ)   目标位置center=(centerX,centerY,centerZ)  向上方向向量 up = (upX,upY,upZ)   
+* 视线方向向量  = center-eye 箭头指向目标
+* 视线和up方向向量 所在平面 由法向量表述：  视线方向向量 叉乘 up方向向量   右手螺旋
+* 修正up方向向量，由于up方向向量与视线方向向量不垂直，所以再要 平面法向量  叉乘  视线方向向量
+* 三个方向向量 就可以作为 新坐标的三个独立基向量  
+  * 视线方向向量(取反方向)，作为 摄像机坐标系 z轴
+  * 修正up方向向量，作为 摄像机坐标系 y轴
+  * 平面法向量，作为 摄像机坐标系 x轴 （x轴 与 视线向量和up向量垂直 或者说垂直于摄像机器）
 
 
 
