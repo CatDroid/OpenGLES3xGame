@@ -1,15 +1,15 @@
-package com.bn.Sample3_14;
+package com.bn.Sample3_15;
 
-import static com.bn.Sample3_14.ParticleDataConstant.walls;
-import static com.bn.Sample3_14.Sample2_12Activity.HEIGHT;
-import static com.bn.Sample3_14.Sample2_12Activity.WIDTH;
+
+import static com.bn.Sample3_15.ParticleDataConstant.walls;
+import static com.bn.Sample3_15.Sample2_12Activity.HEIGHT;
+import static com.bn.Sample3_15.Sample2_12Activity.WIDTH;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -21,16 +21,16 @@ import android.opengl.GLSurfaceView;
 import android.opengl.GLUtils;
 import android.view.MotionEvent;
 
-class MySurfaceView extends GLSurfaceView {
-    private SceneRenderer mRenderer;//场景渲染器
-
+class MySurfaceView extends GLSurfaceView 
+{
+     private SceneRenderer mRenderer;//场景渲染器    
+     
     List<ParticleSystem> mParticleSystems = new ArrayList<ParticleSystem>();
 
-    WallsForwDraw wallsForDraw;
-    LoadedObjectVertexNormalTexture brazier;
-
-    static float direction = 0;//视线方向
-
+     WallsForwDraw wallsForDraw;    
+     LoadedObjectVertexNormalTexture brazier;
+     
+     static float direction=0;//视线方向
     static float sCameraX = 0;     // 摄像机x坐标
     static float sCameraY = 18;    // 摄像机z坐标
     static float sCameraZ = 20;    // 摄像机z坐标
@@ -50,31 +50,30 @@ class MySurfaceView extends GLSurfaceView {
 //    static float sUpX = 0;  // hhl 即使不做上面的运算，效果也差不多，不清楚上述运算原理??
 //    static float sUpY = 1;
 //    static float sUpZ = 0;
-
-    static final float DEGREE_SPAN = (float) (3.0 / 180.0f * Math.PI);//摄像机每次转动的角度
-
-    float Offset = 20; // 距离世界坐标系中心
-    float x;
-    float y;
-
-    int textureIdFire;//系统火焰分配的纹理id
-    int textureIdbrazier;//系统火盆分配的纹理id
+     static final float DEGREE_SPAN=(float)(3.0/180.0f*Math.PI);//摄像机每次转动的角度
+     
+     float Offset=20;
+     float x;
+     float y;  
+     
+     int textureIdFire;//系统火焰分配的纹理id
+     int textureIdbrazier;//系统火盆分配的纹理id
     int mFireCount;
-
-    boolean flag = true;//线程循环的标志位
-
-    public MySurfaceView(Context context) {
+   	 
+     boolean flag=true;//线程循环的标志位
+     
+	public MySurfaceView(Context context) {
         super(context);
-        this.setEGLContextClientVersion(3); //设置使用OPENGL ES3.0
-        mRenderer = new SceneRenderer();    //创建场景渲染器
-        setRenderer(mRenderer);                //设置渲染器
+        this.setEGLContextClientVersion(3); //设置使用OPENGL ES 3.0
+        mRenderer = new SceneRenderer();	//创建场景渲染器
+        setRenderer(mRenderer);				//设置渲染器		        
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);//设置渲染模式为主动渲染   
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        x = event.getX();
-        y = event.getY();
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		x=event.getX();
+		y=event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 flag = true;
@@ -129,27 +128,28 @@ class MySurfaceView extends GLSurfaceView {
 //        android.util.Log.i("TOM",String.format("%f %f %f , %f %f %f , %f %f %f",
 //                sCameraX, sCameraY, sCameraZ, LOOK_AT_X, LOOK_AT_Y, LOOK_AT_Z, sUpX, sUpY, sUpZ ));
         return true;
-    }
+	}
 
-    private class SceneRenderer implements GLSurfaceView.Renderer {
-
-        int countt = 0;//计算帧速率的时间间隔次数--计算器
-        long timeStart = System.nanoTime();//开始时间
-
-        public void onDrawFrame(GL10 gl) {
-            if (countt == 19)//每十次一计算帧速率
-            {
-                long timeEnd = System.nanoTime();//结束时间
-
-                //计算帧速率
-                float ps = (float) (1000000000.0 / ((timeEnd - timeStart) / 20));
-                System.out.println("pss=" + ps);
-                countt = 0;//计算器置0
-                timeStart = timeEnd;//起始时间置为结束时间
-            }
+	private class SceneRenderer implements GLSurfaceView.Renderer 
+    {   
+		
+		int countt=0;//计算帧速率的时间间隔次数--计算器
+		long timeStart=System.nanoTime();//开始时间
+        public void onDrawFrame(GL10 gl) 
+        { 
+        	if(countt==19)//每十次一计算帧速率
+        	{
+        		long timeEnd=System.nanoTime();//结束时间
+        		
+        		//计算帧速率
+        		float ps=(float)(1000000000.0/((timeEnd-timeStart)/20));
+        		System.out.println("pss="+ps);
+        		countt=0;//计算器置0
+        		timeStart=timeEnd;//起始时间置为结束时间
+        	}
         	countt=(countt+1)%20;//更新计数器的值
-            //清除深度缓冲与颜色缓冲
-            GLES30.glClear(GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
+        	//清除深度缓冲与颜色缓冲
+            GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
             MatrixState.pushMatrix();
             //绘制墙体
             wallsForDraw.drawSelf();
@@ -171,25 +171,21 @@ class MySurfaceView extends GLSurfaceView {
                 MatrixState.popMatrix();
             }
             MatrixState.popMatrix();
-        }
-
+        }  
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-
-            GLES30.glViewport(0, 0, width, height);
-
-            // 透视投影矩阵
+            //设置视窗大小及位置 
+        	GLES30.glViewport(0, 0, width, height); 
+        	//计算GLSurfaceView的宽高比
             float ratio = (float) width / height;
-            MatrixState.setProjectFrustum(-0.3f * ratio, 0.3f * ratio, -1 * 0.3f, 1 * 0.3f, 1, 100);
-
-            // 摄像机9参数位置矩阵
+            //调用此方法计算产生透视投影矩阵
+            MatrixState.setProjectFrustum(-0.3f*ratio, 0.3f*ratio, -1*0.3f, 1*0.3f, 1, 100);
+            //调用此方法产生摄像机9参数位置矩阵
             MatrixState.setCamera(sCameraX, sCameraY, sCameraZ, LOOK_AT_X, LOOK_AT_Y, LOOK_AT_Z, sUpX, sUpY, sUpZ);
-
-            // 初始化变换矩阵
-            MatrixState.setInitStack();
-            // 初始化光源位置
+            //初始化变换矩阵
+       	    MatrixState.setInitStack();
+       	    //初始化光源位置   
             MatrixState.setLightLocation(0, 15, 0);
         }
-
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 
 
@@ -247,6 +243,5 @@ class MySurfaceView extends GLSurfaceView {
         GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bitmapTmp, 0);
         bitmapTmp.recycle();
         return textureId;
-
-    }
+	}
 }
