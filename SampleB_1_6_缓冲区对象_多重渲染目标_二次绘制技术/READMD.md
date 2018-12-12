@@ -281,21 +281,62 @@ layout (std140) uniform MyDataBlock
 
 ```
 
+* 绑定点：
+  * 在OpenGL环境（context）中，定义了若干绑定点（binding points） 
+  * 绑定点是整个上下文状态的
+  * 一个绑定点绑定到一个缓冲区对象(glBindBufferBase glBindBufferRage)，一个程序的一个索引 可以通过绑定不同的绑定点来实现绑定不同的缓冲区对象
 
 
-函数`glBindBufferBase`接收一个目标、一个绑定点索引和一个uniform缓冲对象作为它的参数 
 
-使用`glBindBufferRange`函数，这个函数还需要一个偏移量和大小作为参数，这样你就可以只把一定范围的uniform缓冲绑定到一个绑定点上了。使用`glBindBufferRage`函数，你能够将多个不同的uniform块链接到同一个uniform缓冲对象上 
+* 一致绑定点：
 
-调用`glUniformBlockBinding`函数来把uniform块设置到一个特定的绑定点上。函数的第一个参数是一个程序对象，接着是一个uniform块索引（uniform block index）和打算链接的绑定点 
+  * ```
+    void glBindBufferBase(	GLenum target,
+     	GLuint index,
+     	GLuint buffer);
+    ```
 
-glUniformBlockBinding 设置程序的状态
+  * 作用：绑定一个 __缓冲区对象__到 一个 __绑定点__
 
-glBindBufferRange  设置上下文的状态 ( 也即是 UBO 是指向 参数给定的 绑定点(而非索引点)   )，如果当前使用的program中的一致块没有调用(glUniformBlockBinding )，那么一致块索引就会用跟""索引""同样号码的当前上下文的 绑定点（相当于调用了glUniformBlockBinding( program , 索引 , 索引 ); ）
+  * 函数`glBindBufferBase`接收一个目标、一个绑定点索引和一个uniform缓冲对象作为它的参数 
 
-一致绑定点：
+  * 使用`glBindBufferRange`函数，这个函数还需要一个偏移量和大小作为参数，这样你就可以只把一定范围的uniform缓冲绑定到一个绑定点上了。使用`glBindBufferRage`函数，你能够将多个不同的uniform块链接到同一个uniform缓冲对象上
 
-![1540649790972](1540649790972.png)
+   	
+
+  * target：绑定操作的目标 ，GLES3.0 只能是 GL_TRANSFORM_FEEDBACK_BUFFER 变换反馈缓冲区对象 or GL_UNIFORM_BUFFER一致缓冲区对象
+
+  * index：指定绑定点
+
+  * buffer：缓冲区的名字 ![1540649790972](1540649790972.png)
+
+  * 
+
+  * ```
+    void glUniformBlockBinding(	GLuint program,
+     	GLuint uniformBlockIndex,
+     	GLuint uniformBlockBinding);
+    ```
+
+  * 作用：把uniform块设置到一个特定的绑定点上
+
+  * 调用`glUniformBlockBinding`函数来把uniform块设置到一个特定的绑定点上。函数的第一个参数是一个程序对象，接着是一个uniform块索引（uniform block index）和打算链接的绑定点 
+
+  * program：一个程序对象
+
+  * uniformBlockIndex：uniform块索引
+
+  * uniformBlockBinding：打算链接的绑定点
+
+  * ```
+    我们可以从图表设置Lights这个uniform块链接到绑定点2：
+    GLuint lights_index = glGetUniformBlockIndex(shaderA.Program, "Lights");
+    glUniformBlockBinding(shaderA.Program, lights_index, 2);
+    ```
+
+    
+
+
 
 编程套路：
 
