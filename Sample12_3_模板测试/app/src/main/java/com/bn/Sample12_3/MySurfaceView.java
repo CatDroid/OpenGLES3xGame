@@ -119,7 +119,18 @@ class MySurfaceView extends GLSurfaceView
             GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
             GLES30.glTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_DEPTH24_STENCIL8, width, height, 0,
                     GLES30.GL_DEPTH_STENCIL, GLES30.GL_UNSIGNED_INT_24_8, null );
+
+            // glTexImage2D 内部格式 和 格式 :
+
+            // 格式 和 数据类型  告诉OpenGL CPU传递给这个纹理的数据  具体包含什么成分和顺序(比如GL_DEPTH_STENCIL,GL_BGR,GL_RGB) 和 每个成分占多大(GL_UNSIGNED_INT_24_8 GL_UNSIGNED_INT_5_6_6)
+            // 内部格式   就是OpenGL内部(shader)需要用到的具体格式(GL_RGB RGB三个成分都是8bit)，注意内部格式不会是GL_BGR，但可以是GL_RED(只要8bit作为红色)或者有大小的GL_RGB565
+
+            // 对照表格 https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
+
+
             GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER, GLES30.GL_DEPTH_STENCIL_ATTACHMENT, GLES30.GL_TEXTURE_2D, mDepthStencilTexture, 0);
+
+
 
             int result = GLES30.glCheckFramebufferStatus(GLES30.GL_FRAMEBUFFER);
             if( result != GLES30.GL_FRAMEBUFFER_COMPLETE){
