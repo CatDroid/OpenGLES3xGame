@@ -36,7 +36,10 @@ class MySurfaceView extends GLSurfaceView
         public void onDrawFrame(GL10 gl) 
         { 
         	//清除深度缓冲与颜色缓冲
-            GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
+
+            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER,mDepthStenilFBO);
+            GLES30.glClearColor(1.0f,0.0f,0.0f,1.0f);
+            GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT );
              
             MatrixState.pushMatrix();
             MatrixState.translate(0, -2, 0);
@@ -64,7 +67,11 @@ class MySurfaceView extends GLSurfaceView
 
 
             bfd.drawSelf(textureBallId);        // 绘制实际物体
-            MatrixState.popMatrix();   
+            MatrixState.popMatrix();
+
+            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER,0);
+            mDrawer.draw( mColorTexture);
+
         }  
 
         public void onSurfaceChanged(GL10 gl, int width, int height) 
@@ -77,11 +84,71 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.setProjectFrustum(-ratio, ratio, -1, 1, 3, 100);
             //设置摄像机观察矩阵
             MatrixState.setCamera(0.0f,8.0f,8.0f,0,0f,0,0,1,0);
+
+            if(mDepthStenilFBO!=0) GLES30.glDeleteFramebuffers(1,new int[]{mDepthStenilFBO},0);
+            if(mColorTexture!=0) GLES30.glDeleteTextures(1,new int[]{mColorTexture},0);
+            if(mDepthStencilTexture!=0) GLES30.glDeleteTextures(1,new int[]{mDepthStencilTexture},0);
+
+            mDepthStenilFBO = 0;
+            mColorTexture = 0 ;
+            mDepthStencilTexture = 0 ;
+
+
+            int temp[] = new int[1] ;
+            GLES30.glGenFramebuffers(1,temp,0);
+            mDepthStenilFBO = temp[0];
+            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER,mDepthStenilFBO);
+
+            GLES30.glGenTextures(1,temp,0);
+            mColorTexture = temp[0];
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,mColorTexture);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_NEAREST);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexImage2D( GLES30.GL_TEXTURE_2D,0,GLES30.GL_RGBA,width,height,0,GLES30.GL_RGBA,GLES30.GL_UNSIGNED_BYTE,null);
+
+            GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER,GLES30.GL_COLOR_ATTACHMENT0,GLES30.GL_TEXTURE_2D,mColorTexture,0 );
+
+            GLES30.glGenTextures(1,temp,0);
+            mDepthStencilTexture = temp[0];
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D,mDepthStencilTexture);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_NEAREST);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexImage2D( GLES30.GL_TEXTURE_2D, 0, GLES30.GL_DEPTH24_STENCIL8, width, height, 0,
+                    GLES30.GL_DEPTH_STENCIL, GLES30.GL_UNSIGNED_INT_24_8, null );
+            GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER, GLES30.GL_DEPTH_STENCIL_ATTACHMENT, GLES30.GL_TEXTURE_2D, mDepthStencilTexture, 0);
+
+            int result = GLES30.glCheckFramebufferStatus(GLES30.GL_FRAMEBUFFER);
+            if( result != GLES30.GL_FRAMEBUFFER_COMPLETE){
+                throw new RuntimeException("glCheckFramebufferStatus Fail " + result );
+            }
+
+                // RBO作为深度和模板附件
+//                glGenRenderbuffers(1, &rbo);
+//                glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+//                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 800, 600);
+//                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER,0);
+
+            mDrawer.init(width, height);
+
+
         }
+
+        private int mDepthStenilFBO = 0 ;
+        private int mColorTexture = 0;
+        private int mDepthTexture = 0 ;
+        private int mStencilTexture = 0 ;
+        private int mDepthStencilTexture = 0 ;
+        private SimpleDrawer mDrawer = new SimpleDrawer();
 
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             //设置屏幕背景色RGBA
-            GLES30.glClearColor(0.0f,0.0f,0.0f,1.0f);  
+            GLES30.glClearColor(0.0f,0.0f,0.0f,1.0f);
             //创建纹理矩形对对象 
             texRect=new TextureRect(MySurfaceView.this,4,2.568f);  
             //创建用于绘制的篮球对象
