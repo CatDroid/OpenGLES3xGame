@@ -131,9 +131,13 @@ transform feedback是OpenGL渲染管线中，__顶点处理阶段结束之后，
 
 
 
+* GAPID 
+  * 一致块只有默认的状态容器, glBindBufferBase会修改默认的状态容器
+  * ![1547268859728](1547268859728.png)
 
 
-### 绑定缓冲区对象到绑定点(属于上下文)
+
+### 绑定缓冲区对象到绑定点(属于上下文,操作当前绑定的TFO,默认TFO是0)
 
 - ```
   void glBindBufferBase(	GLenum target,
@@ -141,7 +145,7 @@ transform feedback是OpenGL渲染管线中，__顶点处理阶段结束之后，
    	GLuint buffer);
   ```
 
-- 作用：绑定一个 __缓冲区对象__到 一个 __绑定点__
+- 作用：绑定一个 __绑定点__到 一个 __缓冲区对象__
 
 - 注意，绑定点的数目是有限制的，对于每个GL_TRANSORM_FEEDBACK_BUFFER目标，只有4个绑定点，也就是index 可以是0,1,2,3，超过的话，就会glError = 0x501，GL_INVALID_VALUE
 
@@ -157,7 +161,7 @@ transform feedback是OpenGL渲染管线中，__顶点处理阶段结束之后，
 
 
 
-### 一致绑定点（属于程序的状态）
+### 一致绑定点（属于程序的状态,跟反馈变换易变变量glTransformFeedbackVaryings类似）
 
 - ```
   void glUniformBlockBinding(	GLuint program, 
@@ -309,12 +313,17 @@ GL_COPY_WRITE_BUFFER         Buffer copy destination
 GL_PIXEL_PACK_BUFFER         用于从纹理或帧缓冲区对象中读取像素数据     glGetCompressedTexImage, glGetTexImage, and glReadPixels.
 GL_PIXEL_UNPACK_BUFFER       作为生成纹理数据源，用于glTexImage2D, glTexImage3D, glTexSubImage1D, glTexSubImage2D等
 
-
 以下四个类型__含多个绑定点__，需要使用glBindBufferBase 或glBindBufferRange绑定
 ~~GL_ATOMIC_COUNTER_BUFFER        Atomic counter storage~~
 ~~GL_SHADER_STORAGE_BUFFER        Read-write storage for shaders~~
 GL_TRANSFORM_FEEDBACK_BUFFER     Transform feedback buffer
 GL_UNIFORM_BUFFER                 GLuint bufferID
+
+
+
+GL_ARRAY_BUFFER (VBO) ，GL_ELEMENT_ARRAY_BUFFER   (VEO)  这些直接跟顶点属性变量相关 
+
+
 
 #### glBindBufferBase
 
@@ -356,4 +365,4 @@ GLsizeiptr  size 相比glBindBufferBase__增加了offset和size__
 
 ### DEMO
 
-1. 变换反馈程序，顶点着色器中 使用gl_VertextID作为每个粒子的编号（其实是当前绘制顶点的序号），用来判断当前的粒子是否需要激活
+1. 变换反馈程序，顶点着色器中 使用gl_VertextID(GLES2.0没有定义)作为每个粒子的编号（其实是当前绘制顶点的序号），用来判断当前的粒子是否需要激活
