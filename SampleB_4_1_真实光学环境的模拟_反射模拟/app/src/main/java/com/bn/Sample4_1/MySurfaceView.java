@@ -180,19 +180,49 @@ class MySurfaceView extends GLSurfaceView
             //创建纹理矩形对对象 
             texRect=new TextureRect(MySurfaceView.this);   
             //加载纹理
+//            int[] cubeMapResourceIds = new int[]//组织图片资源id数组
+//            {
+//                    R.raw.skycubemap_right, R.raw.skycubemap_left, R.raw.skycubemap_up_cube,
+//                    R.raw.skycubemap_down_cube, R.raw.skycubemap_front, R.raw.skycubemap_back
+//            };
+
+// +X (right)
+// -X (left)
+// +Y (top)
+// -Y (bottom)
+// +Z (front)
+// -Z (back)
+
             int[] cubeMapResourceIds = new int[]//组织图片资源id数组
             {
-                    R.raw.skycubemap_right, R.raw.skycubemap_left, R.raw.skycubemap_up_cube,
-                    R.raw.skycubemap_down_cube, R.raw.skycubemap_front, R.raw.skycubemap_back
+                R.raw.x_plus, R.raw.x_minus,
+                R.raw.y_plus, R.raw.y_minus,
+                R.raw.z_plus, R.raw.z_minus
             };
             textureIdCM=generateCubeMap(cubeMapResourceIds); //加载立方图纹理
             
-            textureIdA[0]=initTexture(R.raw.skycubemap_back);
-            textureIdA[1]=initTexture(R.raw.skycubemap_left);
-            textureIdA[2]=initTexture(R.raw.skycubemap_right);
-            textureIdA[3]=initTexture(R.raw.skycubemap_down);
-            textureIdA[4]=initTexture(R.raw.skycubemap_up);
-            textureIdA[5]=initTexture(R.raw.skycubemap_front);  
+//            textureIdA[0]=initTexture(R.raw.skycubemap_back);
+//            textureIdA[1]=initTexture(R.raw.skycubemap_left);
+//            textureIdA[2]=initTexture(R.raw.skycubemap_right);
+//            textureIdA[3]=initTexture(R.raw.skycubemap_down);
+//            textureIdA[4]=initTexture(R.raw.skycubemap_up);
+//            textureIdA[5]=initTexture(R.raw.skycubemap_front);
+            textureIdA[0]=initTexture(R.raw.z_minus);
+            textureIdA[1]=initTexture(R.raw.x_minus);
+            textureIdA[2]=initTexture(R.raw.x_plus);
+            textureIdA[3]=initTexture(R.raw.y_minus);
+            textureIdA[4]=initTexture(R.raw.y_plus);
+            textureIdA[5]=initTexture(R.raw.z_plus);
+
+            //  hhl 注意：立方体贴图相当于把贴图直接贴到物体上，而天空盒上的图案，应该跟立方体每个面有镜像关系
+            //           所以要左右镜像
+            //
+//            textureIdA[0]=initTexture(R.raw.skycubemap_right);
+//            textureIdA[1]=initTexture(R.raw.skycubemap_right);
+//            textureIdA[2]=initTexture(R.raw.skycubemap_right);
+//            textureIdA[3]=initTexture(R.raw.skycubemap_right);
+//            textureIdA[4]=initTexture(R.raw.skycubemap_right);
+//            textureIdA[5]=initTexture(R.raw.skycubemap_right);
         }
     }
 
@@ -236,8 +266,9 @@ class MySurfaceView extends GLSurfaceView
 		GLES30.glTexParameterf(GLES30.GL_TEXTURE_CUBE_MAP, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_REPEAT);
         GLES30.glTexParameterf(GLES30.GL_TEXTURE_CUBE_MAP, GLES30.GL_TEXTURE_WRAP_R,GLES30.GL_REPEAT);//?? HHL 有这个必要??
 
-        for (int face = 0; face < 6; face++)//循环加载立方图纹理各个面的图片 
+        for (int face = 0; face < 6; face++)//循环加载立方图纹理各个面的图片
         {
+//            InputStream is = getResources().openRawResource(resourceIds[0]);
             InputStream is = getResources().openRawResource(resourceIds[face]);
             Bitmap bitmap;
             try {
@@ -252,8 +283,8 @@ class MySurfaceView extends GLSurfaceView
 //            GL_TEXTURE_CUBE_MAP_NEGATIVE_X    左   // +1
 //            GL_TEXTURE_CUBE_MAP_POSITIVE_Y    上   // +1
 //            GL_TEXTURE_CUBE_MAP_NEGATIVE_Y    下   // +1
-//            GL_TEXTURE_CUBE_MAP_POSITIVE_Z    后   // +1
-//            GL_TEXTURE_CUBE_MAP_NEGATIVE_Z    前   // +1
+//            GL_TEXTURE_CUBE_MAP_POSITIVE_Z    前   // +1
+//            GL_TEXTURE_CUBE_MAP_NEGATIVE_Z    后   // +1
 
             // 加载立方图纹理中的指定编号的面  hhl 注意!! 按照顺序   还是使用 texImage2D 的接口 但是纹理目标是 GL_TEXTURE_CUBE_MAP_POSITIVE_X
             GLUtils.texImage2D(GLES30.GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, 0,bitmap, 0);
