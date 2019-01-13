@@ -122,13 +122,13 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.pushMatrix();
             MatrixState.translate(0, -UNIT_SIZE+tzz, 0);
             MatrixState.rotate(-90, 1, 0, 0);
-            texRect.drawSelf(textureIdA[3]);
+            texRect.drawSelfWithFlip(textureIdA[3],false);
             MatrixState.popMatrix(); 
             //绘制上墙
             MatrixState.pushMatrix();
             MatrixState.translate(0, UNIT_SIZE-tzz, 0);
             MatrixState.rotate(90, 1, 0, 0);
-            texRect.drawSelf(textureIdA[4]);
+            texRect.drawSelfWithFlip(textureIdA[4],false);
             MatrixState.popMatrix(); 
         }  
 
