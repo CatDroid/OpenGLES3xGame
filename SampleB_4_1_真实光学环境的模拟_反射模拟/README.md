@@ -130,4 +130,8 @@
 
     vec4 textureCube(samplerCube sampler, vec3 coord) 
 
-9. （还不确定）通过立方体贴图上传的贴图，貌似自己完成了Android图片原点(左下)和OpenGL纹理图原点(左上)的问题 ??
+9. （还不确定 Not Sure）通过立方体贴图上传的贴图，貌似自己完成了Android图片原点(左下)和OpenGL纹理图原点(左上)的问题 ??
+
+10. demo中的 y轴方向上 天空盒 和 立方体贴图  只是上下flip 没有左右flip，而x轴，z轴都是左右flip
+
+    ![1547343626894](1547343626894.png) 
