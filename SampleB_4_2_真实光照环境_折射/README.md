@@ -91,7 +91,15 @@
    }  
    ```
 
-   
+4. 最终效果
+
+   折射的效果是：出现放大镜一样，HHL：其实是近大远小，把远处天空盒的对应区域颜色搬到了透明球
+
+   色散的效果是：放大镜+物体边缘有彩虹条纹(色散现象)
+
+   ![1547362779953](1547362779953.png)
+
+   ![1547362801937](1547362801937.png)
 
 
 
@@ -100,17 +108,90 @@
 [菲涅耳现象]: https://www.cnblogs.com/BlackWalnut/p/4587182.html
 [菲涅尔反射是什么]: https://www.zhihu.com/question/53022233
 
-拍摄者距离河水较近，视角可以清楚的看见水下的石头，
+1. 拍摄者距离河水较近，视角可以清楚的看见水下的石头，
 
-而图中较远的河水已经看不到水下的物体，水面上有较高的反射现象
+   而图中较远的河水已经看不到水下的物体，水面上有较高的反射现象
 
-![img](../SampleB_4_2_%E7%9C%9F%E5%AE%9E%E5%85%89%E7%85%A7%E7%8E%AF%E5%A2%83_%E6%8A%98%E5%B0%84/v2-fe91db773ad84314f223ea3e34ee48f1_hd.jpg)  
+   __夹角越小，反射越明显，所以远处倒影(反射)明显__
 
-![1547348174887](../SampleB_4_2_%E7%9C%9F%E5%AE%9E%E5%85%89%E7%85%A7%E7%8E%AF%E5%A2%83_%E6%8A%98%E5%B0%84/1547348174887.png)
+    ![img](../SampleB_4_2_%E7%9C%9F%E5%AE%9E%E5%85%89%E7%85%A7%E7%8E%AF%E5%A2%83_%E6%8A%98%E5%B0%84/v2-fe91db773ad84314f223ea3e34ee48f1_hd.jpg)  
 
-__夹角越小，反射越明显，所以远处倒影(反射)明显__
+    ![1547348174887](../SampleB_4_2_%E7%9C%9F%E5%AE%9E%E5%85%89%E7%85%A7%E7%8E%AF%E5%A2%83_%E6%8A%98%E5%B0%84/1547348174887.png)	
 
-在三维软件中，添加菲涅尔反射是为了更逼真的模拟物体的真实效果，__摄像机正视物体的时候，中心处角度大，反射低，四周角度小，反射高__
+
+
+2. 原因：光线到达材质接触面时，一部分光线被反射，一部分光线被折射，大致规律是，入射角较小发生折射，入射角大发生反射，在给定的情况下，反射和折射占比，计算复杂，需要为菲涅尔效果建立复杂数学模型
+
+   ![1547363413323](1547363413323.png)
+
+3. 在三维软件中，添加菲涅尔反射是为了更逼真的模拟物体的真实效果，__摄像机正视物体的时候，中心处角度大，反射低，四周角度小，反射高__
 
 ![1547348430390](../SampleB_4_2_%E7%9C%9F%E5%AE%9E%E5%85%89%E7%85%A7%E7%8E%AF%E5%A2%83_%E6%8A%98%E5%B0%84/1547348430390.png)
 
+ 4. shader实现：
+
+    1. 若入射角小于一定的值，只计算折射效果。
+
+    2. 若入射角大于一定的值，只计算反射效果。
+
+    3. 若入射角在一定的范围内，则首先单独计算折射效果与反射效果，再将两种效果的计算结
+       果按一定的比例进行融合。
+
+       ```
+       precision mediump float;
+       uniform samplerCube sTexture;// 纹理内容数据
+       in vec3 eyeVary;		// 接收从顶点着色器过来的视线向量
+       in vec3 newNormalVary;	// 接收从顶点着色器过来的变换后法向量
+       out vec4 fragColor;     // 输出到的片元颜色
+       
+       // 计算折反射纹理采样颜色的方法
+       vec4 zfs( in float zsl ){   //折射率
+       
+           vec3 vTextureCoord;	    //用于进行立方图纹理采样的向量
+       
+           vec4 finalColor;  		// 最终颜色
+       
+           const float maxH=0.7;	    // 入射角余弦值若大于此值则仅计算折射
+           const float minH=0.2;	    // 入射角余弦值若小于此值则仅计算反射
+           float sizeH=maxH-minH;      // 混合时余弦值的跨度 余弦值越大 代表入射角也小
+       
+           float testValue=abs(dot(eyeVary,newNormalVary));	// 计算视线向量与法向量的余弦值
+       
+           if(testValue>maxH)  {							    // 余弦值大于maxH仅折射
+       
+               vTextureCoord=refract(-eyeVary,newNormalVary,zsl);
+               finalColor=texture(sTexture, vTextureCoord);
+       
+           }else if(testValue<=maxH&&testValue>=minH) {        // 余弦值在minH～maxH范围内反射、折射融合
+       
+               vec4 finalColorZS;		//若是折射的采样结果
+               vec4 finalColorFS;		//若是反射的采样结果
+       
+               vTextureCoord=reflect(-eyeVary,newNormalVary);
+               finalColorFS=texture(sTexture, vTextureCoord);  	    // 反射的计算结果
+       
+               vTextureCoord=refract(-eyeVary,newNormalVary,zsl);
+               finalColorZS=texture(sTexture, vTextureCoord);  	    // 折射的计算结果
+       
+               float ratio=(testValue-minH)/sizeH;					    // 融合比例
+               finalColor=finalColorZS*ratio+(1.0-ratio)*finalColorFS;	// 折反射结果线性融合
+       
+           }else{										                // 余弦值小于minH仅反射
+       
+               vTextureCoord=reflect(-eyeVary,newNormalVary);
+               finalColor=texture(sTexture, vTextureCoord);
+           }
+           return finalColor;									// 返回最终结果
+       }
+       
+       void main(){
+          vec4 finalColor=vec4(0.0,0.0,0.0,0.0);
+          // 由于有色散RGB三个色彩通道单独计算折反射
+          finalColor.r=zfs(0.97).r;  		// 计算红色通道
+          finalColor.g=zfs(0.955).g;  		// 计算绿色通道
+          finalColor.b=zfs(0.94).b;  		// 计算蓝色通道
+          fragColor=finalColor; 		    // 将最终的片元颜色传递给管线
+       } 
+       ```
+
+       
