@@ -82,8 +82,8 @@ void main(){
 //   mat3 rotation=mat3(newTangent,binormal,newNormal); // 原来demo用这个 结果是错误的!
 
 
-    mat3 rotation=inverse(mat3(newTangent,binormal,newNormal));
-     //mat3 rotation=inverse(mat3(binormal,newTangent,newNormal));   // 副法和法调换没有差别
+    //mat3 rotation=inverse(mat3(newTangent,binormal,newNormal));
+     mat3 rotation=inverse(mat3(binormal,newTangent,newNormal));   // 副法和法调换 ?? 有轻微效果不一样??
      // x轴--切线   y轴--副法线  z轴--法线(确定的)
      // 因为NormalMapUtil工具导出来的时候，使用z轴代表法线
 

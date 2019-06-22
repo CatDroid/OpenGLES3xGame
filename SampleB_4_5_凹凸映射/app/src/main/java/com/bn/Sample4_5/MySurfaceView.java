@@ -124,7 +124,8 @@ class MySurfaceView extends GLSurfaceView
             textureId=initTexture(R.drawable.zs);    
             //textureIdNormal=initTexture(R.drawable.gridnt);
 //            textureIdNormal=initTexture(R.drawable.resultnt_x1);
-            textureIdNormal=initTexture(R.drawable.resultnt_x4);
+//            textureIdNormal=initTexture(R.drawable.resultnt_x4);
+            textureIdNormal=initTexture(R.drawable.resultnt__reverse);
         }   
     }
   	public int initTexture(int drawableId)//textureId

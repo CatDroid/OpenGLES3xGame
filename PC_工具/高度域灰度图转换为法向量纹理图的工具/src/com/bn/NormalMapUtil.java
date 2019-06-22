@@ -128,8 +128,11 @@ public class NormalMapUtil extends JFrame {
 				float cRight = (rRight + gRight + bRight) / 3.0f / 255.0f;
 				
 				// 计算出两个差分向量
-				float[] vec1 = { 1, 0, cUp - c };
-				float[] vec2 = { 0, 1, cRight - c };
+//				float[] vec1 = { 1, 0, cUp - c };
+//				float[] vec2 = { 0, 1, cRight - c }; 	// 凸的效果 
+				
+				float[] vec1 = { 1, 0, c - cUp }; 		// 凹的效果 
+				float[] vec2 = { 0, 1, c - cRight  };	
 				
 				// ??? *4是把凹凸感更加明显??
 				float ratio = 4 ; 
