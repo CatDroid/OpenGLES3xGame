@@ -122,7 +122,9 @@ class MySurfaceView extends GLSurfaceView
             lovo=LoadUtil.loadFromFile("ch_t.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
             //加载纹理
             textureId=initTexture(R.drawable.zs);    
-            textureIdNormal=initTexture(R.drawable.gridnt);    
+            //textureIdNormal=initTexture(R.drawable.gridnt);
+//            textureIdNormal=initTexture(R.drawable.resultnt_x1);
+            textureIdNormal=initTexture(R.drawable.resultnt_x4);
         }   
     }
   	public int initTexture(int drawableId)//textureId
