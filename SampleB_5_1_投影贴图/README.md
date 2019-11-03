@@ -105,7 +105,7 @@
 
 * ??? 虚拟摄像机，望向的地方和起始点 连线 应该 跟 真实摄像头，视线向量(望向的目标-位置) 相互垂直
 
-* shader中把距离写入 颜色纹理(内部格式是R16F  外部格式是GL_RED，每像素格式是GL_FLOAT)
+* shader中把距离写入 颜色纹理(内部格式是R16F  外部格式是GL_RED，每像素格式是GL_FLOAT)，FBO需要有深度附件(纹理图或者RBO渲染缓冲对象)，打开深度检测，这样写入颜色纹理的距离，就是最近光源的距离
 
   ```
   顶点着色器：
@@ -130,3 +130,47 @@
 * 聚光灯:
 
 * 面光源:
+
+
+
+* GLES 浮点纹理
+  * **GL_R16F** is not color-renderable in standard ES 3.0 
+
+  * table 3.13 on pages 130-132 lists all texture formats and their properties. R16F does not have the checkmark in the "Color-renderable" column, which means that it **can not be used as a render target.** 
+
+  * Correspondingly, **R16F** is also listed under **Texture-only color formats** in section "Required Texture Formats" on pages 129-130 
+
+  * R16F 是否支持 RenderTarget ，需要查询扩展支持
+
+    https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_color_buffer_half_float.txt
+
+  * color-renderalbe, depth-renderable, stencil-renderable 
+
+  * 显示设置GL特性的APK
+
+    https://play.google.com/store/apps/details?id=com.realtechvr.glview
+
+  * ![1572763875609](R16F not standard color renderable.png)
+
+  * OpenGL ES does not support glReadPixels() on the depth buffer. ???? 
+
+    
+
+* 半浮点数 half  
+
+  * 处理更大的数据集，也可以通过存储和操作更低精度的数据来获得性能
+
+  * 使用半精度来储存数据，然后用32位的单精度来处理这些数据
+
+  * IEEE 754浮点数标准
+
+    * 符号：1 bit
+    * 指数位：5 bits
+    * 精度位：10 bits
+    * 半精度数的范围大约是5.96×10^-8~6.55×10^4 (65,500)
+
+  * half2结构在一个32位字里存储两个half值 
+
+    ![img](half与half2) 
+
+  

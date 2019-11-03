@@ -7,4 +7,4 @@ void main()
 {   
    float dis=distance(vPosition.xyz,uLightLocation);//计算被照射片元到光源的距离
    fragColor=dis;//给此片元最终颜色值 
-}    
+}

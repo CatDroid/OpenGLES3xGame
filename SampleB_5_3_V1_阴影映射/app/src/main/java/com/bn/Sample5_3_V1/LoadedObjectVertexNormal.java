@@ -69,9 +69,9 @@ public class LoadedObjectVertexNormal//加载后的物体
     public void initShaderForShadow(MySurfaceView mv)
     {
     	//加载顶点着色器的脚本内容
-        mVertexShaderForShadow=ShaderUtil.loadFromAssetsFile("vertex_shadow.sh", mv.getResources());
+        mVertexShaderForShadow=ShaderUtil.loadFromAssetsFile("vertex_shadow.glsl", mv.getResources());
         //加载片元着色器的脚本内容
-        mFragmentShaderForShadow=ShaderUtil.loadFromAssetsFile("frag_shadow.sh", mv.getResources());  
+        mFragmentShaderForShadow=ShaderUtil.loadFromAssetsFile("frag_shadow.glsl", mv.getResources());
         //基于顶点着色器与片元着色器创建程序
         mProgramForShadow = ShaderUtil.createProgram(mVertexShaderForShadow, mFragmentShaderForShadow);
         //获取程序中顶点位置属性引用  

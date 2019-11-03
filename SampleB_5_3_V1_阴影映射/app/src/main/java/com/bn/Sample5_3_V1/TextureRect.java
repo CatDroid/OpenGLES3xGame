@@ -13,6 +13,7 @@ public class TextureRect
 {	
 	int mProgram;//自定义渲染管线着色器程序id
     int muMVPMatrixHandle;//总变换矩阵引用
+    int muUsingTextureDepth;
     int maPositionHandle; //顶点位置属性引用  
     int maTexCoorHandle; //顶点纹理坐标属性引用  
     String mVertexShader;//顶点着色器代码脚本    	 
@@ -61,8 +62,12 @@ public class TextureRect
         //顶点纹理坐标数据的初始化================begin============================
         float texCoor[]=new float[]//顶点颜色值数组，每个顶点4个色彩值RGBA
         {
-        		0,0, 0,T_MAX, S_MAX,T_MAX,
-        		S_MAX,T_MAX, S_MAX,0, 0,0      		
+        		0,0,
+                0,T_MAX,
+                S_MAX,T_MAX,
+        		S_MAX,T_MAX,
+                S_MAX,0,
+                0,0
         };        
         //创建顶点纹理坐标数据缓冲
         ByteBuffer cbb = ByteBuffer.allocateDirect(texCoor.length*4);
@@ -90,7 +95,9 @@ public class TextureRect
         //获取程序中顶点纹理坐标属性引用  
         maTexCoorHandle = GLES30.glGetAttribLocation(mProgram, "aTexCoor");
         //获取程序中总变换矩阵引用
-        muMVPMatrixHandle = GLES30.glGetUniformLocation(mProgram, "uMVPMatrix");  
+        muMVPMatrixHandle = GLES30.glGetUniformLocation(mProgram, "uMVPMatrix");
+
+        muUsingTextureDepth = GLES30.glGetUniformLocation(mProgram, "usingTextureDepth");
     }
     
     public void drawSelf(int texId)
@@ -122,7 +129,14 @@ public class TextureRect
          );   
          //允许顶点位置、纹理坐标数据
          GLES30.glEnableVertexAttribArray(maPositionHandle);  
-         GLES30.glEnableVertexAttribArray(maTexCoorHandle);  
+         GLES30.glEnableVertexAttribArray(maTexCoorHandle);
+
+         if (muUsingTextureDepth != 0)
+         {
+            GLES30.glUniform1f(
+                    muUsingTextureDepth,
+                    Constant.USING_DEPTH_TEXTURE?1.0f:0.0f);
+         }
          
          //绑定纹理
          GLES30.glActiveTexture(GLES30.GL_TEXTURE0);

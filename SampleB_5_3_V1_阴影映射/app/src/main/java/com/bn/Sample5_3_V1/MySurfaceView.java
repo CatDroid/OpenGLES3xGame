@@ -8,7 +8,10 @@ import android.opengl.GLSurfaceView;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
- 
+import android.os.Handler;
+import android.util.Log;
+import android.widget.Toast;
+
 class MySurfaceView extends GLSurfaceView   
 {
     private SceneRenderer mRenderer;//场景渲染器         
@@ -21,6 +24,8 @@ class MySurfaceView extends GLSurfaceView
 
     final float cDis=15;    
     float[] mMVPMatrixGY;//光源投影、观察组合矩阵
+
+    private Handler mUIHandler = new Handler();
 	
 	public MySurfaceView(Context context) {
 
@@ -54,76 +59,76 @@ class MySurfaceView extends GLSurfaceView
 
 	private class SceneRenderer implements GLSurfaceView.Renderer 
     {  
-    	//从指定的obj文件中加载对象
-		LoadedObjectVertexNormal lovo_pm;//平面
-		LoadedObjectVertexNormal lovo_ch;//茶壶
+    	// 从指定的obj文件中加载对象
+		LoadedObjectVertexNormal lovo_pm;// 平面
+		LoadedObjectVertexNormal lovo_ch;// 茶壶
 		LoadedObjectVertexNormal lovo_cft;//长方体
-		LoadedObjectVertexNormal lovo_qt;//球体
-		LoadedObjectVertexNormal lovo_yh;//圆环
+		LoadedObjectVertexNormal lovo_qt;// 球体
+		LoadedObjectVertexNormal lovo_yh;// 圆环
 		
 		TextureRect tr;		
 		int frameBufferId;
-		int shadowId;//距离纹理的纹理Id
-		int renderDepthBufferId;//用作深度缓冲的渲染缓冲对象
+		int shadowId;           // 距离纹理的纹理Id
+		int renderDepthBufferId;// 用作深度缓冲的渲染缓冲对象
 		
-		//在屏幕上绘制画面
+		// 在屏幕上绘制画面
         public void onDrawFrame(GL10 gl)
         {    
-        	//设置光源位置
+        	// 设置光源位置
         	MatrixState.setLightLocation(mLightPosX, mLightPosY, mLightPosZ);
-        	//通过绘制产生距离纹理
+        	// 通过绘制产生距离纹理
             generateShadowImage();
-            //绘制距离纹理到屏幕
+            // 绘制距离纹理到屏幕
             drawShadowTexture();
         }
 				
-        //通过绘制产生距离纹理        
+        // 通过绘制产生距离纹理
         public void generateShadowImage() 
         {
-        	//设置视口
+        	// 设置视口
         	GLES30.glViewport(0, 0, SHADOW_TEX_WIDTH, SHADOW_TEX_HEIGHT);  
-        	//绑定帧缓冲
+        	// 绑定帧缓冲
         	GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId); 
-        	//清除深度缓冲与颜色缓冲
+        	// 清除深度缓冲与颜色缓冲
             GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
 
-            // 点光源 没有方向
-            //设置摄像机
+            // 点光源 没有方向 光源摄像机  始终目标坐标始终是原点  位置跟随点光源 在一个XOZ平面上旋转 y一定
+            // 设置摄像机
             MatrixState.setCamera(mLightPosX, mLightPosY, mLightPosZ,0f,0f,0f,0f,1,0);
-            //设置透视矩阵
+            // 设置透视矩阵
             MatrixState.setProjectFrustum(-1, 1, -1.0f, 1.0f, 1.5f, 400); 
-            //获取摄像机投影组合矩阵
+            // 获取摄像机投影组合矩阵
             mMVPMatrixGY=MatrixState.getViewProjMatrix();
             
             //绘制最下面的平面
             lovo_pm.drawSelfForShadow();  
             
-            //绘制球体
+            // 绘制球体
             MatrixState.pushMatrix(); 
             MatrixState.translate(-cDis, 0, 0);
-            //若加载的物体部位空则绘制物体
+            // 若加载的物体部位空则绘制物体
             lovo_qt.drawSelfForShadow();
             MatrixState.popMatrix();    
             
-            //绘制圆环
+            // 绘制圆环
             MatrixState.pushMatrix();            
             MatrixState.translate(cDis, 0, 0);
             MatrixState.rotate(30, 0, 1, 0);
-            //若加载的物体部位空则绘制物体
+            // 若加载的物体部位空则绘制物体
             lovo_yh.drawSelfForShadow();
             MatrixState.popMatrix();  
             
-            //绘制长方体
+            // 绘制长方体
             MatrixState.pushMatrix(); 
             MatrixState.translate(0, 0, -cDis);
-            //若加载的物体部位空则绘制物体
+            // 若加载的物体部位空则绘制物体
             lovo_cft.drawSelfForShadow();
             MatrixState.popMatrix();
             
-            //绘制茶壶
+            // 绘制茶壶
             MatrixState.pushMatrix(); 
             MatrixState.translate(0, 0, cDis);
-            //若加载的物体部位空则绘制物体
+            // 若加载的物体部位空则绘制物体
             lovo_ch.drawSelfForShadow();
             MatrixState.popMatrix();     
         }
@@ -147,7 +152,8 @@ class MySurfaceView extends GLSurfaceView
 			int off_y = (int)((SCREEN_HEIGHT - display_port_h) / 2.0);
 
         	GLES30.glViewport(off_x, off_y, (int)display_port_w, (int)display_port_h);
-			// 绑定帧缓冲 渲染到屏幕???
+
+			// 绑定帧缓冲 把阴影映射图渲染到屏幕
         	GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
 
         	// 清除深度缓冲与颜色缓冲-设置背景色
@@ -164,7 +170,14 @@ class MySurfaceView extends GLSurfaceView
 
 
 			// 渲染用于显示距离纹理的纹理矩形 shadowId 内部格式是 GL_R16F
-            tr.drawSelf(shadowId);
+            if (Constant.USING_DEPTH_TEXTURE) {
+                //Log.d("TOM", "depth " + renderDepthBufferId);
+                tr.drawSelf(renderDepthBufferId);
+            } else {
+                tr.drawSelf(shadowId);
+            }
+            checkError();
+
         }
         
         public void onSurfaceChanged(GL10 gl, int width, int height) 
@@ -173,13 +186,43 @@ class MySurfaceView extends GLSurfaceView
         	GLES30.glViewport(0, 0, width, height); 
         	Constant.SCREEN_HEIGHT = height;
         	Constant.SCREEN_WIDTH = width;
-        	
+
+            checkError();
+
         	// 初始化帧缓冲
         	initFRBuffers();
         }
        
         public void onSurfaceCreated(GL10 gl, EGLConfig config) 
-        {     	
+        {
+
+            String exts = GLES30.glGetString(GLES30.GL_EXTENSIONS);
+            boolean hasR16F_asRenderTarget = exts.contains("GL_EXT_color_buffer_half_float");
+            if (hasR16F_asRenderTarget)
+            {
+                mUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        String msg = "support R16F" ;
+                        Log.e("TOM", msg );
+                        Toast.makeText(MySurfaceView.this.getContext(),msg ,Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            else
+            {
+                mUIHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        String msg = "not support R16F" ;
+                        Log.e("TOM", msg );
+                        Toast.makeText(MySurfaceView.this.getContext(),msg ,Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+            Log.e("TOM","GLES ext " + exts);
+
+
         	// 设置屏幕背景色RGBA
             GLES30.glClearColor(0,0,0,1);    
             // 打开深度检测
@@ -196,41 +239,81 @@ class MySurfaceView extends GLSurfaceView
             lovo_cft= LoadUtil.loadFromFileVertexOnly("cft.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
             lovo_qt = LoadUtil.loadFromFileVertexOnly("qt.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
             lovo_yh = LoadUtil.loadFromFileVertexOnly("yh.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
+            checkError();
+
             //显示阴影贴图的纹理矩形
             tr = new TextureRect(MySurfaceView.this);
+            checkError();
         }
-		//初始化帧缓冲和渲染缓冲的方法
-		public void initFRBuffers()
+
+
+
+        void initFRBuffers()
 		{
-			int[] tia=new int[1];//用于存放产生的帧缓冲id的数组
-			GLES30.glGenFramebuffers(1, tia, 0);//产生一个帧缓冲id
-			frameBufferId=tia[0];//将帧缓冲id记录到成员变量中
+			int[] tia=new int[1];
+			GLES30.glGenFramebuffers(1, tia, 0);
+			frameBufferId=tia[0];
         	 
-			
-			GLES30.glGenRenderbuffers(1, tia, 0);//产生一个帧缓冲id
-			renderDepthBufferId=tia[0];//将渲染缓冲id记录到成员变量中
-			//绑定指定id的渲染缓冲
-			GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, renderDepthBufferId);
-			//为渲染缓冲初始化存储
-        	GLES30.glRenderbufferStorage
-        	(
-        			GLES30.GL_RENDERBUFFER, 
-        			GLES30.GL_DEPTH_COMPONENT16, 
-        			SHADOW_TEX_WIDTH, 
-        			SHADOW_TEX_HEIGHT
-        	);
-			
-        	
-			int[] tempIds = new int[1];//用于存放产生纹理id的数组
-    		GLES30.glGenTextures//产生一个纹理id
-    		(
-    				1,          //产生的纹理id的数量
-    				tempIds,   //纹理id的数组
-    				0           //偏移量
-    		);   
-    		
-    		shadowId=tempIds[0];//将纹理id记录到距离纹理id成员变量
-    		
+
+            if (Constant.USING_DEPTH_TEXTURE) {
+
+                // 深度 使用的是纹理
+
+
+                int[] tempIds = new int[1];
+                GLES30.glGenTextures( 1, tempIds, 0);
+                renderDepthBufferId = tempIds[0];
+
+                GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, renderDepthBufferId);
+
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_LINEAR);
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
+
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
+
+
+                // https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glTexImage2D.xml
+                // https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
+                // 2.0  允许的内部格式有  GL_ALPHA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_RGB, GL_RGBA.
+                // 3.0 允许有 Unsized Internal Format (GL_RGBA) 和 Sized Internal Format (GL_RGB565 GL_DEPTH_COMPONENT24)
+
+                GLES30.glTexImage2D//设置颜色附件纹理图的格式
+                        (
+                                GLES30.GL_TEXTURE_2D,
+                                0,
+                                GLES30.GL_DEPTH_COMPONENT32F,   // 内部格式 Sized Internal Format
+                                SHADOW_TEX_WIDTH,
+                                SHADOW_TEX_HEIGHT,
+                                0,
+                                GLES30.GL_DEPTH_COMPONENT,      // 格式 Format f32
+                                GLES30.GL_FLOAT,           // 数据类型 Type
+                                null
+                        );
+
+
+            } else {
+
+                // 深度 用的是 RBO  只用来渲染时候做深度检测 不读取
+
+                GLES30.glGenRenderbuffers(1, tia, 0);
+                renderDepthBufferId=tia[0];
+
+                GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, renderDepthBufferId);
+                GLES30.glRenderbufferStorage(GLES30.GL_RENDERBUFFER,
+                                GLES30.GL_DEPTH_COMPONENT16,
+                                SHADOW_TEX_WIDTH,
+                                SHADOW_TEX_HEIGHT );
+            }
+            //Log.d("TOM", "create depth texutre " + renderDepthBufferId);
+
+            checkError();
+
+			int[] tempIds = new int[1];
+    		GLES30.glGenTextures(1, tempIds, 0);
+    		shadowId= tempIds[0];
+
+
     		//初始化颜色附件纹理
         	GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, shadowId);//绑定纹理id 
         	//设置min、mag的采样方式
@@ -238,36 +321,102 @@ class MySurfaceView extends GLSurfaceView
     		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
     		//设置纹理s、t轴的拉伸方式
     		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
-    		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE); 
-    		GLES30.glTexImage2D//设置颜色附件纹理图的格式
-        	(
-        		GLES30.GL_TEXTURE_2D, 
-        		0,              // 层次
-        		GLES30.GL_R16F,      // 内部格式
-        		SHADOW_TEX_WIDTH,    // 宽度
-        		SHADOW_TEX_HEIGHT,   // 高度
-        		0,                // 边界宽度
-        		GLES30.GL_RED,          // 格式
-        		GLES30.GL_FLOAT,        // 每像素数据格式
-        		null
-        	);        	
+    		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
+
+            Log.d("TOM", "create color texutre " + shadowId);
+    		if (Constant.USING_DEPTH_TEXTURE) {
+                GLES30.glTexImage2D//设置颜色附件纹理图的格式
+                        (
+                                GLES30.GL_TEXTURE_2D,
+                                0,              // 层次
+                                GLES30.GL_RGBA,      // 内部格式
+                                SHADOW_TEX_WIDTH,    // 宽度
+                                SHADOW_TEX_HEIGHT,   // 高度
+                                0,                // 边界宽度
+                                GLES30.GL_RGBA,          // 格式
+                                GLES30.GL_UNSIGNED_BYTE, // 每像素数据格式
+                                null
+                        );
+            } else {
+
+    		    // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_color_buffer_half_float.txt
+                // R16F 内部格式 是否可以作为 RenderTarget 需要查询扩展支持
+                // 浮点纹理
+                GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D,
+                        0,
+                        GLES30.GL_R16F,
+                        SHADOW_TEX_WIDTH,
+                        SHADOW_TEX_HEIGHT,
+                        0,
+                        GLES30.GL_RED,
+                        GLES30.GL_FLOAT,
+                        null
+                );
+
+            }
+
+            // https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glFramebufferTexture2D.xml
+            // glFramebufferTexture2D
+            // attachment 可以是 GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, or GL_STENCIL_ATTACHMENT.
+            // textarget  可以是 GL_TEXTURE_2D
+
         	
     		GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId);
-            GLES30.glFramebufferTexture2D//设置自定义帧缓冲的颜色附件
-            (
+            GLES30.glFramebufferTexture2D(
             	GLES30.GL_FRAMEBUFFER, 
-            	GLES30.GL_COLOR_ATTACHMENT0,//颜色附件
-            	GLES30.GL_TEXTURE_2D,//类型为2D纹理 
-            	shadowId, //纹理id
-            	0	//层次
-            );       
-        	GLES30.glFramebufferRenderbuffer//设置自定义帧缓冲的深度缓冲附件
-        	(
-        		GLES30.GL_FRAMEBUFFER, 
-        		GLES30.GL_DEPTH_ATTACHMENT,//深度缓冲附件
-        		GLES30.GL_RENDERBUFFER, //渲染缓冲
-        		renderDepthBufferId//渲染缓冲id
-        	);
+            	GLES30.GL_COLOR_ATTACHMENT0,
+            	GLES30.GL_TEXTURE_2D,
+            	shadowId, // 2D纹理 内部格式 是 GL_RGBA or GL_R16F
+            	0
+            );
+
+            if (Constant.USING_DEPTH_TEXTURE) {
+
+                // 使用深度纹理方式，颜色附件 使用普通的 GL_RGBA 纹理
+                GLES30.glFramebufferTexture2D(
+                        GLES30.GL_FRAMEBUFFER,
+                        GLES30.GL_DEPTH_ATTACHMENT,
+                        GLES30.GL_TEXTURE_2D,
+                        renderDepthBufferId,
+                        0
+                );
+
+            } else {
+
+                // 使用深度RBO方式，阴影在颜色附件，那么 颜色附件 使用GL_R16F浮点纹理
+
+                GLES30.glFramebufferRenderbuffer (
+                        GLES30.GL_FRAMEBUFFER,
+                        GLES30.GL_DEPTH_ATTACHMENT,
+                        GLES30.GL_RENDERBUFFER,
+                        renderDepthBufferId
+                );
+            }
+
+            int status = GLES30.glCheckFramebufferStatus(GLES30.GL_FRAMEBUFFER);
+
+            if( status == GLES30.GL_FRAMEBUFFER_COMPLETE)
+            {
+                Log.e ("TOM", "framebuffer complete");
+            }
+            else
+            {
+                Log.e ("TOM", "framebuffer in not complete status = " + status );
+            }
+
+
+            checkError();
+
 		}
+    }
+
+
+    public boolean checkError(){
+	    int error = GLES30.glGetError() ;
+	    if ( error != GLES30.GL_NO_ERROR) {
+	        Log.e("TOM","[checkError] " + error );
+	        throw  new RuntimeException("gl error " + error );
+        }
+	    return true ;
     }
 }
