@@ -30,15 +30,19 @@ import android.graphics.BitmapFactory;
     final float cR=60;
     
     //灯光位置
-	float lx=60;
-	float ly=80;
-	float lz=60;   
+	final float lx=60;
+    final float ly=80;
+    final float lz=60;
 	float lAngle=0;
 	final float lR=1;
 	//灯光投影Up向量   
 	float ux=0;
 	float uy=0;
 	float uz=1;
+	//灯光投影forward向量
+    final float look_x = 10f ;
+    final float look_y = 0f ;
+    final float look_z = 10f ;
 	
       
     //光源总变换矩阵
@@ -115,9 +119,15 @@ import android.graphics.BitmapFactory;
         	//产生位于光源处虚拟摄像机的观察矩阵
             MatrixState.setCamera(
                     lx,ly,lz,
-                    10f,0f,10f,
+                    look_x,look_y,look_z,
                     ux,uy,uz);
+            // 这个up向量会被重新计算, lx,ly,lz和look_x,look_y,look_z的视线向量是固定的
+            // 内部会先计算 坐标系轴CoordAxis(跟传入的up向量和视线向量垂直)，然后重新计算 前方向轴 UpAxis
 
+            // 透明胶片的位置信息：
+            // (lx-look_x,ly-look_y,lz-look_z) 透明胶片所在平面的法线
+            // setProjectFrustum = 1f  透明胶片 与 光源点 的 距离
+            // 确定透明胶片的空间方程是: ( (lx-x),(ly-y),(ly-z) ) = 距离 * 平面的法向量
 
             // 应该按照胶片的比例 来设置 近平面的宽高，相当于限制可以投影
             float ty_ratio = (float) tyTexWidth / tyTexHeight ;
@@ -131,11 +141,11 @@ import android.graphics.BitmapFactory;
 //                    400);
 
             MatrixState.setProjectFrustum(
-                    -ty_ratio/2.0f,
-                    ty_ratio/2.0f ,
-                    -0.5f,
-                    0.5f,
-                    1f,
+                    -ty_ratio ,
+                    ty_ratio ,
+                    -1.0f,
+                    1.0f,
+                    5f,   // 这个可以调整 透明胶片 的位置(与点光源的距离)
                     400);  // 产生位于光源处虚拟摄像机的投影矩阵
 
             mMVPMatrixGY = MatrixState.getViewProjMatrix();// 获取虚拟摄像机的观察、投影组合矩阵

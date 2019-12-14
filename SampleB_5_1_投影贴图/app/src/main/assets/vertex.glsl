@@ -46,6 +46,15 @@ void pointLight(				// 定位光光照计算的方法
 void main()     
 { 
    gl_Position = uMVPMatrix * vec4(aPosition,1); // 根据总变换矩阵计算此次绘制此顶点位置
-   pointLight(normalize(aNormal),ambient,diffuse,specular,uLightLocation,vec4(0.1,0.1,0.1,1.0),vec4(0.7,0.7,0.7,1.0),vec4(0.3,0.3,0.3,1.0));
+
+   pointLight(
+        normalize(aNormal),
+        ambient,diffuse,specular,
+        uLightLocation,
+        vec4(0.1,0.1,0.1,1.0),
+        vec4(0.7,0.7,0.7,1.0),
+        vec4(0.3,0.3,0.3,1.0)
+   );
+
    vPosition = uMMatrix * vec4(aPosition,1);
 }                      

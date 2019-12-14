@@ -23,8 +23,11 @@ void main()
     gytyPosition = gytyPosition / gytyPosition.w;
 
     // 将投影后的坐标换算为纹理坐标
-    float s = gytyPosition.s + 0.5;
-    float t = gytyPosition.t + 0.5;
+//    float s = gytyPosition.s + 0.5;
+//    float t = gytyPosition.t + 0.5;
+
+    float s = (gytyPosition.s + 1.0) * 0.5;
+    float t = (gytyPosition.t + 1.0) * 0.5;
 
     // 物体本身的颜色 这里没有从纹理里面采样物体的颜色
     vec4 finalColor=vec4(0.8,0.8,0.8,1.0);
