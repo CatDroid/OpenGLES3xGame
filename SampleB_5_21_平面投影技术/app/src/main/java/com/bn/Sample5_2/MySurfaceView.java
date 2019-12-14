@@ -124,16 +124,18 @@ import android.content.Context;
             		1, 
             		0
             );
+
             // 初始化光源位置
             MatrixState.setLightLocation(lx, ly, lz);                    
-            // 若加载的物体部位空 则绘制物体
 
-            // 绘制平面
+            // 绘制平面 (即将接收投影的平面)
             pm.drawSelf(0);
 
             // 绘制平面上各个物体的阴影
             GLES30.glDisable(GLES30.GL_CULL_FACE);
+            //GLES30.glDisable(GLES30.GL_DEPTH_TEST);
             drawObject(1);
+            //GLES30.glEnable(GLES30.GL_DEPTH_TEST);
 
             // 绘制物体本身 打开cull_face会导致茶杯有部分镂空情况:茶盖有缝,茶杯后面被面剔除了,结果看到平面
             GLES30.glEnable(GLES30.GL_CULL_FACE);

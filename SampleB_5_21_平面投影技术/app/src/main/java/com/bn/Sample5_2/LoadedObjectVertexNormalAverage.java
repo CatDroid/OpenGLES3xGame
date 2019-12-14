@@ -15,8 +15,12 @@ import android.opengl.GLES30;
     int maPositionHandle; //顶点位置属性引用  
     int maNormalHandle; //顶点法向量属性引用  
     int maLightLocationHandle;//光源位置属性引用  
-    int maCameraHandle; //摄像机位置属性引用 
+    int maCameraHandle; //摄像机位置属性引用
+
     int muIsShadow;//是否绘制阴影属性引用
+    int muPlaneNormal ;
+    int muPlanePot ;
+
     int muProjCameraMatrixHandle;//投影、摄像机组合矩阵引用
     
     String mVertexShader;//顶点着色器代码脚本    	 
@@ -86,49 +90,57 @@ import android.opengl.GLES30;
         //获取程序中是否绘制阴影属性引用
         muIsShadow=GLES30.glGetUniformLocation(mProgram, "isShadow"); 
         //获取程序中投影、摄像机组合矩阵引用
-        muProjCameraMatrixHandle=GLES30.glGetUniformLocation(mProgram, "uMProjCameraMatrix"); 
+        muProjCameraMatrixHandle=GLES30.glGetUniformLocation(mProgram, "uMProjCameraMatrix");
+
+        muPlaneNormal = GLES30.glGetUniformLocation(mProgram, "uPlaneNormal");
+        muPlanePot = GLES30.glGetUniformLocation(mProgram, "uPlanePot");
+
     }
     
     public void drawSelf(int isShadow)
     {        
-    	 //制定使用某套着色器程序
-    	 GLES30.glUseProgram(mProgram);
-         //将最终变换矩阵传入着色器程序
-         GLES30.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, MatrixState.getFinalMatrix(), 0); 
-         //将位置、旋转变换矩阵传入着色器程序
-         GLES30.glUniformMatrix4fv(muMMatrixHandle, 1, false, MatrixState.getMMatrix(), 0);   
-         //将光源位置传入着色器程序   
-         GLES30.glUniform3fv(maLightLocationHandle, 1, MatrixState.lightPositionFB);
-         //将摄像机位置传入着色器程序   
-         GLES30.glUniform3fv(maCameraHandle, 1, MatrixState.cameraFB);
-         //将是否绘制阴影属性传入着色器程序 
-         GLES30.glUniform1i(muIsShadow, isShadow);       
-         //将投影、摄像机组合矩阵传入着色器程序
-         GLES30.glUniformMatrix4fv(muProjCameraMatrixHandle, 1, false, MatrixState.getViewProjMatrix(), 0);     
-         //将顶点位置数据传入渲染管线
-         GLES30.glVertexAttribPointer  
-         (
-         		maPositionHandle,   
-         		3, 
-         		GLES30.GL_FLOAT, 
-         		false,
-                3*4,   
-                mVertexBuffer
-         );       
-         //将顶点法向量数据传入渲染管线
-         GLES30.glVertexAttribPointer  
-         (
-        		maNormalHandle, 
-         		3,   
-         		GLES30.GL_FLOAT, 
-         		false,
-                3*4,   
-                mNormalBuffer
-         );   
-         //启用顶点位置、法向量数据
-         GLES30.glEnableVertexAttribArray(maPositionHandle);  
-         GLES30.glEnableVertexAttribArray(maNormalHandle);  
-         //绘制加载的物体
-         GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vCount); 
+        //制定使用某套着色器程序
+        GLES30.glUseProgram(mProgram);
+        //将最终变换矩阵传入着色器程序
+        GLES30.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, MatrixState.getFinalMatrix(), 0);
+        //将位置、旋转变换矩阵传入着色器程序
+        GLES30.glUniformMatrix4fv(muMMatrixHandle, 1, false, MatrixState.getMMatrix(), 0);
+        //将光源位置传入着色器程序
+        GLES30.glUniform3fv(maLightLocationHandle, 1, MatrixState.lightPositionFB);
+        //将摄像机位置传入着色器程序
+        GLES30.glUniform3fv(maCameraHandle, 1, MatrixState.cameraFB);
+        //将是否绘制阴影属性传入着色器程序
+        GLES30.glUniform1i(muIsShadow, isShadow);
+        // 描述投影平面
+        GLES30.glUniform3fv ( muPlaneNormal,1, Constant.PLANE_NORMAL , 0);
+        GLES30.glUniform3fv( muPlanePot,1, Constant.PLANE_POT, 0 );
+
+        //将投影、摄像机组合矩阵传入着色器程序
+        GLES30.glUniformMatrix4fv(muProjCameraMatrixHandle, 1, false, MatrixState.getViewProjMatrix(), 0);
+        //将顶点位置数据传入渲染管线
+        GLES30.glVertexAttribPointer
+        (
+            maPositionHandle,
+            3,
+            GLES30.GL_FLOAT,
+            false,
+            3*4,
+            mVertexBuffer
+        );
+        //将顶点法向量数据传入渲染管线
+        GLES30.glVertexAttribPointer
+        (
+            maNormalHandle,
+            3,
+            GLES30.GL_FLOAT,
+            false,
+            3*4,
+            mNormalBuffer
+        );
+        //启用顶点位置、法向量数据
+        GLES30.glEnableVertexAttribArray(maPositionHandle);
+        GLES30.glEnableVertexAttribArray(maNormalHandle);
+        //绘制加载的物体
+        GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vCount);
     }
 }
