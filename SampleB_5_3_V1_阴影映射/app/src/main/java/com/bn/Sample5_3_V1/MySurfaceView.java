@@ -3,6 +3,8 @@ import static com.bn.Sample5_3_V1.Constant.SCREEN_HEIGHT;
 import static com.bn.Sample5_3_V1.Constant.SCREEN_WIDTH;
 import static com.bn.Sample5_3_V1.Constant.SHADOW_TEX_HEIGHT;
 import static com.bn.Sample5_3_V1.Constant.SHADOW_TEX_WIDTH;
+
+import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -86,7 +88,7 @@ class MySurfaceView extends GLSurfaceView
         public void generateShadowImage() 
         {
         	// 设置视口
-        	GLES30.glViewport(0, 0, SHADOW_TEX_WIDTH, SHADOW_TEX_HEIGHT);  
+        	GLES30.glViewport(0, 0, SHADOW_TEX_WIDTH, SHADOW_TEX_HEIGHT); // 控制点光源的影响范围
         	// 绑定帧缓冲
         	GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId); 
         	// 清除深度缓冲与颜色缓冲
@@ -172,6 +174,7 @@ class MySurfaceView extends GLSurfaceView
 			// 渲染用于显示距离纹理的纹理矩形 shadowId 内部格式是 GL_R16F
             if (Constant.USING_DEPTH_TEXTURE) {
                 //Log.d("TOM", "depth " + renderDepthBufferId);
+
                 tr.drawSelf(renderDepthBufferId);
             } else {
                 tr.drawSelf(shadowId);
@@ -195,15 +198,16 @@ class MySurfaceView extends GLSurfaceView
        
         public void onSurfaceCreated(GL10 gl, EGLConfig config) 
         {
-
+            // 获取扩展支持 R16F
             String exts = GLES30.glGetString(GLES30.GL_EXTENSIONS);
             boolean hasR16F_asRenderTarget = exts.contains("GL_EXT_color_buffer_half_float");
+            final boolean supportDepthTexture = exts.contains("GL_OES_depth_texture");
             if (hasR16F_asRenderTarget)
             {
                 mUIHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        String msg = "support R16F" ;
+                        String msg = "support R16F " + (supportDepthTexture?"+支持深度纹理":"");
                         Log.e("TOM", msg );
                         Toast.makeText(MySurfaceView.this.getContext(),msg ,Toast.LENGTH_LONG).show();
                     }
@@ -214,7 +218,7 @@ class MySurfaceView extends GLSurfaceView
                 mUIHandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        String msg = "not support R16F" ;
+                        String msg = "not support R16F" + (supportDepthTexture?"+支持深度纹理":"");
                         Log.e("TOM", msg );
                         Toast.makeText(MySurfaceView.this.getContext(),msg ,Toast.LENGTH_LONG).show();
                     }
@@ -253,7 +257,11 @@ class MySurfaceView extends GLSurfaceView
 			int[] tia=new int[1];
 			GLES30.glGenFramebuffers(1, tia, 0);
 			frameBufferId=tia[0];
-        	 
+
+
+
+			// 渲染到的FBO组成: -- 颜色 texture R16F  深度 RBO  GL_DEPTH_COMPONENT16
+            // 渲染到的FBO组成: -- 颜色 texture RGBA  深度 texture GL_DEPTH_COMPONENT32F
 
             if (Constant.USING_DEPTH_TEXTURE) {
 
@@ -266,44 +274,54 @@ class MySurfaceView extends GLSurfaceView
 
                 GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, renderDepthBufferId);
 
-                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_LINEAR);
-                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
+                // https://stackoverflow.com/questions/17707638/getting-black-color-from-depth-buffer-in-open-gl-es-2-0
+                // 如果要显示深度纹理  必须设置为 GL_NEAREST  ， 如果是GL_LINEAR会是全部黑色的 !!
+                GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_NEAREST );
+                GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST );
 
-                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
-                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
+                GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
+                GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
+
+
+//                GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_COMPARE_MODE, GLES30.GL_NONE );
+                //GLES30.glTexParameteri( GLES30.GL_TEXTURE_2D, GLES30.GL_DEPTH_TEXTURE_MODE, GLES30.GL_LUMINANCE );
+
 
 
                 // https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glTexImage2D.xml
                 // https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
-                // 2.0  允许的内部格式有  GL_ALPHA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_RGB, GL_RGBA.
+                // 2.0 允许的内部格式有 GL_ALPHA, GL_LUMINANCE, GL_LUMINANCE_ALPHA, GL_RGB, GL_RGBA.
                 // 3.0 允许有 Unsized Internal Format (GL_RGBA) 和 Sized Internal Format (GL_RGB565 GL_DEPTH_COMPONENT24)
 
                 GLES30.glTexImage2D//设置颜色附件纹理图的格式
                         (
-                                GLES30.GL_TEXTURE_2D,
-                                0,
-                                GLES30.GL_DEPTH_COMPONENT32F,   // 内部格式 Sized Internal Format
-                                SHADOW_TEX_WIDTH,
-                                SHADOW_TEX_HEIGHT,
-                                0,
-                                GLES30.GL_DEPTH_COMPONENT,      // 格式 Format f32
-                                GLES30.GL_FLOAT,           // 数据类型 Type
-                                null
+                            GLES30.GL_TEXTURE_2D,
+                            0,
+                            GLES30.GL_DEPTH_COMPONENT32F,   // 内部格式 Sized Internal Format
+                            SHADOW_TEX_WIDTH,
+                            SHADOW_TEX_HEIGHT,
+                            0,
+                            GLES20.GL_DEPTH_COMPONENT,      // 格式 Format f32
+                            GLES20.GL_FLOAT,                // 数据类型 Type
+                            null
                         );
 
 
             } else {
 
-                // 深度 用的是 RBO  只用来渲染时候做深度检测 不读取
+                // 深度 用的是 RBO  只用来渲染时候给渲染管线做深度检测 不做其他用途
 
                 GLES30.glGenRenderbuffers(1, tia, 0);
-                renderDepthBufferId=tia[0];
+                renderDepthBufferId = tia[0];
 
                 GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, renderDepthBufferId);
-                GLES30.glRenderbufferStorage(GLES30.GL_RENDERBUFFER,
-                                GLES30.GL_DEPTH_COMPONENT16,
-                                SHADOW_TEX_WIDTH,
-                                SHADOW_TEX_HEIGHT );
+                GLES30.glRenderbufferStorage
+                        (
+                            GLES30.GL_RENDERBUFFER,
+                            GLES30.GL_DEPTH_COMPONENT16,
+                            SHADOW_TEX_WIDTH,
+                            SHADOW_TEX_HEIGHT
+                        );
             }
             //Log.d("TOM", "create depth texutre " + renderDepthBufferId);
 
@@ -323,7 +341,6 @@ class MySurfaceView extends GLSurfaceView
     		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
     		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
 
-            Log.d("TOM", "create color texutre " + shadowId);
     		if (Constant.USING_DEPTH_TEXTURE) {
                 GLES30.glTexImage2D//设置颜色附件纹理图的格式
                         (
@@ -355,12 +372,20 @@ class MySurfaceView extends GLSurfaceView
 
             }
 
+            // 绑定FBO附件的两个方法: 分别是把texture或者RBO作为framebuffer的附件
+            // glFramebufferTexture2D
+            // glFramebufferRenderbuffer
+
             // https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glFramebufferTexture2D.xml
             // glFramebufferTexture2D
             // attachment 可以是 GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, or GL_STENCIL_ATTACHMENT.
-            // textarget  可以是 GL_TEXTURE_2D
+            // textarget  可以是 GL_TEXTURE_2D 或者 是 GL_TEXTURE_CUBE_MAP_?
 
-        	
+            // es3.0
+            // attachment 可以是 GL_COLOR_ATTACHMENTi GL_DEPTH_ATTACHMENT GL_STENCIL_ATTACHMENT  GL_DEPTH_STENCIL_ATTACHMENT
+            //                  支持 多渲染目标(Multiple Render Targets)
+            //                  支持 深度和模板共用一个纹理
+
     		GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId);
             GLES30.glFramebufferTexture2D(
             	GLES30.GL_FRAMEBUFFER, 
@@ -371,26 +396,21 @@ class MySurfaceView extends GLSurfaceView
             );
 
             if (Constant.USING_DEPTH_TEXTURE) {
-
                 // 使用深度纹理方式，颜色附件 使用普通的 GL_RGBA 纹理
                 GLES30.glFramebufferTexture2D(
                         GLES30.GL_FRAMEBUFFER,
-                        GLES30.GL_DEPTH_ATTACHMENT,
+                        GLES30.GL_DEPTH_ATTACHMENT, // 2.0
                         GLES30.GL_TEXTURE_2D,
                         renderDepthBufferId,
-                        0
-                );
+                        0 );
 
             } else {
-
                 // 使用深度RBO方式，阴影在颜色附件，那么 颜色附件 使用GL_R16F浮点纹理
-
                 GLES30.glFramebufferRenderbuffer (
                         GLES30.GL_FRAMEBUFFER,
                         GLES30.GL_DEPTH_ATTACHMENT,
                         GLES30.GL_RENDERBUFFER,
-                        renderDepthBufferId
-                );
+                        renderDepthBufferId );
             }
 
             int status = GLES30.glCheckFramebufferStatus(GLES30.GL_FRAMEBUFFER);

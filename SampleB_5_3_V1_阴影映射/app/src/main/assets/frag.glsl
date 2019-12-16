@@ -11,12 +11,10 @@ void main()
 
     if ( usingTextureDepth == 1.0 )
     {
-        // 不能用 depth texture ???
         float depthValue =  texture(sTexture,vTextureCoord).r  ;
-        if (depthValue == 0.0) {
-            depthValue = 1.0 ;
-        }
-        fragColor = vec4(depthValue, 0.0 , 0.0 ,1.0);
+//        depthValue = (depthValue + 1.0) * 0.5;
+        depthValue = pow(depthValue,4.0); // 提高0.5~1.0范围的对比度
+        fragColor = vec4(depthValue, depthValue , depthValue ,1.0);
     }
     else
     {

@@ -155,7 +155,47 @@
 
 * 面光源:
 
+* 2.0 需要渲染到深度纹理(创建深度纹理) 需要扩展支持GL_OES_depth_texture (深度检测的值保存到纹理)
 
+* 3.0 使用R16F 半浮点纹理 也需要查询支持  GL_R16F (在shader中输出非归一化的具体距离值到FBO颜色附件纹理)
+
+  
+
+* FBO附件
+
+  * [glTexImage2D 2.0]: https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glTexImage2D.xml
+
+  * [glTexImage2D 3.0]: https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
+
+  *   绑定FBO附件的两个方法: 分别是把texture或者RBO作为framebuffer的附件
+
+    * glFramebufferTexture2D
+      * 2.0  attachment 附件可以是 GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, or GL_STENCIL_ATTACHMENT
+      * 3.0 attachment 附件可以是 GL_COLOR_ATTACHMENTi GL_DEPTH_ATTACHMENT GL_STENCIL_ATTACHMENT  GL_DEPTH_STENCIL_ATTACHMENT 
+        * 支持 多渲染目标(Multiple Render Targets)
+        * 支持 深度和模板共用一个纹理
+      * textarget  可以是 GL_TEXTURE_2D 或者 是 GL_TEXTURE_CUBE_MAP_? 2D纹理或者立方贴图
+    *  glFramebufferRenderbuffer
+
+  * 使用渲染到深度纹理
+
+    * 如果是2.0 glTextImage2D要是 GLES20.GL_DEPTH_COMPONENT，并且设备要支持GL_OES_depth_texture
+    * 采样方式必须是 GL_NEAREST （拉伸方式没有限制）
+
+    ![1576516529287](RendertoDepthTexture.png)
+
+    ![1576517047576](GLES2.0编程指导.png)
+
+    * 查询扩展支持
+
+      ```
+      String exts = GLES30.glGetString(GLES30.GL_EXTENSIONS);
+      boolean hasR16F_asRenderTarget = exts.contains("GL_EXT_color_buffer_half_float");
+      boolean supportDepthTexture = exts.contains("GL_OES_depth_texture");
+                  
+      ```
+
+      
 
 * GLES 浮点纹理
   * **GL_R16F** is not color-renderable in standard ES 3.0 
@@ -173,6 +213,10 @@
   * 显示设置GL特性的APK
 
     https://play.google.com/store/apps/details?id=com.realtechvr.glview
+
+  * 查询纹理是否可以作为输出(Color-renderable)，或者作为输入(Texure-filterable 纹理采样)
+
+  * https://www.khronos.org/registry/OpenGL-Refpages/es3.1/html/glTexImage2D.xhtml
 
   * ![1572763875609](R16F not standard color renderable.png)
 
