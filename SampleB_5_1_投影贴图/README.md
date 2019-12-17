@@ -115,11 +115,13 @@
 
 ### 阴影映射图
 
-* 把光源作为虚拟摄像机，设置摄像机九参数矩阵，和，投影矩阵，near far 和 近平面的尺寸
+* 把光源作为虚拟摄像机，设置**摄像机九参数矩阵**，和，**投影矩阵**，near far 和 近平面的尺寸
 
-* ??? 虚拟摄像机，望向的地方和起始点 连线 应该 跟 真实摄像头，视线向量(望向的目标-位置) 相互垂直
+* 例子中 使用 正方形的距离纹理 和  视口和近平面都是正方形
 
-* shader中把距离写入 颜色纹理(内部格式是R16F  外部格式是GL_RED，每像素格式是GL_FLOAT)，FBO需要有深度附件(纹理图或者RBO渲染缓冲对象)，打开深度检测，这样写入颜色纹理的距离，就是最近光源的距离
+* **摄像机的位置(点光源)** 和 **透视投影的视椎体** 构成了 **投影的范围** 
+
+* shader中把距离写入 **颜色纹理(内部格式是R16F  外部格式是GL_RED，每像素格式是GL_FLOAT)**，FBO需要**有深度附件**(纹理图或者RBO渲染缓冲对象)，打开**深度检测**，这样**写入颜色纹理的距离，就是最近光源的距离**
 
   ```
   顶点着色器：
@@ -133,15 +135,15 @@
      
   ```
 
-* 需要接收投影的物体，必须在，光源的虚拟摄像机的，视椎体中（透视投影矩阵）
+* 需要接收投影的物体，必须在**光源的虚拟摄像机的视椎体**中（透视投影矩阵）
 
-* 当前距离 和 距离纹理图记录的距离 之间的差，引入一个修正值，超过这个距离才算是阴影，修正值不对会引入“自身阴影”问题 ( 阴影瑕疵（Shadow acne ）/阴影失真 )。可以用一个叫做阴影偏移（shadow bias）的技巧来解决这个问题
+* 当前距离 和 距离纹理图记录的距离 之间的差，引入一个修正值，超过这个距离才算是阴影，修正值不对会引入**“自身阴影”问题 ( 阴影瑕疵（Shadow acne ）/阴影失真 )**。可以用一个叫做阴影偏移（shadow bias）的技巧来解决这个问题
 
   https://learnopengl-cn.readthedocs.io/zh/latest/05%20Advanced%20Lighting/03%20Shadows/01%20Shadow%20Mapping/
 
   因为阴影贴图受限于解析度，在距离光源比较远的情况下，多个片元可能从深度贴图的同一个值中去采样。图片每个斜坡代表深度贴图一个单独的纹理像素。你可以看到，多个片元从同一个深度值进行采样。
 
-  ![1573140809244](1573140809244.png) 
+  ![1576598585466](阴影失真.png) 
 
 * 对于阴影的片元，仅用环境光着色；其他都用计算环境，散射，镜面等三个通道光照着色
 
@@ -167,20 +169,20 @@
 
   * [glTexImage2D 3.0]: https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
 
-  *   绑定FBO附件的两个方法: 分别是把texture或者RBO作为framebuffer的附件
+  *   绑定FBO附件的两个方法: 分别是把**texture或者RBO**作为**framebuffer的附件**
 
     * glFramebufferTexture2D
       * 2.0  attachment 附件可以是 GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, or GL_STENCIL_ATTACHMENT
-      * 3.0 attachment 附件可以是 GL_COLOR_ATTACHMENTi GL_DEPTH_ATTACHMENT GL_STENCIL_ATTACHMENT  GL_DEPTH_STENCIL_ATTACHMENT 
-        * 支持 多渲染目标(Multiple Render Targets)
-        * 支持 深度和模板共用一个纹理
+      * **3.0 attachment 附件**可以是 GL_COLOR_ATTACHMENTi GL_DEPTH_ATTACHMENT GL_STENCIL_ATTACHMENT  GL_DEPTH_STENCIL_ATTACHMENT 
+        * **支持 多渲染目标(Multiple Render Targets)**
+        * **支持 深度和模板共用一个纹理**
       * textarget  可以是 GL_TEXTURE_2D 或者 是 GL_TEXTURE_CUBE_MAP_? 2D纹理或者立方贴图
     *  glFramebufferRenderbuffer
 
   * 使用渲染到深度纹理
 
-    * 如果是2.0 glTextImage2D要是 GLES20.GL_DEPTH_COMPONENT，并且设备要支持GL_OES_depth_texture
-    * 采样方式必须是 GL_NEAREST （拉伸方式没有限制）
+    * 如果是2.0 glTextImage2D要是 GLES20.GL_DEPTH_COMPONENT，并且设备要支持**GL_OES_depth_texture**
+    * 采样方式必须是 **GL_NEAREST** （拉伸方式没有限制）
 
     ![1576516529287](RendertoDepthTexture.png)
 
@@ -198,6 +200,9 @@
       
 
 * GLES 浮点纹理
+
+  * 使用**浮点纹理GL_R16F**，可视化时候shader拿到的数据不是0~1.0，例子中**大部分距离再20~100.0之间**
+
   * **GL_R16F** is not color-renderable in standard ES 3.0 
 
   * table 3.13 on pages 130-132 lists all texture formats and their properties. R16F does not have the checkmark in the "Color-renderable" column, which means that it **can not be used as a render target.** 
@@ -246,3 +251,25 @@
     ![img](half与half2) 
 
   
+
+* 深度范围0~1  **1是最深**
+
+  * https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glClearDepthf.xhtml
+
+    ```
+    glClearDepthf(GLfloat depth);
+    The initial value is 1.
+    clamped to the range [0,1]
+    ```
+
+  * 深度纹理可视化
+
+    * 例子中 depthValue  没有<0也没有>1 大部分在0.95~1.0 整个场景都距离光源比较远的位置
+
+    * **越是白色，就越靠近1，深度越深，距离越远**
+
+    * 通过pow(depthValue,4) 4次方 **增强在0.5~1.0部分的对比度**
+
+      ![1576600108509](深度纹理可视化.png) 
+
+      

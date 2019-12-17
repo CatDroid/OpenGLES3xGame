@@ -10,6 +10,6 @@ public class Constant
     public static final float T_MAX = 1.0f;
 
 
-    public static final boolean USING_DEPTH_TEXTURE = true ;
+    public static final boolean USING_DEPTH_TEXTURE = false ;
 }  
     

@@ -85,23 +85,36 @@ class MySurfaceView extends GLSurfaceView
         }
 				
         // 通过绘制产生距离纹理
-        public void generateShadowImage() 
+        private void generateShadowImage()
         {
+            // 摄像机的位置(点光源) 和 透视投影的视椎体 构成了投影的范围
+
         	// 设置视口
-        	GLES30.glViewport(0, 0, SHADOW_TEX_WIDTH, SHADOW_TEX_HEIGHT); // 控制点光源的影响范围
+            //      这个跟透视投影的视椎体一样比例
+            //      正方形的距离纹理 和  视口和近平面都是正方形
+        	GLES30.glViewport(0, 0, SHADOW_TEX_WIDTH, SHADOW_TEX_HEIGHT);
+
         	// 绑定帧缓冲
-        	GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId); 
-        	// 清除深度缓冲与颜色缓冲
+        	GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId);
             GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
 
-            // 点光源 没有方向 光源摄像机  始终目标坐标始终是原点  位置跟随点光源 在一个XOZ平面上旋转 y一定
-            // 设置摄像机
+            // 设置摄像机/光源摄像机
+            // 点光源,这里有点像聚光灯(因为是透视投影,视椎体就相当于聚光灯)
+            //       LookAt: 始终目标坐标始终是原点
+            //       Pos  :  位置跟随点光源  在一个XOZ平面上旋转 y一定
             MatrixState.setCamera(mLightPosX, mLightPosY, mLightPosZ,0f,0f,0f,0f,1,0);
+
             // 设置透视矩阵
-            MatrixState.setProjectFrustum(-1, 1, -1.0f, 1.0f, 1.5f, 400); 
+            //      近平面时一个正方形
+            //      距离是1.5f ~ 400f
+            MatrixState.setProjectFrustum(-1, 1, -1.0f, 1.0f, 1.5f, 400);
+
+
             // 获取摄像机投影组合矩阵
             mMVPMatrixGY=MatrixState.getViewProjMatrix();
-            
+
+
+
             //绘制最下面的平面
             lovo_pm.drawSelfForShadow();  
             

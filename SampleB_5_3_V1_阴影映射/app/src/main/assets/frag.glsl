@@ -12,7 +12,13 @@ void main()
     if ( usingTextureDepth == 1.0 )
     {
         float depthValue =  texture(sTexture,vTextureCoord).r  ;
-//        depthValue = (depthValue + 1.0) * 0.5;
+
+//        没有<0也没有>1 大部分在0.95~1.0 整个场景都距离光源比较远的位置
+//        if (depthValue > 0.98 && depthValue < 1.0 )
+//        {
+//           fragColor = vec4(1.0, 0. , 0. ,1.0);
+//           return ;
+//        }
         depthValue = pow(depthValue,4.0); // 提高0.5~1.0范围的对比度
         fragColor = vec4(depthValue, depthValue , depthValue ,1.0);
     }
@@ -21,7 +27,16 @@ void main()
         // 给此片元从纹理中采样出颜色值，为了使不同的距离值显示出来灰度不同除以100，
         // 使距离值的对应颜色值在0～1之间，否则值大于1的话看起来都是白色了
         // sTexture是 R16F
-        float depthValue =  texture(sTexture,vTextureCoord).r / 100.0 ;
+        float depthValue =  texture(sTexture,vTextureCoord).r ;
+
+        // 大部分在20 ~ 100之间
+//        if (depthValue > 20. && depthValue < 100.)
+//        {
+//            fragColor = vec4(1.0, 0. , 0. ,1.0);
+//            return ;
+//        }
+
+        depthValue = depthValue / 100.0 ;
         fragColor = vec4(depthValue, depthValue, depthValue,1.0);
 
     }
