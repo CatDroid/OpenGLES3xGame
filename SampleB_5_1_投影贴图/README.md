@@ -201,6 +201,13 @@
 
 * GLES 浮点纹理
 
+  * R16F的浮点纹理 清空 需要设置clearColor,在距离纹理图中一般为光源的虚拟摄像头视椎体zFar
+
+    ```
+    GLES30.glClearColor(400,400,400,400);
+    GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
+    ```
+
   * 使用**浮点纹理GL_R16F**，可视化时候shader拿到的数据不是0~1.0，例子中**大部分距离再20~100.0之间**
 
   * **GL_R16F** is not color-renderable in standard ES 3.0 

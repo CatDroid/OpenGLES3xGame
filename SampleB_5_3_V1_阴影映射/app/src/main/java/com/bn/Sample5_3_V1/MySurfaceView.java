@@ -24,6 +24,9 @@ class MySurfaceView extends GLSurfaceView
 	private float mLightRotateAngle =0;
 	final float mLightRotateRadius = 45;
 
+	// 光源最远出
+    private final float zFar = 400 ;
+
     final float cDis=15;    
     float[] mMVPMatrixGY;//光源投影、观察组合矩阵
 
@@ -96,7 +99,19 @@ class MySurfaceView extends GLSurfaceView
 
         	// 绑定帧缓冲
         	GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId);
+            // 设置屏幕背景色RGBA
+            if (Constant.USING_DEPTH_TEXTURE)
+            {
+                GLES30.glClearColor(0,0,0,1);
+            }
+            else
+            {
+                // 如果是R16F 这里clearcolor直接写入R16F每个纹素
+                // 如果不做这一步的话,会发现最后的背景是黑色的 R=0 而实际应该是无穷远的 这里是R=400 跟虚拟摄像头视椎体zFar一样
+                GLES30.glClearColor(zFar,zFar,zFar,zFar);
+            }
             GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
+
 
             // 设置摄像机/光源摄像机
             // 点光源,这里有点像聚光灯(因为是透视投影,视椎体就相当于聚光灯)
@@ -106,8 +121,8 @@ class MySurfaceView extends GLSurfaceView
 
             // 设置透视矩阵
             //      近平面时一个正方形
-            //      距离是1.5f ~ 400f
-            MatrixState.setProjectFrustum(-1, 1, -1.0f, 1.0f, 1.5f, 400);
+            //      距离是1.5f ~ zFar=400f
+            MatrixState.setProjectFrustum(-1, 1, -1.0f, 1.0f, 1.5f, zFar);
 
 
             // 获取摄像机投影组合矩阵
@@ -186,11 +201,11 @@ class MySurfaceView extends GLSurfaceView
 
 			// 渲染用于显示距离纹理的纹理矩形 shadowId 内部格式是 GL_R16F
             if (Constant.USING_DEPTH_TEXTURE) {
-                //Log.d("TOM", "depth " + renderDepthBufferId);
+                //Log.d("TOM", "depth " + renderDepthBufferId); // 深度纹理
 
                 tr.drawSelf(renderDepthBufferId);
             } else {
-                tr.drawSelf(shadowId);
+                tr.drawSelf(shadowId);  // R16F纹理
             }
             checkError();
 
@@ -241,7 +256,16 @@ class MySurfaceView extends GLSurfaceView
 
 
         	// 设置屏幕背景色RGBA
-            GLES30.glClearColor(0,0,0,1);    
+            if (Constant.USING_DEPTH_TEXTURE)
+            {
+                GLES30.glClearColor(0,0,0,1);
+            }
+            else
+            {
+                // 如果是R16F 这里clearcolor直接写入R16F每个纹素
+                GLES30.glClearColor(400,400,400,400);
+            }
+
             // 打开深度检测
             GLES30.glEnable(GLES30.GL_DEPTH_TEST);
             // 打开背面剪裁
