@@ -12,6 +12,7 @@ public class LoadedObjectVertexNormal
     int muMMatrixHandle;//位置、旋转变换矩阵
     int muDiffHandle;
     int muShowDistortionHandle ;
+    int muAutiDistortionHandle ;
     int maPositionHandle; //顶点位置属性引用  
     int maNormalHandle; //顶点法向量属性引用  
     int maLightLocationHandle;//光源位置属性引用  
@@ -90,6 +91,8 @@ public class LoadedObjectVertexNormal
         muDiffHandle = GLES30.glGetUniformLocation(mProgram, "uDiff");
 
         muShowDistortionHandle = GLES30.glGetUniformLocation(mProgram, "uShowDistortion");
+
+        muAutiDistortionHandle = GLES30.glGetUniformLocation(mProgram, "uAntiDistortion");
     } 
     
     //初始化shader
@@ -130,7 +133,8 @@ public class LoadedObjectVertexNormal
          GLES30.glUniform1f(muDiffHandle, MatrixState.sDiff);
 
 
-         GLES30.glUniform1f(muShowDistortionHandle, Constant.SHOW_DISTORTION?1.0f:0.0f );
+         GLES30.glUniform1f(muShowDistortionHandle, Constant.SHOW_DISTORTION? 1.0f:0.0f );
+         GLES30.glUniform1f(muAutiDistortionHandle, Constant.AUTO_ANTI_DISTORTION? 1.0f:0.0f);
 
          //将顶点位置数据
          GLES30.glVertexAttribPointer  

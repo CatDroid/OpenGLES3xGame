@@ -10,6 +10,7 @@ out vec4 ambient;       // 用于传递给片元着色器的环境光最终强�
 out vec4 diffuse;       // 用于传递给片元着色器的散射光最终强度
 out vec4 specular;      // 用于传递给片元着色器镜面光最终强度
 out vec4 vPosition;     // 用于传递给片元着色器的顶点位置
+out vec3 worldNormal;   // 用于自动计算避免投影失真的偏移量
  
 //定位光光照计算的方法
 void pointLight(                // 定位光光照计算的方法
@@ -27,6 +28,8 @@ void pointLight(                // 定位光光照计算的方法
 
     vec3 newNormal =normalize( mat3(uMMatrix) * aNormal);
     vec3 worldPos = (uMMatrix * vec4(aPosition,1)).xyz;
+
+    worldNormal = newNormal ;
 
     // 计算从表面点到摄像机的向量
     vec3 eye = normalize(uCamera - worldPos);
@@ -54,5 +57,6 @@ void main()
    		vec4(0.15,0.15,0.15,1.0),
    		vec4(0.7,0.7,0.7,1.0),
    		vec4(0.3,0.3,0.3,1.0));                         // 计算光照各个通道的强度
+
    vPosition = uMMatrix * vec4(aPosition,1);            // 将变换后的顶点位置传递给片元着色器
 }                      
