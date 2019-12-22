@@ -186,15 +186,26 @@
 
   * [glTexImage2D 3.0]: https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
 
-  *   绑定FBO附件的两个方法: 分别是把**texture或者RBO**作为**framebuffer的附件**
+  * 绑定FBO附件的两个方法: 分别是把**texture或者RBO**作为**framebuffer的附件**
+
+    * 在GLES3.0中，如果不用输出颜色，可以设置FBO的颜色附件为GL_NONE
+
+      ```
+      GLES30.glDrawBuffers(1, new int[]{GLES30.GL_NONE}, 0);
+      GLES30.glReadBuffer(GLES30.GL_NONE);
+      ```
+
+      
 
     * glFramebufferTexture2D
+
       * 2.0  attachment 附件可以是 GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, or GL_STENCIL_ATTACHMENT
       * **3.0 attachment 附件**可以是 GL_COLOR_ATTACHMENTi GL_DEPTH_ATTACHMENT GL_STENCIL_ATTACHMENT  GL_DEPTH_STENCIL_ATTACHMENT 
         * **支持 多渲染目标(Multiple Render Targets)**
         * **支持 深度和模板共用一个纹理**
       * textarget  可以是 GL_TEXTURE_2D 或者 是 GL_TEXTURE_CUBE_MAP_? 2D纹理或者立方贴图
-    *  glFramebufferRenderbuffer
+
+    * glFramebufferRenderbuffer
 
   * 使用渲染到深度纹理
 

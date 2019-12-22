@@ -291,19 +291,30 @@ class MySurfaceView extends GLSurfaceView
 
         void initFRBuffers()
 		{
-			int[] tia=new int[1];
+			int[] tia = new int[1];
 			GLES30.glGenFramebuffers(1, tia, 0);
-			frameBufferId=tia[0];
-
-
+			frameBufferId = tia[0];
+            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId);
 
 			// 渲染到的FBO组成: -- 颜色 texture R16F  深度 RBO  GL_DEPTH_COMPONENT16
             // 渲染到的FBO组成: -- 颜色 texture RGBA  深度 texture GL_DEPTH_COMPONENT32F
 
+            // 绑定FBO附件的两个方法: 分别是把texture或者RBO作为framebuffer的附件
+            // glFramebufferTexture2D
+            // glFramebufferRenderbuffer
+
+            // https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glFramebufferTexture2D.xml
+            // es 2.0 //
+            // attachment 可以是 GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, or GL_STENCIL_ATTACHMENT.
+            // textarget  可以是 GL_TEXTURE_2D 或者 是 GL_TEXTURE_CUBE_MAP_?
+
+            // es 3.0 //
+            // attachment 可以是 GL_COLOR_ATTACHMENTi GL_DEPTH_ATTACHMENT GL_STENCIL_ATTACHMENT  GL_DEPTH_STENCIL_ATTACHMENT
+            //                  支持 多渲染目标(Multiple Render Targets)
+            //                  支持 深度和模板共用一个纹理
+
             if (Constant.USING_DEPTH_TEXTURE) {
-
-                // 深度 使用的是纹理
-
+                // 使用深度纹理方式，颜色附件 使用普通的 GL_RGBA 纹理
 
                 int[] tempIds = new int[1];
                 GLES30.glGenTextures( 1, tempIds, 0);
@@ -332,17 +343,52 @@ class MySurfaceView extends GLSurfaceView
 
                 GLES30.glTexImage2D//设置颜色附件纹理图的格式
                         (
-                            GLES30.GL_TEXTURE_2D,
-                            0,
-                            GLES30.GL_DEPTH_COMPONENT32F,   // 内部格式 Sized Internal Format
-                            SHADOW_TEX_WIDTH,
-                            SHADOW_TEX_HEIGHT,
-                            0,
-                            GLES20.GL_DEPTH_COMPONENT,      // 格式 Format f32
-                            GLES20.GL_FLOAT,                // 数据类型 Type
-                            null
+                                GLES30.GL_TEXTURE_2D,
+                                0,
+                                GLES30.GL_DEPTH_COMPONENT32F,   // 内部格式 Sized Internal Format
+                                SHADOW_TEX_WIDTH,
+                                SHADOW_TEX_HEIGHT,
+                                0,
+                                GLES20.GL_DEPTH_COMPONENT,      // 格式 Format f32
+                                GLES20.GL_FLOAT,                // 数据类型 Type
+                                null
                         );
 
+
+
+//                GLES30.glTexImage2D//设置颜色附件纹理图的格式
+//                        (
+//                                GLES30.GL_TEXTURE_2D,
+//                                0,              // 层次
+//                                GLES30.GL_RGBA,      // 内部格式
+//                                SHADOW_TEX_WIDTH,    // 宽度
+//                                SHADOW_TEX_HEIGHT,   // 高度
+//                                0,                // 边界宽度
+//                                GLES30.GL_RGBA,          // 格式
+//                                GLES30.GL_UNSIGNED_BYTE, // 每像素数据格式
+//                                null
+//                        );
+
+
+//                GLES30.glFramebufferTexture2D(
+//                        GLES30.GL_FRAMEBUFFER,
+//                        GLES30.GL_COLOR_ATTACHMENT0,
+//                        GLES30.GL_TEXTURE_2D,
+//                        shadowId, // 2D纹理 内部格式 是 GL_RGBA or GL_R16F
+//                        0
+//                );
+
+                // GLES 2.0 由于ES 2.0的 Frame Buffer 只支持一个Color Attachement 所以没有这个接口
+                // GLES 3.0 如果不使用颜色附件  可以这样声明
+                GLES30.glDrawBuffers(1, new int[]{GLES30.GL_NONE},0);
+                GLES30.glReadBuffer(GLES30.GL_NONE);
+
+                GLES30.glFramebufferTexture2D(
+                        GLES30.GL_FRAMEBUFFER,
+                        GLES30.GL_DEPTH_ATTACHMENT, // 2.0
+                        GLES30.GL_TEXTURE_2D,
+                        renderDepthBufferId,
+                        0 );
 
             } else {
 
@@ -352,96 +398,40 @@ class MySurfaceView extends GLSurfaceView
                 renderDepthBufferId = tia[0];
 
                 GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, renderDepthBufferId);
-                GLES30.glRenderbufferStorage
-                        (
-                            GLES30.GL_RENDERBUFFER,
-                            GLES30.GL_DEPTH_COMPONENT16,
-                            SHADOW_TEX_WIDTH,
-                            SHADOW_TEX_HEIGHT
-                        );
-            }
-            //Log.d("TOM", "create depth texutre " + renderDepthBufferId);
-
-            checkError();
-
-			int[] tempIds = new int[1];
-    		GLES30.glGenTextures(1, tempIds, 0);
-    		shadowId= tempIds[0];
+                GLES30.glRenderbufferStorage(GLES30.GL_RENDERBUFFER, GLES30.GL_DEPTH_COMPONENT16,
+                                SHADOW_TEX_WIDTH, SHADOW_TEX_HEIGHT);
 
 
-    		//初始化颜色附件纹理
-        	GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, shadowId);//绑定纹理id 
-        	//设置min、mag的采样方式
-        	GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_LINEAR);
-    		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
-    		//设置纹理s、t轴的拉伸方式
-    		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
-    		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
+                int[] tempIds = new int[1];
+                GLES30.glGenTextures(1, tempIds, 0);
+                shadowId = tempIds[0];
 
-    		if (Constant.USING_DEPTH_TEXTURE) {
-                GLES30.glTexImage2D//设置颜色附件纹理图的格式
-                        (
-                                GLES30.GL_TEXTURE_2D,
-                                0,              // 层次
-                                GLES30.GL_RGBA,      // 内部格式
-                                SHADOW_TEX_WIDTH,    // 宽度
-                                SHADOW_TEX_HEIGHT,   // 高度
-                                0,                // 边界宽度
-                                GLES30.GL_RGBA,          // 格式
-                                GLES30.GL_UNSIGNED_BYTE, // 每像素数据格式
-                                null
-                        );
-            } else {
+                //初始化颜色附件纹理
+                GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, shadowId);//绑定纹理id
+                //设置min、mag的采样方式
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_LINEAR);
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
+                //设置纹理s、t轴的拉伸方式
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE);
 
-    		    // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_color_buffer_half_float.txt
+                // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_color_buffer_half_float.txt
                 // R16F 内部格式 是否可以作为 RenderTarget 需要查询扩展支持
                 // 浮点纹理
                 GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D,
                         0,
-                        GLES30.GL_R16F,
-                        SHADOW_TEX_WIDTH,
-                        SHADOW_TEX_HEIGHT,
-                        0,
-                        GLES30.GL_RED,
-                        GLES30.GL_FLOAT,
-                        null
-                );
+                        GLES30.GL_R16F, SHADOW_TEX_WIDTH, SHADOW_TEX_HEIGHT, 0,
+                        GLES30.GL_RED, GLES30.GL_FLOAT, null);
 
-            }
 
-            // 绑定FBO附件的两个方法: 分别是把texture或者RBO作为framebuffer的附件
-            // glFramebufferTexture2D
-            // glFramebufferRenderbuffer
-
-            // https://www.khronos.org/registry/OpenGL-Refpages/es2.0/xhtml/glFramebufferTexture2D.xml
-            // glFramebufferTexture2D
-            // attachment 可以是 GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, or GL_STENCIL_ATTACHMENT.
-            // textarget  可以是 GL_TEXTURE_2D 或者 是 GL_TEXTURE_CUBE_MAP_?
-
-            // es3.0
-            // attachment 可以是 GL_COLOR_ATTACHMENTi GL_DEPTH_ATTACHMENT GL_STENCIL_ATTACHMENT  GL_DEPTH_STENCIL_ATTACHMENT
-            //                  支持 多渲染目标(Multiple Render Targets)
-            //                  支持 深度和模板共用一个纹理
-
-    		GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId);
-            GLES30.glFramebufferTexture2D(
-            	GLES30.GL_FRAMEBUFFER, 
-            	GLES30.GL_COLOR_ATTACHMENT0,
-            	GLES30.GL_TEXTURE_2D,
-            	shadowId, // 2D纹理 内部格式 是 GL_RGBA or GL_R16F
-            	0
-            );
-
-            if (Constant.USING_DEPTH_TEXTURE) {
-                // 使用深度纹理方式，颜色附件 使用普通的 GL_RGBA 纹理
                 GLES30.glFramebufferTexture2D(
                         GLES30.GL_FRAMEBUFFER,
-                        GLES30.GL_DEPTH_ATTACHMENT, // 2.0
+                        GLES30.GL_COLOR_ATTACHMENT0,
                         GLES30.GL_TEXTURE_2D,
-                        renderDepthBufferId,
-                        0 );
+                        shadowId, // 2D纹理 内部格式 是 GL_RGBA or GL_R16F
+                        0
+                );
 
-            } else {
                 // 使用深度RBO方式，阴影在颜色附件，那么 颜色附件 使用GL_R16F浮点纹理
                 GLES30.glFramebufferRenderbuffer (
                         GLES30.GL_FRAMEBUFFER,
@@ -449,6 +439,8 @@ class MySurfaceView extends GLSurfaceView
                         GLES30.GL_RENDERBUFFER,
                         renderDepthBufferId );
             }
+
+            checkError();
 
             int status = GLES30.glCheckFramebufferStatus(GLES30.GL_FRAMEBUFFER);
 
@@ -460,7 +452,6 @@ class MySurfaceView extends GLSurfaceView
             {
                 Log.e ("TOM", "framebuffer in not complete status = " + status );
             }
-
 
             checkError();
 
