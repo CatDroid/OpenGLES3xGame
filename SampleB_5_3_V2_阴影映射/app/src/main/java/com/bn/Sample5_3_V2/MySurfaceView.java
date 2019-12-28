@@ -112,7 +112,9 @@ class MySurfaceView extends GLSurfaceView
 		LoadedObjectVertexNormal lovo_qt;//球体
 		LoadedObjectVertexNormal lovo_yh;//圆环
 
-		int frameBufferId;      // FBO 两个附件:
+        TextureRect tr;
+
+        int frameBufferId;      // FBO 两个附件:
 		int shadowId;           // 颜色附件 距离纹理R16F
 		int renderDepthBufferId;// 深度附件 RBO
 
@@ -274,6 +276,9 @@ class MySurfaceView extends GLSurfaceView
             generateShadowImage();  // 通过绘制产生距离纹理
             if(Constant.USING_FRONT_CULL) GLES30.glCullFace(GLES30.GL_BACK);
         	drawScene(gl);          // 绘制场景
+
+            drawShadowTexture();    // 绘制距离纹理图
+
         }
 
 
@@ -310,7 +315,61 @@ class MySurfaceView extends GLSurfaceView
             lovo_pm=LoadUtil.loadFromFileVertexOnly("pm.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
             lovo_cft=LoadUtil.loadFromFileVertexOnly("cft.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
             lovo_qt=LoadUtil.loadFromFileVertexOnly("qt.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
-            lovo_yh=LoadUtil.loadFromFileVertexOnly("yh.obj", MySurfaceView.this.getResources(),MySurfaceView.this);       
+            lovo_yh=LoadUtil.loadFromFileVertexOnly("yh.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
+
+            tr = new TextureRect(MySurfaceView.this);
+        }
+
+
+        // 将距离纹理呈现到屏幕上的方法 屏幕坐下角1/4位置
+        public void drawShadowTexture(){
+
+            // 设置视口大小及位置
+            float display_port_w =  Constant.SCREEN_WIDTH / 2;
+            float display_port_h =  Constant.SCREEN_HEIGHT / 2 ;
+
+            float ratio_w = display_port_w / Constant.SHADOW_TEX_WIDTH;
+            float radio_h = display_port_h / Constant.SHADOW_TEX_HEIGHT;
+
+            if (  ratio_w  > radio_h ) {
+                display_port_w = radio_h * Constant.SHADOW_TEX_WIDTH;
+            } else {
+                display_port_h = ratio_w * Constant.SHADOW_TEX_HEIGHT;
+            }
+
+
+            GLES30.glViewport(0, 0, (int)display_port_w, (int)display_port_h);
+
+            // 绑定帧缓冲 把阴影映射图渲染到屏幕
+            GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
+
+
+            // 下面两个操作，会把 MatrixState 中的 投影矩阵和视图矩阵 直接覆盖修改了
+            // 设置投影矩阵 是 正交投影 是因为只是为了显示阴影映射图
+
+            // 设置摄像机
+            MatrixState.setCamera(0,0,0.5f,0f,0f,-1f,0f,1.0f,0.0f);
+            // 设置投影
+            MatrixState.setProjectOrtho(-0.6f,0.6f, -0.6f, 0.6f, 0.1f, 10);
+
+
+            MatrixState.pushMatrix();
+            MatrixState.translate(0, 0, 0);
+            tr.drawSelf(shadowId);  // R16F纹理
+            MatrixState.popMatrix();
+
+            checkError();
+
+        }
+
+
+        public boolean checkError(){
+            int error = GLES30.glGetError() ;
+            if ( error != GLES30.GL_NO_ERROR) {
+                Log.e("TOM","[checkError] " + error );
+                throw  new RuntimeException("gl error " + error );
+            }
+            return true ;
         }
     }
 }

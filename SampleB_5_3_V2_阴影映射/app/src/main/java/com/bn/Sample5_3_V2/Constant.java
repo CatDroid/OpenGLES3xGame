@@ -13,6 +13,6 @@ public class Constant
 
     public static final boolean SHOW_DISTORTION = true; // 由触摸控制最大的diff值
     public static final boolean AUTO_ANTI_DISTORTION = true ; // 由shader根据光线向量和法向量夹角来计算diff值
-    public static final boolean USING_FRONT_CULL = false ;// 距离纹理使用正面剔除 可以使修正值减少 减弱peter悬浮现象(还是会有的)
+    public static final boolean USING_FRONT_CULL = true ;// 距离纹理使用正面剔除 可以使修正值减少 减弱peter悬浮现象(还是会有的)
 }
     
