@@ -51,6 +51,13 @@ void main(){
                 maxDiff = 1.0 ;
             }
 
+            // 显示与光源超过+-90度的地方
+//            if ( dot(normalize(worldNormal), normalize(lightDir)) < 0. )
+//            {
+//                fragColor = vec4(0.0, 1.0, 0.0, 1.0);
+//                return ;
+//            }
+
             // 如果光源的方向 和 表面法线 垂直 那么修正值越小
             bias = max(maxDiff * (1.0 -  dot(normalize(worldNormal), normalize(lightDir))  ), minDiff);
         }
