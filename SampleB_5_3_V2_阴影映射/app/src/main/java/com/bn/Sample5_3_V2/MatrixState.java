@@ -17,7 +17,7 @@ public class MatrixState
     public static FloatBuffer lightPositionFB;
 
 
-    public static float sDiff = 3.0f;
+    public static float sDiff = Constant.USING_FRONT_CULL ?  0.6f : 3.0f; // 距离纹理 使用正面剔除 可以减少距离修正值
 
     public static Stack<float[]> mStack=new Stack<float[]>();//保护变换矩阵的栈
     

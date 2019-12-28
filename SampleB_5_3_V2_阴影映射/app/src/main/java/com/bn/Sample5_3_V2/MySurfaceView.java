@@ -270,7 +270,9 @@ class MySurfaceView extends GLSurfaceView
         public void onDrawFrame(GL10 gl)
         {        	
         	MatrixState.setLightLocation(lx, ly, lz);// 设置光源位置
+            if(Constant.USING_FRONT_CULL) GLES30.glCullFace(GLES30.GL_FRONT); // Fix 引入偏移之后导致的 悬浮(Peter Panning) 失真
             generateShadowImage();  // 通过绘制产生距离纹理
+            if(Constant.USING_FRONT_CULL) GLES30.glCullFace(GLES30.GL_BACK);
         	drawScene(gl);          // 绘制场景
         }
 

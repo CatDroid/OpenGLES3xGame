@@ -6,6 +6,7 @@ uniform highp mat4 uMVPMatrixGY; 	// 总变换矩阵(光源)
 uniform highp float uDiff;          // 实际距离 和 距离纹理 的 最小差
 uniform highp float uShowDistortion;// 使用红色表示阴影 强化失真效果
 uniform highp float uAntiDistortion;// 自动 避免失真 计算法线和光线的夹角 越是斜着越容易产生自身失真
+uniform highp float uUsingFrontCull;// 使用正面剔除
 uniform mat4   uMMatrix;            // 变换矩阵
 
 in vec3 worldNormal;                // 用于自动计算避免投影失真的偏移量
@@ -42,8 +43,16 @@ void main(){
             vec3 worldPos = mat3(uMMatrix) *vPosition.xyz ;
             vec3 lightDir = uLightLocation - worldPos;
 
-            // 如果光源的方向 和
-            bias = max(5.0 * (1.0 - dot(normalize(worldNormal), normalize(lightDir))), 3.0);
+            float minDiff = 3.0 ;
+            float maxDiff = 5.0 ;
+            if (uUsingFrontCull == 1.0)
+            {
+                minDiff = 0.6 ;
+                maxDiff = 1.0 ;
+            }
+
+            // 如果光源的方向 和 表面法线 垂直 那么修正值越小
+            bias = max(maxDiff * (1.0 -  dot(normalize(worldNormal), normalize(lightDir))  ), minDiff);
         }
 
         if(minDis <= currDis - bias)
