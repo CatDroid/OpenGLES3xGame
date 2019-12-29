@@ -343,3 +343,41 @@
       ![1576600108509](深度纹理可视化.png) 
 
       
+
+* glsl
+
+  ```
+  genType step( genType edge, genType x);
+  x  < edge  =  0.0 
+  x >= edge  =  1.0
+  
+  genType sign( genType x);
+  x < 0   = -1.0
+  x = 0   = 0.0
+  x > 0   = 1.0 
+  
+  三次埃尔米特插值
+  genType smoothstep(	genType edge0, genType edge1, genType x);
+  edge0 Hermite function的下边界
+  edge1 Hermite function的上边界
+  
+  计算公式是: (埃尔米特插值多项式)
+  genType t;  /* Or genDType t; */
+  t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  return t * t * (3.0 - 2.0 * t);
+  
+  ```
+
+  
+
+* 阴影贴图
+
+  * 对应平面接收阴影，使用 **平面阴影**
+
+  * 对于固定不动物体(阴影投射体在比较远处 形状固定)，使用预先设计好的阴影图，**投影贴图** ，比如房间里的网格形天窗
+
+  * 阴影下，可以考虑有**环境光** 和  **弱化的散射光(e.g 30%)**
+
+  * **阴影图是没有过渡的**，纹理使用**线性采样 **GL_LINEAR 的话，就会有过渡，GL_NEAREST 就没有过渡,效果了
+
+    ![1577604352778](平面阴影加投影贴图 构成阴影.png)
