@@ -381,3 +381,21 @@
   * **阴影图是没有过渡的**，纹理使用**线性采样 **GL_LINEAR 的话，就会有过渡，GL_NEAREST 就没有过渡,效果了
 
     ![1577604352778](平面阴影加投影贴图 构成阴影.png)
+
+
+
+
+
+* 3dsmax 贴图
+
+  * [第6章 第4节 1.贴图类型简介 3ds Max 2011白金手册]: https://www.youtube.com/watch?v=S9xLeloce0U
+
+  * [第6章 第4节 2.位图坐标参数 3ds Max 2011白金手册]: https://www.youtube.com/watch?v=yVRxldwGeZU
+
+  * [第6章 第4节 11.混合贴图  3ds Max 2011白金手册]: https://www.youtube.com/watch?v=M7QGrE_qgcs&amp;amp;t=134s
+
+
+
+* 3dsmax 
+  * LightingMap 光照贴图 :  ??  需要不同表面的纹理坐标不重合，因为不同表面即使对应同一个位图中一区域，但是关照之后的效果也会不一样，所以可以把UV坐标放到超过1的地方，**平铺UV**
+  * 3dsmax： 是**Z轴向上的右手坐标系**，导出的时候可以设置Y和Z轴调换，具体是，y轴和z轴，沿x轴右手螺旋90度，变成Y轴向上的右手坐标系，坐标变成了z = -y  y = z 
