@@ -153,7 +153,7 @@
 
 * 点光源：
 
-* **聚光灯**:  有方向，方向向量，在计算顶点光照的时候，把模型顶点坐标转换到世界坐标系，然后计算 **顶点与光源的向量** 与 **聚光灯方向向量**的 **夹角余弦值**  ( cosθ = a*b / |a||b|) ，设置**没光照的颜色**，然后和 **物体颜色在顶点光照计算出来的最终颜色**，如果在过渡区就**混合**
+* **聚光灯**:  有方向，方向向量，在计算顶点光照的时候，把模型顶点坐标转换到世界坐标系，然后计算 **顶点与光源的向量** 与 **聚光灯方向向量**的 **夹角余弦值**  ( cosθ = a*b / |a||b|) ，设置**没光照的颜色**，然后和 **物体颜色在顶点光照计算出来的最终颜色**，如果在过渡区就**混合**。 在片元着色器中计算，可以避免像平面那样顶点比较少的物体表面。
 
 * **半球光照**：光线经过**环境反射**，属于**区域光源**。就是原来漫反射时候，计算**光线向量** 与 **法向量** 之间的**夹角的余弦值**，从**1~0~-1**  转成到 **1.0 ~ 0.0**，**作为alpha值**，然后在**skyColor 和 groundColor 之间mix**，skyColor可以是灯光的颜色，groundColor是周围环境反射的颜色 ，??这个颜色由什么决定??
 
@@ -303,7 +303,16 @@
 
   * OpenGL ES does not support glReadPixels() on the depth buffer. ???? 
 
-    
+
+
+
+
+
+* GLSL的浮点数精度
+  * lowp float变量用10位表示
+  * medium float用16位表示,
+    * 相对于short int 16bit  float16 可以表示范围更大，但是有效位数会变小 
+  * highp用32位来表示
 
 * 半浮点数 half  
 
@@ -314,9 +323,18 @@
   * IEEE 754浮点数标准（半精度）
 
     * 符号：1 bit
+
     * 指数位：5 bits
-    * 精度位：10 bits
-    * 半精度数的范围大约是5.96×10^-8~6.55×10^4 (65,500)
+
+    * 精度位：10 bits  （显式存储 ，隐式存储了1bit，始终是1）
+
+    * 半精度数的范围大约是5.96×10^-8   ~   6.55×10^4 (65,500)
+
+    * 指数部分   00000和11111有其他意义，偏正值是15，所以实际范围是-14~15
+
+    * 2^15 =32,768  尾数部分 1.xxx  最大还是2，max= 65536
+
+  * 计算公式：alue = (-1)^sign X 2^(e - 16) X (1 + M / 2^10) 
 
   * 单精度浮点数float的这三部分所占的位宽分别为：1，8，23
 
@@ -326,7 +344,63 @@
 
     ![img](half与half2) 
 
-  
+  * IEEE 754 单精度--32bit
+
+    * [浮点数二进制的科学计数法]: https://blog.csdn.net/zhengyanan815/article/details/78550073
+
+    * [32bit 在线转换工具]: https://www.h-schmidt.net/FloatConverter/IEEE754.html
+
+    * [16bit 半浮点在线]: https://oletus.github.io/float16-simulator.js/
+
+    * [Sign bit](https://en.wikipedia.org/wiki/Sign_bit): 1 bit
+
+    * [Exponent](https://en.wikipedia.org/wiki/Exponent) width: 8 bits
+
+    * [Significand](https://en.wikipedia.org/wiki/Significand) [precision](https://en.wikipedia.org/wiki/Precision_(arithmetic)): 24 bits (23 explicitly stored)
+
+      ![img](IEEE74_32bits_float.png)  
+
+      **指数位**，位宽8bit，这8位可以表示为8bit的有符号数，也可以表示为8bit的无符号数，当表示成8bit的无符号数 [0，255] 时，指数的实际值 = E(指数表示的值) - 127，127被称为 exponent - bias  (阶数部分使用**偏正值**形式表示，偏正值为实际的指数与127的和)  。这样做之后指数的实际值的范围为 -126 ~ +127   ( 只有254个实际值)，而**-127和+128保留做其他用处**。 **2^127**  = 1.7 * 10^38 ，由于尾数部分最大不超过2* (2^0) = 2 也即是 最大可以表示 3.4* 10^38
+      **有效位数**，也被称为**尾数**，24bit中最高1bit为隐式存储，且值为1，剩下的23bit显式存储为32bit中的低23bit。
+
+      其数值范围为-3.4E-38～3.4E+38，单精度浮点数最多有**7位有效小数**  (2^23)
+
+    * 计算公式： value = (-1)^sign X 2^(e - 127) X (1 + M / 2^23)；（M的值为23bit表示的整数值）；
+
+      8.25 用 十进制的科学计数法表示就为:8.25x10^0 ,  而120.5可以表示为:1.205*x10^3
+
+      8.25 用二进制 可表示为1000.01  用二进制的科学计数法 表示为1.0001 x 2^3
+
+      120.5 用二进制 可表示为 1110110.1  用二进制的科学计数法 表示为1.1101101x2^6
+
+      任何一个数都的科学计数法表示都为1.xxx*2^n , 尾数部分就可以表示为xxxx，第一位都是1嘛，干嘛还要表示呀？可以将小数点前面的1省略，所以23bit的尾数部分，可以表示的精度却变成了24bit 
+
+    * OpenGL的定义：**半精度浮点数 的 范围是-14~14** 
+
+      * [glsl spec]: https://www.khronos.org/files/opengles_shading_language.pdf
+
+      ![1578750993550](OpengGL的浮点数定义.png)
+
+    * 声明精度：
+
+      ```
+      uniform highp float h1;
+      
+      highp float h2 = 2.3*4.7;操作和结果都是高精度
+      
+      mediump float m;
+      
+      m = 3.7*h1*h2;//所有操作都是高精度
+      
+      h2 = m * h1;//操作是高精度
+      
+      m = h2 - h1;//操作是高精度
+      
+      h2 = m + m;//加法和结果都是mediump精度 <<<< 注意这个
+       
+      ```
+
+      
 
 * 深度范围0~1  **1是最深**
 
@@ -398,7 +472,7 @@
 
   * [第6章 第4节 2.位图坐标参数 3ds Max 2011白金手册]: https://www.youtube.com/watch?v=yVRxldwGeZU
 
-  * [第6章 第4节 11.混合贴图  3ds Max 2011白金手册]: https://www.youtube.com/watch?v=M7QGrE_qgcs&amp;amp;amp;t=134s
+  * [第6章 第4节 11.混合贴图  3ds Max 2011白金手册]: https://www.youtube.com/watch?v=M7QGrE_qgcs&amp;amp;amp;amp;amp;amp;t=134s
 
 
 
