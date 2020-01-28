@@ -521,6 +521,9 @@
 
     * ```
          t = ((n1 – m1)*vp1+(n2 – m2)*vp2+(n3 – m3)*vp3) / (vp1* v1+ vp2* v2+ vp3* v3)                                                                       (3)
+         ```
+      ```
+    
       ```
 
   *  如果（3）式中分母(vp1* v1+ vp2* v2+ vp3* v3)为0，则表示**直线与平面平行**，即直线与平面没有交点。 否则求解出t后，然后将t代入式（1）即可求得交点O的坐标（x，y，z） 
@@ -593,6 +596,28 @@
 
 
 
+* 3D空间中的平面对称点
+
+  * 平面的点法式方程  F (x,y,z) =  Xn* (x - X0) + Yn * ( y - Y0) + Zn * (z - Z0)    (Xn,Yn,Zn) 为法向量  (X0,Y0,Z0)为平面上的点
+
+  * 某个点是 (X1,Y1,Z1)  那么过这个点的，垂直于平面的直线点向式方程 是  
+
+    x = X1 + Xn*t  
+
+    y  = Y1 + Yn*t
+
+    z = Z1 + Zn*t
+
+  * 代入平面的点法式方程 可以计算出时间t，然后对称点就是 
+
+    x = X1 + Xn*t * 2  
+
+    y  = Y1 + Yn*t * 2
+
+    z = Z1 + Zn*t * 2
+
+
+
 
 
 * 3dsmax 贴图
@@ -601,7 +626,7 @@
 
   * [第6章 第4节 2.位图坐标参数 3ds Max 2011白金手册]: https://www.youtube.com/watch?v=yVRxldwGeZU
 
-  * [第6章 第4节 11.混合贴图  3ds Max 2011白金手册]: https://www.youtube.com/watch?v=M7QGrE_qgcs&amp;amp;amp;amp;amp;amp;amp;t=134s
+  * [第6章 第4节 11.混合贴图  3ds Max 2011白金手册]: https://www.youtube.com/watch?v=M7QGrE_qgcs&amp;amp;amp;amp;amp;amp;amp;amp;t=134s
 
 
 
