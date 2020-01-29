@@ -618,6 +618,18 @@
 
 
 
+* 点到平面的距离
+
+  * ![1580286452680](点面距离.png)* 
+
+  * 如果知道平面的 点法式方程 :    nx * (x - xp)  +   ny * (y - yp) + nz * (z - zp)  = 0 
+
+    d =  | nx * xq  +  ny * yq + nz * zq + D | 
+
+    D =    - ( nx * xp +  ny * yp + nz * zp) 
+
+
+
 
 
 * 3dsmax 贴图
