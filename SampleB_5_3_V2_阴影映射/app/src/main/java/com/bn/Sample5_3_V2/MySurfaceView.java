@@ -145,16 +145,26 @@ class MySurfaceView extends GLSurfaceView
     		
     		//初始化颜色附件纹理
         	GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, shadowId);        	
-        	GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_LINEAR);
-    		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
+
     		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S,GLES30.GL_CLAMP_TO_EDGE);
     		GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T,GLES30.GL_CLAMP_TO_EDGE); 
-    		
-    		GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0,
-                    GLES30.GL_R16F, Constant.SHADOW_TEX_WIDTH, Constant.SHADOW_TEX_HEIGHT, 0,
-                    GLES30.GL_RED, GLES30.GL_FLOAT, null
-        	);
 
+    		if (Constant.USING_R16F_TEXTURE)
+            {
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_LINEAR);
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_LINEAR);
+                GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0,
+                        GLES30.GL_R16F, Constant.SHADOW_TEX_WIDTH, Constant.SHADOW_TEX_HEIGHT, 0,
+                        GLES30.GL_RED, GLES30.GL_FLOAT, null);
+            }
+    		else
+            {
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER,GLES30.GL_NEAREST);
+                GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,GLES30.GL_TEXTURE_MAG_FILTER,GLES30.GL_NEAREST);
+                GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0,
+                        GLES30.GL_RGBA, Constant.SHADOW_TEX_WIDTH, Constant.SHADOW_TEX_HEIGHT, 0,
+                        GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, null);
+            }
 
         	GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId); 
             GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER, GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_TEXTURE_2D, shadowId, 0);
@@ -169,8 +179,17 @@ class MySurfaceView extends GLSurfaceView
             GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, frameBufferId);
             GLES30.glViewport(0, 0, Constant.SHADOW_TEX_WIDTH, Constant.SHADOW_TEX_HEIGHT);
 
+            if (Constant.USING_R16F_TEXTURE)
+            {
+                // 这样clear R16F浮点纹理后 shader获取到的就是zFar
+                GLES30.glClearColor(zFar,zFar,zFar,zFar);
+            }
+            else
+            {
+                // 使用RGBA纹理 那么深度最大是1
+                GLES30.glClearColor(1,1,1,1);
+            }
 
-            GLES30.glClearColor(zFar,zFar,zFar,zFar); // 这样clear R16F浮点纹理后 shader获取到的就是zFar
             // 清除深度缓冲与颜色缓冲
             GLES30.glClear( GLES30.GL_DEPTH_BUFFER_BIT | GLES30.GL_COLOR_BUFFER_BIT);
 
@@ -215,6 +234,9 @@ class MySurfaceView extends GLSurfaceView
             //若加载的物体部位空则绘制物体
             lovo_ch.drawSelfForShadow();
             MatrixState.popMatrix();
+
+            checkError();
+
         }
         
         public void drawScene(GL10 gl) 
@@ -233,8 +255,12 @@ class MySurfaceView extends GLSurfaceView
                     -Constant.SCREEN_RATIO, Constant.SCREEN_RATIO,
                     -1.0f, 1.0f, 2, 1000);
 
+            checkError();
+
             //绘制最下面的平面  平面也计算阴影~~
             lovo_pm.drawSelf(shadowId, mMVPMatrixGY);
+
+            checkError();
             
             //绘制球体
             MatrixState.pushMatrix(); 
@@ -264,8 +290,9 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.translate(0, 0, cDis);
             //若加载的物体部位空则绘制物体
             lovo_ch.drawSelf(shadowId,mMVPMatrixGY);
-            MatrixState.popMatrix(); 
-            
+            MatrixState.popMatrix();
+
+            checkError();
         }
         
         //绘制一帧画面方法
@@ -352,6 +379,8 @@ class MySurfaceView extends GLSurfaceView
             // 设置投影
             MatrixState.setProjectOrtho(-0.6f,0.6f, -0.6f, 0.6f, 0.1f, 10);
 
+
+            checkError();
 
             MatrixState.pushMatrix();
             MatrixState.translate(0, 0, 0);

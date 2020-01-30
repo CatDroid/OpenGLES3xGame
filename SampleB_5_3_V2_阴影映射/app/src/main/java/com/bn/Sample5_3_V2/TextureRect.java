@@ -90,7 +90,16 @@ public class TextureRect
 
         GLES30.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, MatrixState.getFinalMatrix(), 0);
 
-        GLES30.glUniform1f(muUsingTextureDepth, 0.0f);
+        if (Constant.USING_R16F_TEXTURE)
+        {
+            GLES30.glUniform1f(muUsingTextureDepth, 0.0f);
+        }
+        else
+        {
+            // 跟使用深度纹理一样,如果使用RGBA纹理的话,也是使用 sampler2D texture的R通道 在shader中也归一化到-1~1范围
+            GLES30.glUniform1f(muUsingTextureDepth, 2.0f);
+        }
+
 
         GLES30.glVertexAttribPointer(maPositionHandle, 3, GLES30.GL_FLOAT, false, 3*4, mVertexBuffer);
         GLES30.glVertexAttribPointer(maTexCoorHandle, 2, GLES30.GL_FLOAT, false, 2*4, mTexCoorBuffer);

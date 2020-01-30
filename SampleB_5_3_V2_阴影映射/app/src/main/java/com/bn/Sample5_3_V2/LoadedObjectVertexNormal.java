@@ -22,16 +22,18 @@ public class LoadedObjectVertexNormal
     String mVertexShader;//顶点着色器代码脚本    	 
     String mFragmentShader;//片元着色器代码脚本    
     
-    int mProgramForShadow;//自定义渲染管线着色器程序id   
-    int muMVPMatrixHandleForShadow;//总变换矩阵引用
-    int muMMatrixHandleForShadow;//位置、旋转变换矩阵
-    int maPositionHandleForShadow; //顶点位置属性引用  
-    int maLightLocationHandleForShadow;//光源位置属性引用  
-    String mVertexShaderForShadow;//顶点着色器代码脚本    	 
-    String mFragmentShaderForShadow;//片元着色器代码脚本    
+    int mProgramForShadow;              // 自定义渲染管线着色器程序id
+    int muMVPMatrixHandleForShadow;     // 总变换矩阵引用
+    int muMMatrixHandleForShadow;       // 位置、旋转变换矩阵
+    int maPositionHandleForShadow;      // 顶点位置属性引用
+    int muLightLocationHandleForShadow; // 光源位置属性引用
+    int muUsingRGBATexture ;            // 普通program 是否使用RGBA纹理
+    int muUsingRGBATextureForShadow;    // 阴影program 是否使用rgba纹理
+    String mVertexShaderForShadow;      // 顶点着色器代码脚本
+    String mFragmentShaderForShadow;    // 片元着色器代码脚本
 	
-	FloatBuffer   mVertexBuffer;//顶点坐标数据缓冲  
-	FloatBuffer   mNormalBuffer;//顶点法向量数据缓冲
+	FloatBuffer   mVertexBuffer;        // 顶点坐标数据缓冲
+	FloatBuffer   mNormalBuffer;        // 顶点法向量数据缓冲
     int vCount=0;     
     
     public LoadedObjectVertexNormal(MySurfaceView mv,float[] vertices,float[] normals)
@@ -96,6 +98,8 @@ public class LoadedObjectVertexNormal
         muAutiDistortionHandle = GLES30.glGetUniformLocation(mProgram, "uAntiDistortion");
 
         muUsingFrontCullHandle = GLES30.glGetUniformLocation(mProgram, "uUsingFrontCull");
+
+        muUsingRGBATexture = GLES30.glGetUniformLocation(mProgram, "uUsingRGBATexture");
     } 
     
     //初始化shader
@@ -114,60 +118,63 @@ public class LoadedObjectVertexNormal
         //获取位置、旋转变换矩阵引用
         muMMatrixHandleForShadow = GLES30.glGetUniformLocation(mProgramForShadow, "uMMatrix"); 
         //获取程序中光源位置引用
-        maLightLocationHandleForShadow=GLES30.glGetUniformLocation(mProgramForShadow, "uLightLocation");
+        muLightLocationHandleForShadow =GLES30.glGetUniformLocation(mProgramForShadow, "uLightLocation");
+
+        muUsingRGBATextureForShadow = GLES30.glGetUniformLocation(mProgramForShadow, "uUsingRGBATexture");
+
     }
     
     public void drawSelf(int texId,float[] mMVPMatrixGY)
     {        
-    	 //制定使用某套着色器程序
-    	 GLES30.glUseProgram(mProgram);
-         //将最终变换矩阵传入着色器程序
-         GLES30.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, MatrixState.getFinalMatrix(), 0); 
-         //将光源最终变换矩阵传入着色器程序
-         GLES30.glUniformMatrix4fv(muMVPMatrixGYHandle, 1, false, mMVPMatrixGY, 0);          
-         //将位置、旋转变换矩阵传入着色器程序
-         GLES30.glUniformMatrix4fv(muMMatrixHandle, 1, false, MatrixState.getMMatrix(), 0);   
-         //将光源位置传入着色器程序   
-         GLES30.glUniform3fv(maLightLocationHandle, 1, MatrixState.lightPositionFB);
-         //将摄像机位置传入着色器程序   
-         GLES30.glUniform3fv(maCameraHandle, 1, MatrixState.cameraFB);
+        //制定使用某套着色器程序
+        GLES30.glUseProgram(mProgram);
+        //将最终变换矩阵传入着色器程序
+        GLES30.glUniformMatrix4fv(muMVPMatrixHandle, 1, false, MatrixState.getFinalMatrix(), 0);
+        //将光源最终变换矩阵传入着色器程序
+        GLES30.glUniformMatrix4fv(muMVPMatrixGYHandle, 1, false, mMVPMatrixGY, 0);
+        //将位置、旋转变换矩阵传入着色器程序
+        GLES30.glUniformMatrix4fv(muMMatrixHandle, 1, false, MatrixState.getMMatrix(), 0);
+        //将光源位置传入着色器程序
+        GLES30.glUniform3fv(maLightLocationHandle, 1, MatrixState.lightPositionFB);
+        //将摄像机位置传入着色器程序
+        GLES30.glUniform3fv(maCameraHandle, 1, MatrixState.cameraFB);
 
+        GLES30.glUniform1f(muDiffHandle, MatrixState.sDiff);
 
-         GLES30.glUniform1f(muDiffHandle, MatrixState.sDiff);
+        GLES30.glUniform1f(muShowDistortionHandle, Constant.SHOW_DISTORTION? 1.0f:0.0f );
+        GLES30.glUniform1f(muAutiDistortionHandle, Constant.AUTO_ANTI_DISTORTION? 1.0f:0.0f);
+        GLES30.glUniform1f(muUsingFrontCullHandle , Constant.USING_FRONT_CULL?1.0f:0.0f);
 
+        GLES30.glUniform1f(muUsingRGBATexture, Constant.USING_R16F_TEXTURE?0.0f:1.0f);
 
-         GLES30.glUniform1f(muShowDistortionHandle, Constant.SHOW_DISTORTION? 1.0f:0.0f );
-         GLES30.glUniform1f(muAutiDistortionHandle, Constant.AUTO_ANTI_DISTORTION? 1.0f:0.0f);
-         GLES30.glUniform1f(muUsingFrontCullHandle , Constant.USING_FRONT_CULL?1.0f:0.0f);
-
-         //将顶点位置数据
-         GLES30.glVertexAttribPointer  
-         (
-         		maPositionHandle,   
-         		3, 
-         		GLES30.GL_FLOAT, 
-         		false,
-                3*4,   
-                mVertexBuffer
-         );       
-         //将顶点法向量数据
-         GLES30.glVertexAttribPointer  
-         (
-        		maNormalHandle, 
-         		3,   
-         		GLES30.GL_FLOAT, 
-         		false,
-                3*4,   
-                mNormalBuffer
-         );   
-         //启用顶点位置、法向量数据
-         GLES30.glEnableVertexAttribArray(maPositionHandle);  
-         GLES30.glEnableVertexAttribArray(maNormalHandle);  
-         //绑定纹理
-         GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
-         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texId);
-         //绘制加载的物体
-         GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vCount); 
+        //将顶点位置数据
+        GLES30.glVertexAttribPointer
+        (
+            maPositionHandle,
+            3,
+            GLES30.GL_FLOAT,
+            false,
+            3*4,
+            mVertexBuffer
+        );
+        //将顶点法向量数据
+        GLES30.glVertexAttribPointer
+        (
+            maNormalHandle,
+            3,
+            GLES30.GL_FLOAT,
+            false,
+            3*4,
+            mNormalBuffer
+        );
+        //启用顶点位置、法向量数据
+        GLES30.glEnableVertexAttribArray(maPositionHandle);
+        GLES30.glEnableVertexAttribArray(maNormalHandle);
+        //绑定纹理
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, texId);
+        //绘制加载的物体
+        GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, vCount);
     }
     
     public void drawSelfForShadow()
@@ -179,8 +186,11 @@ public class LoadedObjectVertexNormal
         //将位置、旋转变换矩阵传入着色器程序
         GLES30.glUniformMatrix4fv(muMMatrixHandleForShadow, 1, false, MatrixState.getMMatrix(), 0);   
         //将光源位置传入着色器程序   
-        GLES30.glUniform3fv(maLightLocationHandleForShadow, 1, MatrixState.lightPositionFB);
-        
+        GLES30.glUniform3fv(muLightLocationHandleForShadow, 1, MatrixState.lightPositionFB);
+
+
+        GLES30.glUniform1f(muUsingRGBATextureForShadow, Constant.USING_R16F_TEXTURE?0.0f:1.0f);
+
         //将顶点位置数据传入渲染管线
         GLES30.glVertexAttribPointer  
         (

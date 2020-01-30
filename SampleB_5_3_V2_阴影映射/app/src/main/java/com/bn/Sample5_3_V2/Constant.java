@@ -11,6 +11,7 @@ public class Constant
     public static final float T_MAX = 1.0f;
     public static final float MAX_DIFF = 10.0f;  // 距离差  如果两个物体之间要在24.0f才算是真的阴影
 
+    public static final boolean USING_R16F_TEXTURE = true ; //  true:R16F 纹理  false:RGBA 纹理(还有效果问题 自身阴影??)
     public static final boolean SHOW_DISTORTION = true; // 由触摸控制最大的diff值
     public static final boolean AUTO_ANTI_DISTORTION = true ; // 由shader根据光线向量和法向量夹角来计算diff值
     public static final boolean USING_FRONT_CULL = false ;// 距离纹理使用正面剔除 可以使修正值减少 减弱peter悬浮现象(还是会有的)

@@ -3,15 +3,17 @@ uniform mat4 uMVPMatrix;        // 总变换矩阵
 uniform mat4 uMMatrix;          // 变换矩阵
 uniform mat4 uMVPMatrixGY;      // 总变换矩阵(光源)
 uniform vec3 uLightLocation;    // 光源位置
-uniform vec3 uCamera;   // 摄像机位置
+uniform vec3 uCamera;           // 摄像机位置
+
 in vec3 aPosition;      // 顶点位置
 in vec3 aNormal;        // 顶点法向量
 out vec4 ambient;       // 用于传递给片元着色器的环境光最终强度
 out vec4 diffuse;       // 用于传递给片元着色器的散射光最终强度
 out vec4 specular;      // 用于传递给片元着色器镜面光最终强度
-out vec4 vPosition;     // 用于传递给片元着色器的顶点位置
+out vec4 vPosition;     // 用于传递给片元着色器的顶点位置(世界坐标系)
 out vec3 worldNormal;   // 用于自动计算避免投影失真的偏移量
- 
+out vec3 vModelPosition ;
+
 //定位光光照计算的方法
 void pointLight(                // 定位光光照计算的方法
   in vec3 normal,				// 法向量
@@ -47,16 +49,19 @@ void pointLight(                // 定位光光照计算的方法
 }
 void main()     
 { 
-   gl_Position = uMVPMatrix * vec4(aPosition,1);      // 根据总变换矩阵计算此次绘制此顶点的位置
-   pointLight(
+    gl_Position = uMVPMatrix * vec4(aPosition,1.0);      // 根据总变换矩阵计算此次绘制此顶点的位置
+    pointLight(
         normalize(aNormal),
         ambient,
         diffuse,
         specular,
         uLightLocation,
-   		vec4(0.15,0.15,0.15,1.0),
-   		vec4(0.7,0.7,0.7,1.0),
-   		vec4(0.3,0.3,0.3,1.0));                         // 计算光照各个通道的强度
+        vec4(0.15,0.15,0.15,1.0),
+        vec4(0.7,0.7,0.7,1.0),
+        vec4(0.3,0.3,0.3,1.0));                         // 计算光照各个通道的强度
 
-   vPosition = uMMatrix * vec4(aPosition,1);            // 将变换后的顶点位置传递给片元着色器
+
+    vPosition = uMMatrix * vec4(aPosition,1.0);       // 将变换后的顶点位置传递给片元着色器
+
+    vModelPosition = aPosition ;
 }                      

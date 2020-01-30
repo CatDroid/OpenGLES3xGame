@@ -21,6 +21,20 @@ void main()
 //        }
         depthValue = pow(depthValue,4.0); // 提高0.5~1.0范围的对比度
         fragColor = vec4(depthValue, depthValue , depthValue ,1.0);
+
+    }
+    else if ( usingTextureDepth == 2.0)
+    {
+
+        float depthValue =  texture(sTexture,vTextureCoord).r  ; // -1 ~ 1
+        //if (depthValue < 0.8) // 大部分在 0.8 ~ 1.0
+        //{
+        //    fragColor = vec4(1.0, 0.0 , 0.0 ,1.0);
+        //    return ;
+        //}
+        float depth2 = (depthValue + 1.0) * 0.5 ;
+        float depth3 = pow(depth2, 5.0);
+        fragColor = vec4(depth3, depth3 , depth3 ,1.0);
     }
     else
     {
