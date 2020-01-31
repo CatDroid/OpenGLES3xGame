@@ -7,13 +7,15 @@ import android.graphics.Color;
 
 public class Constant
 {
-	public static boolean threadFlag=true;//水面换帧线程工作标志位	  
+	public static final boolean CONIFG_RENDER_THREAD_UPDATE = false ;
+
+	public static boolean threadFlag = true;//水面换帧线程工作标志位
 	
 	public static float[][] yArray; 
 	public static final float LAND_HIGH_ADJUST=3f;//陆地的高度调整值
 	public static final float LAND_HIGHEST=40f;//陆地最大高差  
 	
-	public static final int SAMPLENUMBER=2;
+	public static final int SAMPLENUMBER = 2;
 	public static final float SPAN=2.0f;
     
     static int GEN_TEX_WIDTH=1024;

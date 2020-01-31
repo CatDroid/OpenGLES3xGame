@@ -15,6 +15,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.SystemClock;
 
 import static com.bn.Sample5_12.Constant.*;
 
@@ -209,15 +210,40 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.setCamera(0,0,3.0f,0f,0f,0f,0f,1.0f,0.0f);
             
             MatrixState.pushMatrix();
-            tr.drawSelf(tempIds[0],tempIds[1],mPreviousProjectionMatrix,mViewProjectionInverseMatrix,SAMPLENUMBER);//绘制纹理矩形
+            tr.drawSelf(tempIds[0], tempIds[1], mPreviousProjectionMatrix, mViewProjectionInverseMatrix, SAMPLENUMBER);//绘制纹理矩形
             MatrixState.popMatrix();
 		}
+
+
+		private long mLastTimeStamp = 0 ;
 
 		@Override
         public void onDrawFrame(GL10 gl) 
         {
         	generateTextImage();//通过绘制产生矩形纹理
         	drawShadowTexture();//绘制矩形纹理
+
+			if (CONIFG_RENDER_THREAD_UPDATE)
+			{
+				long now =  SystemClock.currentThreadTimeMillis(); // 当前线程运行时间
+				long duration = now - mLastTimeStamp;
+				if (duration > 100) {
+					mLastTimeStamp = now ;
+
+					preCZ = cz;
+					preTargetZ = targetz;
+
+					cz -= SPAN;
+					targetz -= SPAN;
+
+					if(cz<=-35)
+					{
+						cz = preCZ = 100f;
+						targetz = preTargetZ = 0f;
+					}
+				}
+			}
+
         }
 
         @Override
@@ -227,7 +253,7 @@ class MySurfaceView extends GLSurfaceView
         	SCREEN_HEIGHT=height;
             ratio = (float) width / height;//计算GLSurfaceView的宽高比
             initFRBuffers();//初始化帧缓冲和渲染缓冲的方法
-            tr=new TextureRect(MySurfaceView.this, ratio);//创建矩形绘制对象
+            tr = new TextureRect(MySurfaceView.this, ratio);//创建矩形绘制对象
         }
 
 		@Override
@@ -242,7 +268,7 @@ class MySurfaceView extends GLSurfaceView
             MatrixState.setLightLocation(0, 80, 100);
 
 
-            yArray=loadLandforms(MySurfaceView.this.getResources(), R.drawable.hd1);
+            yArray = loadLandforms(MySurfaceView.this.getResources(), R.drawable.hd1);
             mountain = new Mountain(MySurfaceView.this,yArray,yArray.length-1,yArray[0].length-1);
             cloud = new Sky_cloud(MySurfaceView.this);
             // 创建树的绘制对象
@@ -253,36 +279,42 @@ class MySurfaceView extends GLSurfaceView
             tree1TextId = initTexture(R.drawable.tree);
             tree2TextId = initTexture(R.drawable.tree1);
             cloudTextId = initTexture(R.drawable.sky_cloud);
-            
-            new Thread()
-            {
-            	public void run()
-            	{
-            		while(true)
-            		{
-            			synchronized (mLock)
+
+			mLastTimeStamp = SystemClock.currentThreadTimeMillis();
+
+			if (!CONIFG_RENDER_THREAD_UPDATE)
+			{
+				new Thread()
+				{
+					public void run()
+					{
+						while(true)
 						{
-							preCZ = cz;
-							preTargetZ = targetz;
-
-							cz -= SPAN;
-							targetz -= SPAN;
-
-							if(cz<=-35)
+							synchronized (mLock)
 							{
-								cz = preCZ = 100f;
-								targetz = preTargetZ = 0f;
+								preCZ = cz;
+								preTargetZ = targetz;
+
+								cz -= SPAN;
+								targetz -= SPAN;
+
+								if(cz<=-35)
+								{
+									cz = preCZ = 100f;
+									targetz = preTargetZ = 0f;
+								}
+							}
+
+							try {
+								Thread.sleep(50);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
 							}
 						}
+					}
+				}.start();
+			}
 
-            			try {
-							Thread.sleep(50);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-            		}
-            	}
-            }.start();
         }
         
         private void drawTrees(int treeIndex,float transX,float transY,float transZ)
