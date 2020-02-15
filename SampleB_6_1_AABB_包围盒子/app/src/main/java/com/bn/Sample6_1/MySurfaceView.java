@@ -72,8 +72,10 @@ class MySurfaceView extends GLSurfaceView
             ch = LoadUtil.loadFromFile("ch.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
             pm = LoadUtil.loadFromFile("pm.obj", MySurfaceView.this.getResources(),MySurfaceView.this);
             aList.add(new RigidBody(ch,true,new Vector3f(-13f,0f,0),new Vector3f(0,0,0)));
-            aList.add(new RigidBody(ch,true,new Vector3f(13f,0f,0),new Vector3f(0,0,0)));		
-            aList.add(new RigidBody(ch,false,new Vector3f(0f,0f,0),new Vector3f(0.1f,0,0)));
+            aList.add(new RigidBody(ch,true,new Vector3f(13f,0f,0),new Vector3f(0,0,0)));
+             aList.add(new RigidBody(ch,false,new Vector3f(0f,0f,0),new Vector3f(0.1f,0,0)));
+             // 速度或者时间步进过大 会导致穿透效应
+//            aList.add(new RigidBody(ch,false,new Vector3f(0f,0f,0),new Vector3f(4f,0,0)));
 
             // 启动线程 更新物体位置 检查碰撞 更新速度方向
             lgt = new LovoGoThread(aList);
