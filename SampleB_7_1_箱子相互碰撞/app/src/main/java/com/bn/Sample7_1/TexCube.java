@@ -62,7 +62,13 @@ public class TexCube
     {
         tr.initShader(mv, mProgram);// 初始化纹理矩形的绘制着色器
         int texId = texIda[0];      // 箱子运动时的纹理id
-        if (!body.isActive()) {     // 箱子静止时的纹理id
+
+        // WANTS_DEACTIVATION  ACTIVE_TAG 代表物体在运动
+        // ISLAND_SLEEPING  代表物体禁止
+        // android.util.Log.e("TexCube", ">>> " + body.getActivationState() );
+
+        if (!body.isActive())       // 箱子静止时的纹理id
+        {
             texId = texIda[1];
         }
 

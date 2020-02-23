@@ -185,7 +185,7 @@ class MySurfaceView extends GLSurfaceView {
 
                         // 将新箱子添加到待待添加箱子集合中
                         tca.add(tcTemp);
-                        // 将立方体箱子设置为一开始是不激活的
+                        // 将立方体箱子设置为一开始是不激活的 ---  放在地上的箱子 不动
                         tcTemp.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
                     }
                 }
@@ -209,7 +209,7 @@ class MySurfaceView extends GLSurfaceView {
                                 tcaForAdd.clear();      // 将待添加箱子集合清空
                             }
                                                         // 执行模拟 实际上 20ms相当于 1/60s = 16ms
-                            dynamicsWorld.stepSimulation(TIME_STEP, MAX_SUB_STEPS);
+                            dynamicsWorld.stepSimulation(TIME_STEP / 4, MAX_SUB_STEPS); // TIME_STEP / 10 放慢10倍速度来看
                             Thread.sleep(20);      // 当前线程睡眠20毫秒
                         } catch (Exception e)           // 若有异常则打印异常栈
                         {
@@ -223,7 +223,8 @@ class MySurfaceView extends GLSurfaceView {
 
     //触摸事件回调方法
     @Override
-    public boolean onTouchEvent(MotionEvent e) {
+    public boolean onTouchEvent(MotionEvent e)
+    {
         switch (e.getAction()) {
             case MotionEvent.ACTION_DOWN:                           // 处理触控点按下的事件
                 TexCube tcTemp = new TexCube                        // 创建一个箱子
@@ -242,7 +243,7 @@ class MySurfaceView extends GLSurfaceView {
                 // 设置箱子的初始线速度
                 tcTemp.body.setLinearVelocity(new Vector3f(0, 2, -12));
                 // 设置箱子的初始角速度
-                tcTemp.body.setAngularVelocity(new Vector3f(0, 0, 0));
+                tcTemp.body.setAngularVelocity(new Vector3f(0, 0, 5)); // 盒子会旋转 ???
 
                 synchronized (tcaForAdd)//锁定待添加箱子集合
                 {
