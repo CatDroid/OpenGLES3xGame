@@ -49,6 +49,7 @@ public class TexFloor {
         // 创建刚体的运动状态对象
         DefaultMotionState myMotionState = new DefaultMotionState(groundTransform);
         // 创建刚体描述信息对象  质量--运动状态--碰撞形状--惯性变量
+        // 这里不传入质量,就会标记当前的刚体是 静态物体 ,不会计算质量的倒数,也就不会计算合力和加速度 --静态物体-保持原来的运动状态
         RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(0, myMotionState, groundShape, localInertia);
         // 创建刚体
         RigidBody body = new RigidBody(rbInfo);

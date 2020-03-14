@@ -35,8 +35,8 @@ class MySurfaceView extends GLSurfaceView {
 
     private SceneRenderer mRenderer;                // 场景渲染器
     private DiscreteDynamicsWorld dynamicsWorld;    // 世界对象
-    final private ArrayList<TexCube> tca = new ArrayList<TexCube>();
-    final private ArrayList<TexCube> tcaForAdd = new ArrayList<TexCube>();
+    final private ArrayList<TexCube> mTexCuteList = new ArrayList<TexCube>();
+    final private ArrayList<TexCube> mTexCuteListTobeAdd = new ArrayList<TexCube>();
     private CollisionShape boxShape;                        // 共用的立方体
     private CollisionShape planeShape;                      // 共用的平面形状
 
@@ -104,8 +104,8 @@ class MySurfaceView extends GLSurfaceView {
             GLES30.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
             // 绘制箱子
-            synchronized (tca) {
-                for (TexCube tc : tca) {
+            synchronized (mTexCuteList) {
+                for (TexCube tc : mTexCuteList) {
                     MatrixState.pushMatrix();
                     tc.drawSelf(cubeTextureId);
                     MatrixState.popMatrix();
@@ -189,7 +189,7 @@ class MySurfaceView extends GLSurfaceView {
                                 );
 
                         // 将新箱子添加到待待添加箱子集合中
-                        tca.add(tcTemp);
+                        mTexCuteList.add(tcTemp);
                         // 将立方体箱子设置为一开始是不激活的 ---  放在地上的箱子 不动
                         tcTemp.body.forceActivationState(RigidBody.WANTS_DEACTIVATION);
                     }
@@ -203,15 +203,15 @@ class MySurfaceView extends GLSurfaceView {
                     while (true)                        // 模拟循环
                     {
                         try {
-                            synchronized (tcaForAdd)    // 锁定待添加箱子集合
+                            synchronized (mTexCuteListTobeAdd)    // 锁定待添加箱子集合
                             {
-                                synchronized (tca)      // 锁定总箱子集合
+                                synchronized (mTexCuteList)      // 锁定总箱子集合
                                 {
-                                    for (TexCube tc : tcaForAdd) {
-                                        tca.add(tc);    // 向总箱子集合中添加箱子
+                                    for (TexCube tc : mTexCuteListTobeAdd) {
+                                        mTexCuteList.add(tc);    // 向总箱子集合中添加箱子
                                     }
                                 }
-                                tcaForAdd.clear();      // 将待添加箱子集合清空
+                                mTexCuteListTobeAdd.clear();      // 将待添加箱子集合清空
                             }
                                                         // 执行模拟 实际上 20ms相当于 1/60s = 16ms
                             dynamicsWorld.stepSimulation(TIME_STEP / 4, MAX_SUB_STEPS); // TIME_STEP / 10 放慢10倍速度来看
@@ -250,9 +250,9 @@ class MySurfaceView extends GLSurfaceView {
                 // 设置箱子的初始角速度
                 tcTemp.body.setAngularVelocity(new Vector3f(0, 0, 5)); // 盒子会旋转 ???
 
-                synchronized (tcaForAdd)//锁定待添加箱子集合
+                synchronized (mTexCuteListTobeAdd)//锁定待添加箱子集合
                 {
-                    tcaForAdd.add(tcTemp);//将新箱子添加到待添加箱子集合中
+                    mTexCuteListTobeAdd.add(tcTemp);//将新箱子添加到待添加箱子集合中
                 }
                 break;
         }
