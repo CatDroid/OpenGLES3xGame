@@ -82,8 +82,13 @@ class MySurfaceView extends GLSurfaceView {
 
         // 创建共用的立方体碰撞形状  参数是 长方形盒子 的 长宽高 的半边长  TexCube的质心在原点(长方体)
         boxShape = new BoxShape(new Vector3f(Constant.UNIT_SIZE, Constant.UNIT_SIZE, Constant.UNIT_SIZE));
+        android.util.Log.w("TOM", "box is 凸面形状 ? " +    boxShape.isConvex()
+                + " 凹面形状 " + boxShape.isConcave() + " shape is " + boxShape.hashCode() );
+
         // 创建共用的平面碰撞形状  法向量  平面上任意一点
         planeShape = new StaticPlaneShape(new Vector3f(0, 1, 0), 0);
+        android.util.Log.w("TOM", "Static Plane is 凸面形状 ? " +    boxShape.isConvex()
+                + " 凹面形状 " + boxShape.isConcave() );
     }
 
     private class SceneRenderer implements GLSurfaceView.Renderer {

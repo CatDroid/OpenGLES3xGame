@@ -55,6 +55,13 @@ public class TexCube
         tr = new TextureRect(halfSize); // 创建纹理矩形
         this.mProgram = mProgram;       // 保存着色器程序引用
         this.halfSize = halfSize;       // 保存箱子的半边长
+
+
+
+        CollisionShape shape = body.getCollisionShape(); // 跟之前设置进入的是同一个shape实例
+        android.util.Log.w("TOM", "BoxShape   is 复合形状 ? " +    shape.isCompound()
+                + " BoxShape is  多面体 " + shape.isPolyhedral() + " shape is " + shape.hashCode() );
+
     }
 
     // 绘制立方体箱子的方法
