@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 26
     buildToolsVersion "26.0.2"
 
     defaultConfig {
         applicationId "com.bn.Sample13_7"
         minSdkVersion 21
-        targetSdkVersion 21
+        targetSdkVersion 26
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_5
             targetCompatibility JavaVersion.VERSION_1_5
@@ -19,5 +19,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
+    }
+    compileOptions {
+        sourceCompatibility = 1.6
+        targetCompatibility = 1.6
     }
 }

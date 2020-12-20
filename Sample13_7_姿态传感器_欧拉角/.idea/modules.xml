@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/OpenGLES3xGame-Sample13_7_姿态传感器_欧拉角.iml" filepath="$PROJECT_DIR$/OpenGLES3xGame-Sample13_7_姿态传感器_欧拉角.iml" group="Sample13_7_姿态传感器_欧拉角" />
       <module fileurl="file://$PROJECT_DIR$/Sample13_7_姿态传感器_欧拉角.iml" filepath="$PROJECT_DIR$/Sample13_7_姿态传感器_欧拉角.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/Sample13_7_姿态传感器_欧拉角-app.iml" filepath="$PROJECT_DIR$/app/Sample13_7_姿态传感器_欧拉角-app.iml" group="Sample13_7_姿态传感器_欧拉角/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

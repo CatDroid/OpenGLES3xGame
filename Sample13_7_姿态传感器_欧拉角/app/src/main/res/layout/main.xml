@@ -28,4 +28,31 @@
 	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content"
 	    android:textSize="18dip"/>
+
+
+	<TextView
+		android:text="方向传感器"
+		android:gravity="center_horizontal"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:textSize="22dip"/>
+
+	<TextView
+		android:id="@+id/tOriYaw"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:textSize="18dip"/>
+
+	<TextView
+		android:id="@+id/tOriPicth"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:textSize="18dip"/>
+
+	<TextView
+		android:id="@+id/tOriRoll"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:textSize="18dip"/>
+
 </LinearLayout>
